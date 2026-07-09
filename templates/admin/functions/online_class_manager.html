@@ -1,0 +1,48 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>DIAMOND PUBLIC SCHOOL</title>
+        <link rel="icon" type="image/png" href="{{url_for('static',filename='images/SYMBOLS.png')}}">
+        <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <style>
+            table{text-align: center;border: 3px solid blue;}
+        </style>
+    </head>
+    <body><ul id="nav">
+    <li><a href="dashboard"><i class="fa fa-home"></i></a></li>
+    <img src="static/images/SYMBOLS.png" alt="SYMBOL">
+    <li>DIAMOND PUBLIC SCHOOL</li>
+  </ul>
+        <fieldset>
+            <fieldset>
+                <form action="{{url_for('online_class_manager')}}" method="post">
+                <h1>ONLINE CLASS MANAGER</h1>
+                <b>CHOOSE CLASS <label>*</label></b>
+                <select id="nor_opt" name="class" required>
+                    <option value="">---SELECT---</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                </select>
+                <input type="text" name="stage" value="st1" hidden>
+                <button type="submit" id="nor_btn">LOAD CLASS</button>
+                </form>
+            </fieldset>
+            <fieldset>
+                <code><b><i><u>NOTE:-</u></i></b> BEFORE FILLING THE TABLE. LOAD CLASS PLEASE!!!</code><br><br>
+                <form action="{{url_for('online_class_manager')}}" method="post">
+                <input type="text" name="stage" value="st2" hidden>
+                    {{code|safe}}
+                </form>
+            </fieldset>
+        </fieldset>
+<ul id="nav"><li>COPYRIGHT&copy; 2026 <code>ALL RIGHTS RESERVED.</code></li></ul>
+</body>
+</html>

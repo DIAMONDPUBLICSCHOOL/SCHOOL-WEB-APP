@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIAMOND PUBLIC SCHOOL</title>
+    <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" type="image/png" href="{{url_for('static',filename='images/SYMBOLS.png')}}">
+</head>
+<body><ul id="nav">
+    <li><a href="dashboard"><i class="fa fa-home"></i></a></li>
+    <img src="static/images/SYMBOLS.png" alt="SYMBOL">
+    <li>DIAMOND PUBLIC SCHOOL</li>
+  </ul>
+    <fieldset>
+        <h1>TEACHER TEST DATA</h1>
+        <fieldset>
+            <form action="{{url_for('student_test_data')}}" method="post">
+            <input type="text" name="stage" value="st1" hidden>
+            <b>SELECT CLASS <label>*</label></b>
+            <select name="c_class" id="nor_opt" required>
+                <option value="">---SELECT---</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+            </select>
+            <button id="nor_btn">LOAD TEST</button></form>
+            <form action="{{url_for('student_test_data')}}" method="post">
+            <input type="text" name="stage" value="st2" hidden>
+            {{opt_code|safe}}
+            </form>
+        </fieldset>
+        <fieldset><legend>TEST DATA</legend>
+            <form action="{{url_for('student_test_data')}}" method="post">
+            {{code|safe}}
+            </form>
+        </fieldset>
+    </fieldset>
+<ul id="nav"><li>COPYRIGHT&copy; 2026 <code>ALL RIGHTS RESERVED.</code></li></ul>
+</body>
+</html>

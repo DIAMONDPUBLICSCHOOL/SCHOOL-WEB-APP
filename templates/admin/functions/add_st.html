@@ -1,0 +1,63 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>DIAMOND PUBLIC SCHOOL</title>
+        <link rel="icon" type="image/png" href="{{url_for('static',filename='images/SYMBOLS.png')}}">
+        <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    </head>
+    <body><ul id="nav">
+    <li><a href="dashboard"><i class="fa fa-home"></i></a></li>
+    <img src="static/images/SYMBOLS.png" alt="SYMBOL">
+    <li>DIAMOND PUBLIC SCHOOL</li>
+  </ul>
+        <fieldset>
+            <form action="{{url_for('add_student')}}" method="post">
+                <h1>ADD STUDENT</h1>
+                <code><b><i>NOTE:-</i></b> This page makes only student IDs For Dashboard.</code><br>
+                <label><b>{{error}}</b></label>
+                <fieldset>
+                    <legend>STUDENT DETAILS</legend>
+                    <b>STUDENT NAME <label>*</label></b>
+                    <input type="text" id="nor_input" value="{{e1}}" name="st_name" placeholder="ENTER STUDENT NAME" required>
+                    <b>FATHER NAME <label>*</label></b>
+                    <input type="text" id="nor_input" value="{{e2}}" name="st_ft_name" placeholder="ENTER FATHER NAME" required>
+                    <b>MOTHER NAME <label>*</label></b>
+                    <input type="text" id="nor_input" value="{{e3}}" name="st_mt_name" placeholder="ENTER MOTHER NAME" required>
+                    <b>CLASS:- <label>*</label></b>
+                    <select id="nor_opt" name="st_class" required>
+                        <option value="">---SELECT---</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                    </select>
+                    <b>D.O.B. <label>*</label></b>
+                    <input type="date" id="nor_input" value="{{e5}}" name="st_dob" required>
+                    <b>ADDRESS <label>*</label></b>
+                    <input type="text" id="nor_input" value="{{e6}}" name="st_add" placeholder="ENTER ADDRESS" required>
+                    <b>MOBILE <label>*</label></b>
+                    <input type="number" id="nor_input" value="{{e7}}" name="st_mob" placeholder="ENTER MOBILE" max="9999999999" min="6000000000" required>
+                    <b>ADHAAR NO. <label>*</label></b>
+                    <input type="number" id="nor_input" value="{{e8}}" name="st_adhaar" placeholder="ENTER ADHAAR NUMBER" min="100000000000" max="999999999999" required>
+                    <b>PEN NO. <label>*</label></b>
+                    <input type="number" id="nor_input" value="{{e9}}" name="st_pen" placeholder="ENTER PEN NO." min="10000000000" max="99999999999" required>
+                </fieldset>
+                <fieldset>
+                    <legend>ID DETAILS</legend>
+                    <b>ENTER ADMISSION NO. [FOR DASHBOARD ID]<label>*</label></b>
+                    <input type="number" id="nor_input" value="{{e10}}" name="st_adm" placeholder="ENTER ADMISSION NO." required>
+                    <b>CREATE PASSWORD <label>*</label></b>
+                    <input type="password" id="nor_input" value="{{e11}}" name="st_pwd" placeholder="ENTER PASSWORD" required>
+                </fieldset>
+                <button type="submit" id="nor_btn"><b>SUBMIT</b></button>
+            </form>
+        </fieldset>
+<ul id="nav"><li>COPYRIGHT&copy; 2026 <code>ALL RIGHTS RESERVED.</code></li></ul>
+</body>
+</html>

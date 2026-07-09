@@ -1,0 +1,48 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>DIAMOND PUBLIC SCHOOL</title>
+        <link rel="icon" type="image/png" href="{{url_for('static',filename='images/SYMBOLS.png')}}">
+        <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    </head>
+    <body><ul id="nav">
+    <li><a href="dashboard"><i class="fa fa-home"></i></a></li>
+    <img src="{{url_for('static',filename='images/SYMBOLS.png')}}" alt="SYMBOL">
+    <li>DIAMOND PUBLIC SCHOOL</li>
+  </ul>
+        <fieldset>
+            <form action="{{url_for('test_data_storage')}}" method="post">
+            <h2>TEST ID:- {{test_id}}</h2>
+            <hr>
+            <b>CLASS:- <label>*</label></b>
+            <select id="nor_opt" name="test_class" required>
+                <option value="">---SELECT---</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+            </select>
+            <b>SUBJECT <label>*</label></b>
+            <input type="text" name="test_subject" id="nor_input" placeholder="ENTER SUBJECT" required>
+            <input type="text" name="test_id" value="{{test_id}}" hidden>
+            <input type="text" name="TEST_DATA_INPUT" value="{{code}}" hidden>
+            <b>DATE<label>*</label></b>
+            <input name="test_date" id="nor_input" type="date" required>
+            <b>TIME<label>*</label></b>
+            <input name="test_time" id="nor_input" type="time" required>
+            <b>TOTAL MARKS <label>*</label></b>
+            <input type="number" name="marks" id="nor_input" placeholder="ENTER TOTAL MARKS OF TEST" required>
+            <b><input type="checkbox" required>I CONFIRMMED ABOVE DETAILS.</b>
+            <button id="nor_btn">SUBMIT -></button>
+            </form>
+            <button onclick="alert('{{code}}')">VIEW TEST DATA<b>< ></b> </button>
+        </fieldset>
+<ul id="nav"><li>COPYRIGHT&copy; 2026 <code>ALL RIGHTS RESERVED.</code></li></ul>
+</body>
+</html>

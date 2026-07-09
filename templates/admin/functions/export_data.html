@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIAMOND PUBLIC SCHOOL</title>
+    <link rel="icon" type="image/png" href="{{url_for('static',filename='images/SYMBOLS.png')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body><ul id="nav">
+    <li><a href="dashboard"><i class="fa fa-home"></i></a></li>
+    <img src="static/images/SYMBOLS.png" alt="SYMBOL">
+    <li>DIAMOND PUBLIC SCHOOL</li>
+  </ul>
+    <fieldset>
+        <h1>EXPORT DATA</h1>
+        <fieldset><legend>EXPORT TYPE</legend>
+        <form action="{{url_for('export_data')}}" method="post">
+        <input name="btn_type" id="data_type" hidden>
+        <button type="submit" onclick="appendValue('1')" id="nor_btn">EXPORT STUDENTS DATA <b id="btn"><i class="fa fa-download"></i></b></button>
+        <button type="submit" onclick="appendValue('2')" id="nor_btn">EXPORT STUDENTS PASSWORDS <b id="btn"><i class="fa fa-download"></i></b></button>
+        <button type="submit" onclick="appendValue('3')" id="nor_btn">EXPORT TEACHERS DATA <b id="btn"><i class="fa fa-download"></i></b></button>
+        <button type="submit" onclick="appendValue('4')" id="nor_btn">EXPORT TEACHERS PASSWORDS <b id="btn"><i class="fa fa-download"></i></b></button></form>
+        <code><b><i><u>NOTE:-</u></i></b> ALL DATA SAVE IN .pdf <i class="fa fa-file"></i> FORMAT.</code>
+    </fieldset>
+    {{code|safe}}
+    </fieldset>
+    <script>
+        function appendValue(data){
+        let inputField = document.getElementById('data_type');
+            inputField.value = data;
+            }
+    </script>
+<ul id="nav"><li>COPYRIGHT&copy; 2026 <code>ALL RIGHTS RESERVED.</code></li></ul>
+</body>
+</html>

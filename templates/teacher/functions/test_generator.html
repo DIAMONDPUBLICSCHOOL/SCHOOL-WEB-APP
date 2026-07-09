@@ -1,0 +1,62 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>DIAMOND PUBLIC SCHOOL</title>
+        <link rel="icon" type="image/png" href="{{url_for('static',filename='images/SYMBOLS.png')}}">
+        <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    </head>
+    <body><ul id="nav">
+    <li><a href="dashboard"><i class="fa fa-home"></i></a></li>
+    <img src="static/images/SYMBOLS.png" alt="SYMBOL">
+    <li>DIAMOND PUBLIC SCHOOL</li>
+  </ul>
+        <fieldset>
+            <form action="{{url_for('test_del')}}" method="post">
+                <textarea name="TEST_DATA_INPUT" id="TEST_DATA_INPUT" rows="25" style="width:100%;resize:none;border: 2PX solid green;" required></textarea>
+                <input type="checkbox" required> THIS TEST IS PROPERLY CHECKED. <br>
+                <font style="color: red;"><b><i><u>NOTE:- </u></i></b> AVOID USE OF SPECIAL SYMBOLS ( ' ).</font>
+                <button id="nor_btn"><b>SUBMIT TEST -></b></button>
+            </form>
+            <div id="test_gen_div" style="float:left;">
+                <button id="N_Q" class="test_btn" onclick="appendValue2('<---NEXT_QUES--->')">NEXT QUESTION</button>
+                <button id="E_Q" class="test_btn" onclick="appendValue2('<---MARKS--->')">END QUESTION</button>
+            </div>
+                <div id="test_gen_div" style="float:right;">
+                <button id="I_F" class="test_btn" onclick="appendValue1('<---INPUT_FIELD--->')">INPUT FIELD</button>
+                <button id="OP" class="test_btn" onclick="appendValue1('<---OPTION--->')">OPTION</button>
+                <button id="L_F" class="test_btn" onclick="appendValue1('<---LONG_FIELD--->')">LONG FIELD</button>
+            </div>
+            <script>
+                function appendValue1(data){
+                    let inputField = document.getElementById('TEST_DATA_INPUT');
+                    inputField.value += " "+data;
+                    if (data!=='<---OPTION--->'){
+                    document.getElementById("OP").style.opacity = "0";
+                    }
+                    document.getElementById("I_F").style.opacity = "0";
+                    document.getElementById("L_F").style.opacity = "0";
+                    document.getElementByID("N_Q").style.opacity = "0";
+                    document.getElementByID("E_Q").style.opacity = "1";
+                }
+                function appendValue2(data){
+                    let inputField = document.getElementById('TEST_DATA_INPUT');
+                    inputField.value += " "+data;
+                    if (data!=="<---NEXT_QUES--->"){
+                        document.getElementByID("N_Q").style.opacity = "1";
+                        document.getElementByID("E_Q").style.opacity = "0";
+                    }
+                    else{
+                        document.getElementById("I_F").style.opacity = "1";
+                        document.getElementById("OP").style.opacity = "1";
+                        document.getElementById("L_F").style.opacity = "1";
+                        document.getElementByID("E_Q").style.opacity = "0";
+                        document.getElementByID("N_Q").style.opacity = "0";
+                    }
+                }
+            </script>
+        </fieldset>
+<ul id="nav"><li>COPYRIGHT&copy; 2026 <code>ALL RIGHTS RESERVED.</code></li></ul>
+</body>
+</html>

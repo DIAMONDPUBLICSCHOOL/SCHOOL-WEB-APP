@@ -1,0 +1,12 @@
+name: Keep Alive Awake
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+    - name: "DIAMOND PUBLIC SCHOOL"
+      run: curl https://dpsjalesar.onrender.com

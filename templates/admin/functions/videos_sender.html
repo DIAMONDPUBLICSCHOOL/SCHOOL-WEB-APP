@@ -1,0 +1,29 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>DIAMOND PUBLIC SCHOOL</title>
+        <link rel="icon" type="image/png" href="{{url_for('static',filename='images/SYMBOLS.png')}}">
+        <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    </head>
+    <body><ul id="nav">
+    <li><a href="dashboard"><i class="fa fa-home"></i></a></li>
+    <img src="static/images/SYMBOLS.png" alt="SYMBOL">
+    <li>DIAMOND PUBLIC SCHOOL</li>
+  </ul>
+        <fieldset>
+            <label><b>{{status|safe}}</b></label>
+            <form action="{{url_for('admin_video_sender')}}" method="post" enctype="multipart/form-data">
+            <h1>VIDEO SENDER</h1>
+            <b>CHOOSE VIDEO [MUST BE IN .mp4],[LESS THAN 10MB] <label>*</label></b>
+            <input type="file" name="video" id="nor_input" required>
+            <b>CAPTION</b>
+            <input type="text" value="{{caption}}" name="video_caption" id="nor_input" placeholder="ENTER CATION FOR VIDEO (OPTIONAL)">
+            <b><input type="checkbox" required>I CONFIRMMED ABOVE DETAILS.</b>
+            <button id="nor_btn">UPLOAD VIDEO <i class="fa fa-play"></i></button>
+            </form>
+        </fieldset>
+<ul id="nav"><li>COPYRIGHT&copy; 2026 <code>ALL RIGHTS RESERVED.</code></li></ul>
+</body>
+</html>

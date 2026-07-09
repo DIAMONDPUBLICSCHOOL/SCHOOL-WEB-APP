@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>DIAMOND PUBLIC SCHOOL</title>
+        <link rel="icon" type="image/png" href="{{url_for('static',filename='images/SYMBOLS.png')}}">
+        <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <style>
+            fieldset{text-align: center;}
+        </style>
+    </head>
+    <body>
+        <fieldset>
+            <img src="{{url_for('static',filename='images/SYMBOLS.png')}}" alt="SYMBOL" height="100px" width="100px">
+            <form action="{{url_for('welcome_page')}}" method="POST" id="login">
+            <input type="text" name="ip_address" id="ip-address" hidden>
+            <h1>DIAMOND PUBLIC SCHOOL</h1>
+            <h2>LOGIN PAGE</h2>
+            <label id="error">{{error|safe}}</label><br>
+            <b>CHOOSE LOGIN TYPE <label>*</label></b>
+            <select id="nor_opt" name="LOG_TYPE">
+                <option value="">--SELECT--</option>
+                <option value="STUDENT">STUDENT</option>
+                <option value="TEACHER">TEACHER</option>
+                <option value="ADMIN">ADMIN [FERNET MODE]</option>
+            </select>
+            <b>ENTER USERNAME <label>*</label></b>
+            <input type="number" id="nor_input" name="USER_NAME" placeholder="ENTER YOUR USERNAME">
+            <b>ENTER PASSWORD <label>*</label></b>
+            <input type="password" id="nor_input" name="PWD" placeholder="ENTER YOUR PASSWORD">
+        </form>
+        <button onclick="run()" type="submit" id="nor_btn"><b>LOGIN <i class="fa fa-sign-in"></i></b></button>
+        </fieldset>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    fetch("https://ipinfo.io/json") 
+        .then(response => response.json())
+        .then(data => {document.getElementById("ip-address").value = data.ip;})
+		.catch(error => {
+            document.getElementById('error').innerHTML = "IP ADDRESS IS NOT TRACKING";
+			document.getElementById("ip-address").value = "NA";
+        });
+});
+function run(){
+    if (document.getElementsByName('LOG_TYPE')[0].value !== '' && document.getElementsByName('USER_NAME')[0].value && document.getElementsByName("PWD")[0].value !== ''){
+        if (document.getElementById("ip-address").value !== "NA"){
+            document.getElementById('login').submit();
+        }
+    }
+    else{
+        document.getElementById('error').innerHTML = "FILL OUT ALL THE FIELDS!!!";
+    }
+}
+</script>
+<ul id="nav"><li>COPYRIGHT&copy; 2026 <code>ALL RIGHTS RESERVED.</code></li></ul></body>
+</html>

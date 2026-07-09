@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIAMOND PUBLIC SCHOOL</title>
+    <link rel="icon" type="image/png" href="{{url_for('static',filename='images/SYMBOLS.png')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body><ul id="nav">
+    <li><a href="dashboard"><i class="fa fa-home"></i></a></li>
+    <img src="static/images/SYMBOLS.png" alt="SYMBOL">
+    <li>DIAMOND PUBLIC SCHOOL</li>
+  </ul>
+  <fieldset>
+        <h2>SPECIAL LOG FUNCTION</h2>
+        <!-- <div class="warning">
+            <h1>WARNING !!!</h1>
+            <h2>BEFORE USING THIS FEATURE READ THESE INSTRUCTIONS CAREFULLY-</h2>
+            <h4><ul>
+                <li>THIS IS A SPECIAL FEATURE THAT ALLOW ADMIN TO TAKE SAMPLE, WHO APP WORK IN STUDENT/TEACHER SIDE.</li>
+                <li>AFTER USING IT YOU MAY BE RELOG AS ADMIN. [DUE TO SESSION CHANGE]</li>
+                <li>THIS FUNCTION CAN CRASH THE SYSTEM. BEFORE USE IT YOU HAVE TO OPEN (debug=True) , (port=2000) [DEVELOPMENT SETTINGS].</li>
+                <code><b><i><u>NOTE:- </u></i></b>FOR ANY CONFUSION CONTACT ON MOBILE NO:- +919897432207 or +918273998585</code>
+            </ul></h4><p style="float: right;">-: DEVELOPER TEAM</p>
+        </div> -->
+        <fieldset>
+            <legend><b>SPECIAL FUNCTION</b></legend>
+            <form action="{{url_for('special_log_function')}}" method="post">
+                <b><font style="color:red;">{{code|safe}}</font></b><br>
+                <b>CHOOSE USER TYPE <label>*</label></b>
+                <select name="type" id="nor_opt" required>
+                    <option value="">---SELECT---</option>
+                    <option value="STUDENT">STUDENT</option>
+                    <option value="TEACHER">TEACHER</option>
+                </select>
+                <b>ENTER USER ID <label>*</label></b>
+                <input type="number" name="ID" id="nor_input" placeholder="ENTER USER ID." required>
+                <button type="submit" id="nor_btn">LOGIN</button>
+            </form>
+        </fieldset>
+    </fieldset>
+<ul id="nav"><li>COPYRIGHT&copy; 2026 <code>ALL RIGHTS RESERVED.</code></li></ul>
+</body>
+</html>

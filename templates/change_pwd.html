@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIAMOND PUBLIC SCHOOL</title>
+    <link rel="icon" type="image/png" href="{{url_for('static',filename='images/SYMBOLS.png')}}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
+</head>
+<body><ul id="nav">
+    <li><a href="dashboard"><i class="fa fa-home"></i></a></li>
+    <img src="static/images/SYMBOLS.png" alt="SYMBOL">
+    <li>DIAMOND PUBLIC SCHOOL</li>
+  </ul>
+    <fieldset>
+        <h1>CHANGE PASSWORD</h1>
+        <fieldset>
+        <form action="{{url_for('change_pwd')}}" method="post" id="changepwd">
+            <b>ENTER OLD PASSWORD <label>*</label></b>
+            <input type="text" name="old_pwd" id="nor_input" placeholder="ENTER OLD PASSWORD">
+            <b>ENTER NEW PASSWORD <label>*</label></b>
+            <input type="text" name="new_pwd" id="nor_input" placeholder="ENTER NEW PASSWORD">
+            <b>CONFIRM PASSWORD <label>*</label></b>
+            <input type="text" name="con_pwd" id="nor_input" placeholder="ENTER CONFIRM PASSWORD">
+        </form>
+        <button id="nor_btn" onclick="check_pwd()">CHANGE PASSWORD</button>
+        <b><label id="error">{{error|safe}}</label></b>
+        </fieldset>
+    </fieldset>
+<script>
+    function check_pwd(){
+        const new_pwd = document.getElementsByName('new_pwd')[0].value;
+        const con_pwd = document.getElementsByName('con_pwd')[0].value;
+        const old_pwd = document.getElementsByName('old_pwd')[0].value;
+        if (new_pwd !== '' && con_pwd !== '' && old_pwd !== ''){
+            if (con_pwd === old_pwd){
+                document.getElementById('error').innerHTML = 'NEW PASSWORD SHOULD WE DIFFERENT.';
+            }
+            else{
+            if(new_pwd === con_pwd){document.getElementById('changepwd').submit()}
+            else{document.getElementById('error').innerHTML = 'NEW PASSWORD AND CONFIRM PASSWORD HAVE TO BE SAME.';}
+            }
+        }
+        else{
+            document.getElementById('error').innerHTML = 'PLEASE FILL OUT ALL FIELDS.';
+            }
+        }
+</script>
+<ul id="nav"><li>COPYRIGHT&copy; 2026 <code>ALL RIGHTS RESERVED.</code></li></ul>
+</body>
+</html>

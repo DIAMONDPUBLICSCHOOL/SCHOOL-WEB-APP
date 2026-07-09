@@ -1,0 +1,140 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>DIAMOND PUBLIC SCHOOL</title>
+        <link rel="icon" type="image/png" href="{{url_for('static',filename='images/SYMBOLS.png')}}">
+        <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+    input{width: 100%;padding: 12px 20px;margin: 8px 0;display: inline-block;border: 1px solid #ccc;box-sizing: border-box;}
+    button {background-color: #04AA6D;color: white;padding: 14px 20px;margin: 8px 0;border: none;cursor: pointer;width: 100%;}
+    button:hover {opacity: 0.8;}
+    .cancelbtn {width: auto;padding: 10px 18px;background-color: #f44336;}
+    .imgcontainer {text-align: center;margin: 24px 0 12px 0;position: relative;}
+    .container {padding: 16px;}
+    span.psw {float: right;padding-top: 16px;}
+    .modal {display: none;position: fixed;z-index: 1;left: 0;top: 0;width: 100%;height: 100%;overflow: auto;background-color: rgb(0,0,0);background-color: rgba(0,0,0,0.4);padding-top: 60px;}
+    .modal-content {background-color: #fefefe;margin: 5% auto 15% auto;border: 1px solid #888;width: 80%;}
+    .close {position: absolute;right: 25px;top: 0;color: #000;font-size: 35px;font-weight: bold;}
+    .close:hover,
+    .close:focus {color: red;cursor: pointer;}
+    .animate {-webkit-animation: animatezoom 0.6s;animation: animatezoom 0.6s}
+    @-webkit-keyframes animatezoom {
+    from {-webkit-transform: scale(0)} 
+    to {-webkit-transform: scale(1)}
+    }
+    @keyframes animatezoom {
+    from {transform: scale(0)} 
+    to {transform: scale(1)}
+    }
+    @media screen and (max-width: 300px) {
+    span.psw {
+        display: block;
+        float: none;
+    }
+    .cancelbtn {
+        width: 100%;
+        }
+    }
+    </style>
+    </head>
+    <body>
+    <ul id="nav">
+    <li><a href="dashboard"><i class="fa fa-home"></i></a></li>
+    <img src="static/images/SYMBOLS.png" alt="SYMBOL">
+    <li>DIAMOND PUBLIC SCHOOL</li>
+  </ul>
+        <fieldset>
+            <fieldset>
+                <h1>STUDENT DASHBOARD</h1>
+                <div><code style="float: left;width: 49.8%;"><b><i><u>NOTE:-</u></i></b> ANY ACTION MADE HERE IS INREVESIVLE. WE CAREFULL!!!</code>
+                <a href="{{url_for('add_student')}}" style="float: right;width: 49.8%;"><button id="nor_btn"><b>+</b> ADD STUDENT</button></a></div>
+            </fieldset>
+                {{code|safe}}
+        </fieldset>
+<div id="edit_container" class="modal">
+  <div class="modal-content animate">
+    <div class="imgcontainer">
+      <span onclick="hide('edit_container')" class="close">&times;</span>
+    </div>
+    <div class="container">
+      <form action="{{url_for('student_manual')}}" method="post">
+      <h2>EDIT STUDENT</h2>
+      <input type="text" name="action_type" value="EDIT" style="display: none;">
+      <input type="number" name="st_id" id="st_id" style="display: none;">
+      <b>STUDENT NAME <label>*</label></b>
+      <input type="text" placeholder="ENTER STUDENT NAME" name="st_name" id="st_name" required>
+      <b>FATHER NAME <label>*</label></b>
+      <input type="text" placeholder="ENTER FATHER NAME" name="st_father" id="st_father" required>
+      <b>MOTHER NAME <label>*</label></b>
+      <input type="text" placeholder="ENTER MOTHER NAME" name="st_mother" id="st_mother" required>
+      <b>D.O.B. <label>*</label></b>
+      <input type="date" name="st_dob" id="st_dob" required>
+      <b>MOBILE <label>*</label></b>
+      <input type="number" id="st_mob" name="st_mob" placeholder="ENTER MOBILE NO." required>
+      <b>ADDRESS <label>*</label></b>
+      <input type="text" id="st_add" name="st_add" placeholder="ENTER ADDRESS" required>
+      <button type="submit" id="nor_btn">SAVE STUDENT</button>
+    </div></form>
+    <div class="container" style="background-color:#f1f1f1">
+      <button type="button" onclick="hide('edit_container')" class="cancelbtn">Cancel</button>
+    </div>
+  </div>
+</div>
+<div id="del_container" class="modal">
+  <div class="modal-content animate">
+    <div class="imgcontainer">
+      <span onclick="hide('del_container')" class="close" title="Close Modal">&times;</span>
+    </div>
+    <div class="container">
+      <form action="{{url_for('student_manual')}}" method="post">
+      <input type="text" name="action_type" value="DELETE" style="display: none;">
+      <input type="number" name="dest_id" id="dest_id" style="display: none;">
+      <table border="3" style="border: rgb(0, 0, 0);">
+      <caption><h2>DELETE STUDENT</h2></caption>
+      <tr><th style="width: 50%;"><b>STUDENT'S ID :- </th><th style="width: 50%;"><label name="delst_id" id="delst_id"></label></b><br></th></tr>
+      <tr><th style="width: 50%;"><b>STUDENT'S NAME :- </th><th style="width: 50%;"><label name="delst_name" id="delst_name"></label></b><br></th></tr>
+      <tr><th style="width: 50%;"><b>STUDENT'S FATHER :- </th><th style="width: 50%;"><label name="delst_father" id="delst_father"></label></b><br></th></tr>
+      <tr><th style="width: 50%;"><b>STUDENT'S MOTHER :- </th><th style="width: 50%;"><label name="delst_mother" id="delst_mother"></label></b><br></th></tr>
+      <tr><th style="width: 50%;"><b>STUDENT'S D.O.B. :- </th><th style="width: 50%;"><label name="delst_dob" id="delst_dob"></label></b><br></th></tr>
+      <tr><th style="width: 50%;"><b>STUDENT'S MOBILE :- </th><th style="width: 50%;"><label name="delst_mob" id="delst_mob"></label></b><br></th></tr>
+      <tr><th style="width: 50%;"><b>STUDENT'S ADDRESS :- </th><th style="width: 50%;"><label name="delst_add" id="delst_add"></label></b><br></th></tr>
+    </table>
+      <button type="submit" id="nor_btn">DELETE STUDENT</button></form>
+    </div>
+    <div class="container" style="background-color:#f1f1f1">
+      <button type="button" onclick="hide('del_container')" class="cancelbtn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+    function run1(st_id_,st_name_,st_father_,st_mother_,st_dob_,st_mob_,st_add_){
+        document.getElementById('edit_container').style.display='block';
+        document.getElementById('st_id').value = st_id_
+        document.getElementById('st_name').value = st_name_
+        document.getElementById('st_father').value = st_father_
+        document.getElementById('st_mother').value = st_mother_
+        document.getElementById('st_dob').value = st_dob_
+        document.getElementById('st_mob').value = st_mob_
+        document.getElementById('st_add').value = st_add_
+    }
+    function run2(st_id_,st_name_,st_father_,st_mother_,st_dob_,st_mob_,st_add_){
+        document.getElementById('del_container').style.display='block';
+        document.getElementById('dest_id').value = st_id_
+        document.getElementById('delst_id').innerHTML = st_id_
+        document.getElementById('delst_name').innerHTML = st_name_
+        document.getElementById('delst_father').innerHTML = st_father_
+        document.getElementById('delst_mother').innerHTML = st_mother_
+        document.getElementById('delst_dob').innerHTML = st_dob_
+        document.getElementById('delst_mob').innerHTML = st_mob_
+        document.getElementById('delst_add').innerHTML = st_add_
+    }
+    function hide(item){
+        document.getElementById(item).style.display='none';
+    }
+</script>
+<ul id="nav"><li>COPYRIGHT&copy; 2026 <code>ALL RIGHTS RESERVED.</code></li></ul>
+</body>
+</html>

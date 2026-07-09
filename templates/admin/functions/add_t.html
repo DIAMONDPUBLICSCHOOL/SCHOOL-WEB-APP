@@ -1,0 +1,49 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>DIAMOND PUBLIC SCHOOL</title>
+        <link rel="icon" type="image/png" href="{{url_for('static',filename='images/SYMBOLS.png')}}">
+        <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    </head>
+    <body><ul id="nav">
+    <li><a href="dashboard"><i class="fa fa-home"></i></a></li>
+    <img src="static/images/SYMBOLS.png" alt="SYMBOL">
+    <li>DIAMOND PUBLIC SCHOOL</li>
+  </ul>
+        <fieldset>
+            <form action="{{url_for('add_teacher')}}" method="post">
+            <h1>ADD TEACHER</h1>
+            <code><b><i>NOTE:-</i></b> This page makes only teachers IDs For Dashboard.</code><br>
+            <label><b>{{error}}</b></label>
+            <fieldset>
+                <legend>TEACHER'S DETAILS</legend>
+                <b>TEACHER NAME <label>*</label></b>
+                <input type="text" id="nor_input" value="{{e1}}" name="T_name" placeholder="ENTER TEACHER NAME" required>
+                <b>FATHER NAME <label>*</label></b>
+                <input type="text" id="nor_input" value="{{e2}}" name="T_ft_name" placeholder="ENTER TEACHER's FATHER NAME" required>
+                <b>MOTHER NAME <label>*</label></b>
+                <input type="text" id="nor_input" value="{{e3}}" name="T_mt_name" placeholder="ENTER TEACHER's MOTHER NAME" required>
+                <b>ADDRESS <label>*</label></b>
+                <input type="text" id="nor_input" value="{{e4}}" name="T_add" placeholder="ENTER ADDRESS" required>
+                <b>D.O.B. </b>
+                <input type="date" id="nor_input" value="{{e5}}"name="T_dob" >
+                <b>MOBILE <label>*</label></b>
+                <input type="number" id="nor_input" value="{{e9}}" placeholder="ENTER MOBILE NO." name="T_mob" max="9999999999" min="6000000000" required>
+                <b>ADHAAR NO.</b>
+                <input type="number" id="nor_input" value="{{e6}}" name="ft_adhaar" min="100000000000" max="999999999999" placeholder="ENTER ADHAAR NUMBER">
+            </fieldset>
+            <fieldset>
+                <legend>IDs DETAILS</legend>
+                <b>ENTER ID<label>*</label></b>
+                <input type="number" id="nor_input" value="{{e7}}" name="T_ID" placeholder="ENTER ID NO." required>
+                <b>CREATE PASSWORD <label>*</label></b>
+                <input type="password" id="nor_input" value="{{e8}}" name="T_pwd" placeholder="ENTER PASSWORD" required>
+            </fieldset>
+            <button type="submit" id="nor_btn"><b>SUBMIT</b></button>
+            </form>
+        </fieldset>
+<ul id="nav"><li>COPYRIGHT&copy; 2026 <code>ALL RIGHTS RESERVED.</code></li></ul>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" href="{{url_for('static',filename='images/SYMBOLS.png')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>--COMMAND BOX--</title>
+</head>
+<body><ul id="nav">
+    <li><a href="dashboard"><i class="fa fa-home"></i></a></li>
+    <img src="static/images/SYMBOLS.png" alt="SYMBOL">
+    <li>DIAMOND PUBLIC SCHOOL</li>
+  </ul>
+    <fieldset>
+        <h1>COMMAND BOX</h1>
+        <form action="{{url_for('command_box')}}" method="post">
+            <font style="color: red;">{{command|safe}}</font>
+            <b>ENTER COMMAND <label>*</label></b>
+            <textarea style="border: 3px solid red;" type="text" name="user_command" id="nor_input" placeholder="ENTER COMMAND [EXAMPLE: ls, pwd, whoami, date, cal, echo, uname, etc.]"></textarea>
+            <button id="nor_btn">EXECUTE COMMAND</button>
+        </form>
+        <b>OUTPUT:</b>
+        <b>RESULT</b>
+        <textarea id="nor_input" style="height: 200px;" readonly>{{code}}</textarea>
+        <b>ERROR</b>
+        <textarea id="nor_input" style="height: 200px;" readonly>{{error}}</textarea>
+    </fieldset>
+<ul id="nav"><li>COPYRIGHT&copy; 2026 <code>ALL RIGHTS RESERVED.</code></li></ul>
+</body>
+</html>

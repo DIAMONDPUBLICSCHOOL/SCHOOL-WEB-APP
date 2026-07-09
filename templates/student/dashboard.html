@@ -1,0 +1,31 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>DIAMOND PUBLIC SCHOOL</title>
+        <link rel="icon" type="image/png" href="{{url_for('static',filename='images/SYMBOLS.png')}}">
+        <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <style>
+b{font-size:64;}</style>
+    </head>
+    <body style="text-align: center;">
+<ul id="nav">
+    <li><a href="dashboard"><i class="fa fa-home"></i></a></li>
+    <img src="static/images/SYMBOLS.png" alt="SYMBOL">
+    <li>DIAMOND PUBLIC SCHOOL</li>
+  </ul>
+<div id="user_info"><img src="{{url_for('static',filename='images/user.png')}}" alt="USER"><br><br>{{info|safe}}
+<br><a href="/complains"><button id="comp">REPORT COMPLAIN <i class="fa fa-exclamation-triangle alert-icon"></i></button></a><a href="/change_pwd"><button id="pwd">CHANGE PASSWORD <i class="fa fa-key"></i></button></a><a href="{{url_for('logout')}}"><button id="log">LOGOUT <i class="fa fa-sign-out"></i></button></a>
+</div>
+<a href="{{url_for('student_online_classes')}}"><button id="dash_btn"><b><i class="fa fa-tv"></i></b><br><br>ONLINE CLASSES</button></a>
+<a href="{{url_for('noti_view')}}"><button id="dash_btn"><b><i class="fa fa-bell"></i></b><br><br>NOTIFICATION</button></a>
+<a href="{{url_for('student_class_test')}}"><button id="dash_btn"><b><i class="fa fa-user"></i></b><br><br>CLASS TEST</button></a>
+<a href="{{url_for('st_attandance')}}"><button id="dash_btn"><b><i class="fa fa-list"></i></b><br><br>ATTANDANCE</button></a>
+<a href="{{url_for('homework_view')}}"><button id="dash_btn"><b><i class="fa fa-book"></i></b><br><br>HOMEWORK</button></a>
+<a href="{{url_for('report_card')}}"><button id="dash_btn"><b><i class="fa fa-envelope"></i></b><br><br>REPORT CARD</button></a>
+<a href="{{url_for('videos')}}"><button id="dash_btn"><b><i class="fa fa-address-card-o"></i></b><br><br>VIDEOES</button></a>
+<a href="{{url_for('time_table')}}"><button id="dash_btn"><b><i class="fa fa-calendar"></i></b><br><br>TIME TABLE</button></a>
+<ul id="nav"><li>COPYRIGHT&copy; 2026 <code>ALL RIGHTS RESERVED.</code></li></ul>
+</body>
+</html>

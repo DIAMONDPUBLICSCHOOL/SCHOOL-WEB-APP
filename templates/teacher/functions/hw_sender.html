@@ -1,0 +1,45 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>DIAMOND PUBLIC SCHOOL</title>
+        <link rel="icon" type="image/png" href="{{url_for('static',filename='images/SYMBOLS.png')}}">
+        <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    </head>
+    <body><ul id="nav">
+    <li><a href="dashboard"><i class="fa fa-home"></i></a></li>
+    <img src="static/images/SYMBOLS.png" alt="SYMBOL">
+    <li>DIAMOND PUBLIC SCHOOL</li>
+  </ul>
+        <fieldset>
+            <h1>HOMEWORK SENDER</h1>
+            <form action="{{url_for('teacher_hw_sender')}}" method="post" enctype="multipart/form-data">
+            <b>CLASS:- <label>*</label></b>
+            <select id="nor_opt" name="hw_class" required>
+                <option value="">---SELECT---</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+            </select>
+            <b>HOMEWORK <label>*</label></b>
+            <input type="text" id="nor_input" name="hw_text" placeholder="ENTER YOUR HOMEWORK" required>
+            <b>FILE (in .pdf)</b>
+            <input type="file" id="nor_input" name="hw_file">
+            <b>DATE<label>*</label></b>
+            <input name="hw_date" id="nor_input" type="date" required>
+            <b>TIME<label>*</label></b>
+            <input name="hw_time" id="nor_input" type="time" required>
+            <b><input type="checkbox" name="hw_send_method" disabled> WHETER STUDENT CAN SEND HOMEWORK. [CURRENTLY DISALED]</b><br>
+            <b><input type="checkbox" required>I CONFIRMMED ABOVE DETAILS.</b>
+            <button id="nor_btn">UPLOAD -></button>
+            </form>
+        </fieldset>
+<ul id="nav"><li>COPYRIGHT&copy; 2026 <code>ALL RIGHTS RESERVED.</code></li></ul>
+</body>
+</html>

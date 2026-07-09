@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIAMOND PUBLIC SCHOOL</title>
+    <link rel="icon" type="image/png" href="{{url_for('static',filename='images/SYMBOLS.png')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body><ul id="nav">
+    <li><a href="dashboard"><i class="fa fa-home"></i></a></li>
+    <img src="static/images/SYMBOLS.png" alt="SYMBOL">
+    <li>DIAMOND PUBLIC SCHOOL</li></ul>
+    <fieldset>
+        <h1>BLOCK / UNBLOCK USER PAGE</h1>
+        <label>{{code|safe}}</label>
+        <fieldset>
+            <form action="{{url_for('block_user')}}" method="post">
+            <b>OPERATION TYPE <label>*</label></b>
+            <select name="action_type" id="nor_opt">
+                <option value="">---SELECT---</option>
+                <option value="BLOCK">BLOCK</option>
+                <option value="UNBLOCK">UNBLOCK</option>
+            </select>
+            <b>CHOOSE USER TYPE <label>*</label></b>
+            <select name="user_type" id="nor_opt" required>
+                <option value="">---SELECT---</option>
+                <option value="STUDENT">STUDENT</option>
+                <option value="TEACHER">TEACHER</option>
+            </select>
+            <b>ENTER ID <label>*</label></b>
+            <input type="number" name="ID" id="nor_input" min="0" placeholder="ENTER ID" required>
+            <button id="nor_btn">EXECUTE</button></form>
+        </fieldset>
+    </fieldset>
+<ul id="nav"><li>COPYRIGHT&copy; 2026 <code>ALL RIGHTS RESERVED.</code></li></ul>
+</body>
+</html>
