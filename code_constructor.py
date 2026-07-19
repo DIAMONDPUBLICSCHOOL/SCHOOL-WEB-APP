@@ -308,6 +308,7 @@ class Online_classes(content_creator):
     
     def student_code_online(self,st_class,day):
         html_text = ''
+        day = 'MONDAY'####################
         if day.upper() == "SUNDAY":
             return "<h2>TODAY IS SUNDAY !!!</h2>"
         conn,cursor = funt.Data().data_base_function()

@@ -42,7 +42,7 @@
 </head>
 <body>
 <ul id="nav">
-    <li><a href="dashboard"><i class="fa fa-home"></i></a></li>
+    <li><button></button></li>
     <img src="static/images/SYMBOLS.png" alt="SYMBOL">
     <li>DIAMOND PUBLIC SCHOOL</li>
   </ul>
@@ -86,9 +86,9 @@
     <div class="container">
       <form action="{{url_for('command_box')}}" method="post">
       <h2>COMMAND BOX</h2>
-       <b>ENTER UNIVERSAL ADMIN PIN <label>*</label></b>
-       <input type="number" name="pin" id="pin" placeholder="ENTER UNIVERSAL ADMIN PIN" required>
-      <button type="submit" id="nor_btn">VERIFY [UNIVERSAL ADMIN] PIN</button>
+       <b style="color:#000">ENTER UNIVERSAL ADMIN PASSWORD <label>*</label></b>
+       <input type="password" name="pin" placeholder="ENTER UNIVERSAL ADMIN PASSWORD" required>
+      <button type="submit" id="nor_btn">VERIFY [UNIVERSAL ADMIN] PASSWORD</button>
     </div></form>
     <div class="container" style="background-color:#f1f1f1">
       <button type="button" onclick="hide()" class="cancelbtn">Cancel</button>

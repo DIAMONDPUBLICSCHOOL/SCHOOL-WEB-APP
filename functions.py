@@ -1,4 +1,4 @@
-import sqlite3,my_cryptography,datetime,json,subprocess
+import sqlite3,my_cryptography,datetime,json,subprocess,os
 from reportlab.lib.pagesizes import A4,landscape
 from reportlab.platypus import SimpleDocTemplate
 from reportlab.platypus import Table, TableStyle, Paragraph
@@ -24,20 +24,23 @@ class Functions(Data):
     def __init__(self):
         super().__init__()
     
+    def system_checker(self):
+        li = ['data.db','functions.py','app.py','code_constructor.py','templates','static','content_creator.py','my_cryptography.py']
+        for item in li:
+            if not os.path.exists(item):
+                exit()
+                return False
+        
     def command_box(self,command):
         with open('output.py', 'w') as f:
             f.write(command)
         result = subprocess.run(['python','output.py'],capture_output=True,text=True)
         output = result.stdout
         error = result.stderr
-        with open('com_history.json','r') as f:
-            li = json.load(f)
-        li_list = [int(num) for num in li.keys() if num.isdigit()]
-        num = max(li_list) if li_list else 0
-        li[num+1] = {"command": command, "output": output, "error": error}
-        open('output.py', 'w').close()
-        with open('com_history.json', 'w') as f:
-            json.dump(li,f,indent=4)
+        conn,cursor = self.data_base_function()
+        cursor.execute('INSERT INTO com_history(command, output, error) VALUES(?,?,?)',(command, output, error))
+        self.data_base_function(conn)
+        self.system_checker()
         return output, error
 
     def date_show_mon(self,d):

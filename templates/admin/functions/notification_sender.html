@@ -8,7 +8,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     </head>
 <body><ul id="nav">
-    <li><a href="dashboard"><i class="fa fa-home"></i></a></li>
+    <li><button type="button" onclick="history.back()">⬅️</button></li>
     <img src="static/images/SYMBOLS.png" alt="SYMBOL">
     <li>DIAMOND PUBLIC SCHOOL</li>
   </ul>
@@ -16,15 +16,15 @@
             <form action="{{url_for('noti_sender')}}" method="post">
             <h1>NOTIFICATION SENDER</h1>
             <b>ENTER NOTIFICATION<label>*</label></b>
-            <input name="noti" id="noti" id="nor_input" type="text" placeholder="ENTER NOTIFICATION" required>
+            <input name="noti" id="nor_input" type="text" placeholder="ENTER NOTIFICATION" required>
             <button id="nor_btn"><b>SEND <i class="fa fa-bell"></i></b></button>
             </form>
         </fieldset>
         <b><i><u>NOTE:- </u></i> FOR ENTER ANY LINE IN NOTIFICATION YOU HAVE TO WRITE "<font style="color: red;"> <---ENTER---> </font>" OR CLICK THIS BUTTON.</b><br>
-        <button onclick="enter()" style="color: white;background: red;border: 2px solid grey;"><b>ADD <font style="color: rgb(98, 0, 255);"> <---ENTER---> </font> ELEMENT</b></button>
+        <button onclick="enter()" style="margin:10px 10px;padding: 12px 20px;color: white;background: red;border: 2px solid grey;"><b>ADD <font style="color: rgb(98, 0, 255);"> <---ENTER---> </font> ELEMENT</b></button>
 <ul id="nav"><li>COPYRIGHT&copy; 2026 <code>ALL RIGHTS RESERVED.</code></li></ul>
 <script>
-function enter(){document.getElementById('noti').value += ' <---ENTER---> '}
+function enter(){document.getElementById('nor_input').value += ' <---ENTER---> '}
 </script>
 </body>
 </html>

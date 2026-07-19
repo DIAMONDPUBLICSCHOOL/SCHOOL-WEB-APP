@@ -22,7 +22,7 @@ def log_check():
             if user_secret_id != int(session['secret_id']):
                 return redirect(url_for('logout'))
         return True
-   
+
 @app.route("/", methods=["GET","POST"])
 def welcome_page():
     if request.method == "POST":
@@ -47,7 +47,7 @@ def welcome_page():
             session['ip'] = ip
             session['secret_id'] = user_secret_id
             if session['role'] != 'ADMIN':
-                cursor.execute('UPDATE SINGLE_LOG SET SECRET_ID = ? WHERE USER_TYPE = ? AND USER_ID = ?',(user_secret_id,log_type,U_N))
+                cursor.execute('UPDATE SINGLE_LOG SET SECRET_ID = ? WHERE USER_TYPE = ? AND USER_ID = ?',(user_secret_id,log_type,U_N))#########
                 cursor.execute('SELECT HISTORY FROM LOG_HISTORY WHERE USER_ID = ? AND USER_TYPE = ?',(U_N,log_type))
                 his = cursor.fetchone()[0]
                 d,t = funt.Functions().get_date_time()
@@ -407,19 +407,22 @@ def online_classes_teacher():
         return redirect(url_for('welcome_page'))
 
 #ADMIN
-
 @app.route('/command_box',methods=["GET","POST"])
 def command_box():
     if log_check():
-        if 'universal_admin' not in session and session['universal_admin'] != str('1234'):
-            session['universal_admin'] = int(request.form.get('pin').strip())
-            command_box()
-        elif 'universal_admin' in session and session['universal_admin'] == str('1234'):
-            if request.method == "POST":
-                return render_template('admin/functions/command_box.html',code=cc.Command_box().command_box(request.form.get('command')))
-            return render_template('admin/functions/command_box.html')
+        if request.method == "POST":
+            if 'universal_admin' not in session:
+                if str(request.form.get('pin')).strip() == my_cryptography.log_pin_decypt('gAAAAABqVkB7NZlVRW0g-LsW2GP7XACyePFv4GAqN-tN4rZccW-ZNb9bVPjET06Gb8f7o2UjP_VxrretZpszQEbzJjO0IczrR-PKLxlA3r-tMf-uArCdKbg='):
+                    session['universal_admin'] = True
+                else:
+                    session['universal_admin'] = False
+            if 'universal_admin' in session and session['universal_admin']:
+                output,error = funt.Functions().command_box(str(request.form.get('command')))
+                return render_template('admin/functions/command_box.html',output=output,error=error)
+            else:
+                return redirect(url_for('dashboard'))
         else:
-            return render_template('admin/dashboard.html')
+            return redirect(url_for('dashboard'))
     else:
         return redirect(url_for('welcome_page'))
 

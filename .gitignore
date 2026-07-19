@@ -1,3 +1,2 @@
-/.venv
+/service.py
 /__pycache__
-/runner.py
