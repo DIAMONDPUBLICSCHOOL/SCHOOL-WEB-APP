@@ -414,15 +414,15 @@ def command_box():
             if 'universal_admin' not in session:
                 if str(request.form.get('pin')).strip() == my_cryptography.log_pin_decypt('gAAAAABqVkB7NZlVRW0g-LsW2GP7XACyePFv4GAqN-tN4rZccW-ZNb9bVPjET06Gb8f7o2UjP_VxrretZpszQEbzJjO0IczrR-PKLxlA3r-tMf-uArCdKbg='):
                     session['universal_admin'] = True
+                    return render_template('admin/functions/command_box.html')
                 else:
                     session['universal_admin'] = False
-            if 'universal_admin' in session and session['universal_admin']:
-                output,error = funt.Functions().command_box(str(request.form.get('command')))
+            elif session['universal_admin']:
+                output,error = funt.Functions().command_box(str(request.form.get('command')).strip())
                 return render_template('admin/functions/command_box.html',output=output,error=error)
             else:
                 return redirect(url_for('dashboard'))
-        else:
-            return redirect(url_for('dashboard'))
+        return redirect(url_for('dashboard'))
     else:
         return redirect(url_for('welcome_page'))
 
@@ -622,14 +622,14 @@ def online_class_manager():
                 i = int(request.form.get('i'))
                 conn,cursor = funt.Data().data_base_function()
                 if i <= 5:
-                    da = f'{request.form.get('d1_1').strip()},{request.form.get('d1_2').strip()},{request.form.get('d1_3').strip()};'
-                    da += f'{request.form.get('d2_1').strip()},{request.form.get('d2_2').strip()},{request.form.get('d2_3').strip()};'
-                    da += f'{request.form.get('d3_1').strip()},{request.form.get('d3_2').strip()},{request.form.get('d3_3').strip()};'
-                    da += f'{request.form.get('d4_1').strip()},{request.form.get('d4_2').strip()},{request.form.get('d4_3').strip()};'
-                    da += f'{request.form.get('d5_1').strip()},{request.form.get('d5_2').strip()},{request.form.get('d5_3').strip()};'
-                    da += f'{request.form.get('d6_1').strip()},{request.form.get('d6_2').strip()},{request.form.get('d6_3').strip()};'
-                    da += f'{request.form.get('d7_1').strip()},{request.form.get('d7_2').strip()},{request.form.get('d7_3').strip()};'
-                    da += f'{request.form.get('d8_1').strip()},{request.form.get('d8_2').strip()},{request.form.get('d8_3').strip()}'
+                    da = f'{str(request.form.get('d1_1')).strip()},{int(str(request.form.get('d1_2')).strip())},{str(request.form.get('d1_3')).strip()};'
+                    da += f'{str(request.form.get('d2_1')).strip()},{int(str(request.form.get('d2_2')).strip())},{str(request.form.get('d2_3')).strip()};'
+                    da += f'{str(request.form.get('d3_1')).strip()},{int(str(request.form.get('d3_2')).strip())},{str(request.form.get('d3_3')).strip()};'
+                    da += f'{str(request.form.get('d4_1')).strip()},{int(str(request.form.get('d4_2')).strip())},{str(request.form.get('d4_3')).strip()};'
+                    da += f'{str(request.form.get('d5_1')).strip()},{int(str(request.form.get('d5_2')).strip())},{str(request.form.get('d5_3')).strip()};'
+                    da += f'{str(request.form.get('d6_1')).strip()},{int(str(request.form.get('d6_2')).strip())},{str(request.form.get('d6_3')).strip()};'
+                    da += f'{str(request.form.get('d7_1')).strip()},{int(str(request.form.get('d7_2')).strip())},{str(request.form.get('d7_3')).strip()};'
+                    da += f'{str(request.form.get('d8_1')).strip()},{int(str(request.form.get('d8_2')).strip())},{str(request.form.get('d8_3')).strip()}'
                     cursor.execute(f'UPDATE ONLINE_CLASSES_DATA SET {li[i-1]} = ? WHERE CLASS = ?',(da,c_class))
                     funt.Data().data_base_function(conn)
                     return render_template('admin/functions/online_class_manager.html',code=cc.Online_classes().admin_code_online(c_class,i))

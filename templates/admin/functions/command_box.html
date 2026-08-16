@@ -16,7 +16,6 @@
     <fieldset>
         <h1>COMMAND BOX</h1>
         <form action="{{url_for('command_box')}}" method="post">
-            <font style="color: red;">{{command|safe}}</font>
             <b>ENTER COMMAND <label>*</label></b>
             <textarea style="border: 3px solid red;" type="text" name="command" id="nor_input" placeholder="ENTER COMMAND [EXAMPLE: ls, pwd, whoami, date, cal, echo, uname, etc.]"></textarea>
             <button id="nor_btn">EXECUTE COMMAND</button>
