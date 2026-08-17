@@ -13,9 +13,11 @@ class Data:
         if conn != None:
             conn.commit()
             conn.close()
-        conn = sqlite3.connect('data.db')
-        cursor = conn.cursor()
-        return conn,cursor
+            return
+        else:
+            conn = sqlite3.connect('data.db')
+            cursor = conn.cursor()
+            return conn,cursor
     def class_fees(self,st_class):
         fees_dic = {"1":3000,"2":3300,"3":3900,"4":4200,"5":4500,"6":4800,"7":5100,"8":5400}
         return int(fees_dic[str(st_class)])
@@ -95,29 +97,12 @@ class Functions(Data):
     def crt_pwd(self,PWD):
         return crypt.log_pin_encrypt(PWD)
     
-    def change_pwd(self,user_id,user_type,pwd,admin_entity=False,old_pwd=None):
-        conn,cursor = self.data_base_function()
-        if admin_entity is not False: 
+    def change_pwd(self,user_id,user_type,pwd):
+            conn,cursor = self.data_base_function()
             en_pwd = my_cryptography.log_pin_encrypt(pwd)
             cursor.execute('UPDATE PASSWORDS SET PASSWORD = ? WHERE LOG_TYPE = ? AND USER_ID = ?',(en_pwd,user_type,user_id))
             self.data_base_function(conn)
             return True
-        else:
-            if old_pwd is None:
-                return False
-            cursor.execute('SELECT PASSWORD FROM PASSWORDS WHERE LOG_TYPE = ? AND USER_ID = ?',(user_type,user_id))
-            data = cursor.fetchone()
-            if data is not None:
-                de_pwd = my_cryptography.log_pin_decypt(data[0])
-                if de_pwd == old_pwd:
-                    en_pwd = my_cryptography.log_pin_encrypt(pwd)
-                    cursor.execute('UPDATE PASSWORDS SET PASSWORD = ? WHERE LOG_TYPE = ? AND USER_ID = ?',(en_pwd,user_type,user_id))
-                    self.data_base_function(conn)
-                    return True
-                else:
-                    self.data_base_function(conn)
-                    return False
-            return False
             
     
     def crt_pdf(self,data,pdf_name,land=False,content=[]):

@@ -161,14 +161,14 @@ def change_pwd():
     if log_check():
         if session['role'] == "STUDENT" or session['role'] == "TEACHER":
             if request.method == "POST":
-                if funt.Functions().change_pwd(user_id=session['user_id'],user_type=session['role'],pwd=request.form.get('con_pwd'),old_pwd=request.form.get('old_pwd')):
+                if funt.Functions().change_pwd(user_id=session['user_id'],user_type=session['role'],pwd=request.form.get('con_pwd')):
                     return render_template('change_pwd.html',error='PASSWORD CHANGED SUCCESSFULLY.')
                 else:
                     return render_template('change_pwd.html',error='PASSWORD NOT CHANGED.')
             return render_template('change_pwd.html')
         elif session['role'] == "ADMIN":
             if request.method == "POST":
-                if funt.Functions().change_pwd(request.form.get('ID'),request.form.get('user_type'),request.form.get('con_pwd'),admin_entity=True):
+                if funt.Functions().change_pwd(request.form.get('ID'),request.form.get('user_type'),request.form.get('con_pwd')):
                     return render_template('admin/functions/change_pwd.html',error='PASSWORD CHANGED SUCCESSFULLY.')
                 else:
                     return render_template('admin/functions/change_pwd.html',error='PASSWORD NOT CHANGED.')
@@ -573,8 +573,9 @@ def student_manual():
                 cursor.execute('DELETE FROM STUDENT_DATA WHERE Adm_ID = ?',(dest_id,))
                 cursor.execute('DELETE FROM PASSWORDS WHERE LOG_TYPE = "STUDENT" AND USER_ID = ?',(dest_id,))
                 cursor.execute('DELETE FROM BLOCK_USER WHERE USER_ID = ? AND USER_TYPE = "STUDENT";',(dest_id,))
-                cursor.execute('DELETE FROM EXAM_DATA WHERE Adm_ID = ?',(st_id,))
-                cursor.execute('DELETE FROM SINGLE_LOG WHERE USER_TYPE = ? AND USER_ID = ?',('STUDENT',st_id))
+                cursor.execute('DELETE FROM EXAM_DATA WHERE Adm_ID = ?',(dest_id,))
+                cursor.execute('DELETE FROM LOG_HISTORY WHERE USER_TYPE = "STUDENT" AND USER_ID = ?',(dest_id,))
+                cursor.execute('DELETE FROM SINGLE_LOG WHERE USER_TYPE = "STUDENT" AND USER_ID = ?',(dest_id,))
 
             funt.Data().data_base_function(conn)
         return render_template('admin/functions/st_del.html',code=cc.Details_Page().students())
@@ -622,14 +623,14 @@ def online_class_manager():
                 i = int(request.form.get('i'))
                 conn,cursor = funt.Data().data_base_function()
                 if i <= 5:
-                    da = f'{str(request.form.get('d1_1')).strip()},{int(str(request.form.get('d1_2')).strip())},{str(request.form.get('d1_3')).strip()};'
-                    da += f'{str(request.form.get('d2_1')).strip()},{int(str(request.form.get('d2_2')).strip())},{str(request.form.get('d2_3')).strip()};'
-                    da += f'{str(request.form.get('d3_1')).strip()},{int(str(request.form.get('d3_2')).strip())},{str(request.form.get('d3_3')).strip()};'
-                    da += f'{str(request.form.get('d4_1')).strip()},{int(str(request.form.get('d4_2')).strip())},{str(request.form.get('d4_3')).strip()};'
-                    da += f'{str(request.form.get('d5_1')).strip()},{int(str(request.form.get('d5_2')).strip())},{str(request.form.get('d5_3')).strip()};'
-                    da += f'{str(request.form.get('d6_1')).strip()},{int(str(request.form.get('d6_2')).strip())},{str(request.form.get('d6_3')).strip()};'
-                    da += f'{str(request.form.get('d7_1')).strip()},{int(str(request.form.get('d7_2')).strip())},{str(request.form.get('d7_3')).strip()};'
-                    da += f'{str(request.form.get('d8_1')).strip()},{int(str(request.form.get('d8_2')).strip())},{str(request.form.get('d8_3')).strip()}'
+                    da = f'{str(request.form.get('d1_1')).strip()},{str(request.form.get('d1_2')).strip()},{str(request.form.get('d1_3')).strip()};'
+                    da += f'{str(request.form.get('d2_1')).strip()},{str(request.form.get('d2_2')).strip()},{str(request.form.get('d2_3')).strip()};'
+                    da += f'{str(request.form.get('d3_1')).strip()},{str(request.form.get('d3_2')).strip()},{str(request.form.get('d3_3')).strip()};'
+                    da += f'{str(request.form.get('d4_1')).strip()},{str(request.form.get('d4_2')).strip()},{str(request.form.get('d4_3')).strip()};'
+                    da += f'{str(request.form.get('d5_1')).strip()},{str(request.form.get('d5_2')).strip()},{str(request.form.get('d5_3')).strip()};'
+                    da += f'{str(request.form.get('d6_1')).strip()},{str(request.form.get('d6_2')).strip()},{str(request.form.get('d6_3')).strip()};'
+                    da += f'{str(request.form.get('d7_1')).strip()},{str(request.form.get('d7_2')).strip()},{str(request.form.get('d7_3')).strip()};'
+                    da += f'{str(request.form.get('d8_1')).strip()},{str(request.form.get('d8_2')).strip()},{str(request.form.get('d8_3')).strip()}'
                     cursor.execute(f'UPDATE ONLINE_CLASSES_DATA SET {li[i-1]} = ? WHERE CLASS = ?',(da,c_class))
                     funt.Data().data_base_function(conn)
                     return render_template('admin/functions/online_class_manager.html',code=cc.Online_classes().admin_code_online(c_class,i))
