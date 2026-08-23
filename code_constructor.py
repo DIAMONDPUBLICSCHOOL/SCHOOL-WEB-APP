@@ -334,7 +334,7 @@ class Online_classes(content_creator):
         in_data = cursor.fetchone()
         if in_data is None:
             return '<h2>CLASSES NOT SCHEDULED.</h2>'
-        data = in_data[0].split(';')
+        data = in_data.split(';')
         for i in range(len(time)):
             d1,d2,d3 = tuple(data[i].split(','))
             if d1 and d3:
