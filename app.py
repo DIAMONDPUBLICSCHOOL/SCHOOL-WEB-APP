@@ -622,20 +622,19 @@ def online_class_manager():
                 li = ['MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY']
                 i = int(request.form.get('i'))
                 conn,cursor = funt.Data().data_base_function()
+                da = f'{str(request.form.get('d1_1')).strip()},{str(request.form.get('d1_2')).strip()},{str(request.form.get('d1_3')).strip()};'
+                da += f'{str(request.form.get('d2_1')).strip()},{str(request.form.get('d2_2')).strip()},{str(request.form.get('d2_3')).strip()};'
+                da += f'{str(request.form.get('d3_1')).strip()},{str(request.form.get('d3_2')).strip()},{str(request.form.get('d3_3')).strip()};'
+                da += f'{str(request.form.get('d4_1')).strip()},{str(request.form.get('d4_2')).strip()},{str(request.form.get('d4_3')).strip()};'
+                da += f'{str(request.form.get('d5_1')).strip()},{str(request.form.get('d5_2')).strip()},{str(request.form.get('d5_3')).strip()};'
+                da += f'{str(request.form.get('d6_1')).strip()},{str(request.form.get('d6_2')).strip()},{str(request.form.get('d6_3')).strip()};'
+                da += f'{str(request.form.get('d7_1')).strip()},{str(request.form.get('d7_2')).strip()},{str(request.form.get('d7_3')).strip()};'
+                da += f'{str(request.form.get('d8_1')).strip()},{str(request.form.get('d8_2')).strip()},{str(request.form.get('d8_3')).strip()}'
+                cursor.execute(f'UPDATE ONLINE_CLASSES_DATA SET {li[i-1]} = ? WHERE CLASS = ?',(da,c_class))
+                funt.Data().data_base_function(conn)
                 if i <= 5:
-                    da = f'{str(request.form.get('d1_1')).strip()},{str(request.form.get('d1_2')).strip()},{str(request.form.get('d1_3')).strip()};'
-                    da += f'{str(request.form.get('d2_1')).strip()},{str(request.form.get('d2_2')).strip()},{str(request.form.get('d2_3')).strip()};'
-                    da += f'{str(request.form.get('d3_1')).strip()},{str(request.form.get('d3_2')).strip()},{str(request.form.get('d3_3')).strip()};'
-                    da += f'{str(request.form.get('d4_1')).strip()},{str(request.form.get('d4_2')).strip()},{str(request.form.get('d4_3')).strip()};'
-                    da += f'{str(request.form.get('d5_1')).strip()},{str(request.form.get('d5_2')).strip()},{str(request.form.get('d5_3')).strip()};'
-                    da += f'{str(request.form.get('d6_1')).strip()},{str(request.form.get('d6_2')).strip()},{str(request.form.get('d6_3')).strip()};'
-                    da += f'{str(request.form.get('d7_1')).strip()},{str(request.form.get('d7_2')).strip()},{str(request.form.get('d7_3')).strip()};'
-                    da += f'{str(request.form.get('d8_1')).strip()},{str(request.form.get('d8_2')).strip()},{str(request.form.get('d8_3')).strip()}'
-                    cursor.execute(f'UPDATE ONLINE_CLASSES_DATA SET {li[i-1]} = ? WHERE CLASS = ?',(da,c_class))
-                    funt.Data().data_base_function(conn)
                     return render_template('admin/functions/online_class_manager.html',code=cc.Online_classes().admin_code_online(c_class,i))
                 else:
-                    funt.Data().data_base_function(conn)
                     return render_template('confirmation.html')
         return render_template('admin/functions/online_class_manager.html')
     else:
