@@ -292,8 +292,8 @@ class Online_classes(content_creator):
         cursor.execute(f'SELECT {li[i]} FROM ONLINE_CLASSES_DATA WHERE CLASS = ?',(c_class,))
         data = cursor.fetchone()
         if data is None:
-            for i in range(1,9):
-                html_text += f"""<tr><th>{time[i-1]}</th><td>SUBJECT<br><input type="text" value="" name="d{i}_1"><br>TEACHER ID<br><input type="number" value="" name="d{i}_2"><br>MEET ID<br><input type="text" value="" name="d{i}_3"></td></tr>"""
+            for im in range(1,9):
+                html_text += f"""<tr><th>{time[im-1]}</th><td>SUBJECT<br><input type="text" value="" name="d{im}_1"><br>TEACHER ID<br><input type="number" value="" name="d{im}_2"><br>MEET ID<br><input type="text" value="" name="d{im}_3"></td></tr>"""
         else:
             for r in range(len(str(data[0].split(';')))):
                 d1,d2,d3 = tuple(data[r].split(','))
@@ -308,7 +308,7 @@ class Online_classes(content_creator):
     
     def student_code_online(self,st_class,day):
         html_text = ''
-        day = 'MONDAY'####################
+        day = "MONDAY"
         if day.upper() == "SUNDAY":
             return "<h2>TODAY IS SUNDAY !!!</h2>"
         conn,cursor = funt.Data().data_base_function()
