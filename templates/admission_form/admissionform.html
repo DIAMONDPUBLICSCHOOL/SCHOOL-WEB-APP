@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DPS ADMISSION FORM</title>
+    <link rel="icon" type="image/png" href="{{url_for('static',filename='images/SYMBOLS.png')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+</head>
+<body>
+    <fieldset>
+        <h1>ADMISSION FORM</h1>
+        <h2>FILL OUT THE DETAILS PROPERLY!!</h2>
+        <label>* FIELDS ARE REQUIRED.</label>
+        <hr><hr>
+        <fieldset>
+            <legend><b>STUDENT DETAILS</b></legend>
+            <form action="{{url_for('admission_form')}}" method="post">
+                <input name="ip_address" id="ip_address" hidden>
+                <b>STUDENT NAME <label>*</label></b>
+                <input type="text" id="nor_input" name="st_name" placeholder="ENTER STUDENT NAME" required>
+                <b>FATHER NAME <label>*</label></b>
+                <input type="text" id="nor_input" name="st_ft_name" placeholder="ENTER FATHER NAME" required>
+                <b>MOTHER NAME <label>*</label></b>
+                <input type="text" id="nor_input" name="st_mt_name" placeholder="ENTER MOTHER NAME" required>
+                <b>CLASS:- <label>*</label></b>
+                <select id="nor_opt" name="st_class" required>
+                    <option value="">---SELECT---</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                </select>
+                <b>D.O.B. <label>*</label></b>
+                <input type="date" id="nor_input" name="st_dob" required>
+                <b>ADDRESS <label>*</label></b>
+                <input type="text" id="nor_input" name="st_add" placeholder="ENTER ADDRESS" required>
+                <b>MOBILE <label>*</label></b>
+                <input type="number" id="nor_input" name="st_mob" placeholder="ENTER MOBILE" max="9999999999" min="6000000000" required>
+                <b>ADHAAR NO. <label>*</label></b>
+                <input type="number" id="nor_input" name="st_adhaar" placeholder="ENTER ADHAAR NUMBER" min="100000000000" max="999999999999" required>
+                <b>PEN NO. </b>
+                <input type="number" id="nor_input" name="st_pen" placeholder="ENTER PEN NO." min="10000000000" max="99999999999">
+                <input type="checkbox"> <b>ABOVE ENTER BY ME IS CORRECT!!!</b>
+                <button id="nor_btn">SUBMIT</button>
+            </form>
+        </fieldset>
+    </fieldset>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        fetch("https://ipinfo.io/json") 
+            .then(response => response.json())
+            .then(data => {document.getElementById("ip-address").value = data.ip;})
+            .catch(error => {
+                document.getElementById('error').innerHTML = "IP ADDRESS IS NOT TRACKING";
+                document.getElementById("ip-address").value = "NA";
+            });
+    });
+    </script>
+</body>
+</html>

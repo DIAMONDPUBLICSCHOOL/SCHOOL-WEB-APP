@@ -820,6 +820,102 @@ def sync_db_new_session():
     else:
         return redirect(url_for('welcome_page'))
 
+############ ADMISSION FORM CODE
+
+@app.route("/DPSADMISSION_FORM",methods=["POST","GET"])
+def welcometoadmissionform():
+    return render_template('admission_form/adwelcomepage.html')
+
+@app.route('/ADMISSION_FORM',methods=["POST","GET"])
+def admission_form():
+    if request.form == 'POST':
+            session['role']=session['name']="ADMISSION"
+            session['user_id']=session['ip']=request.form.get('ip_address') if not request.form.get('ip_address') else 'NONE'
+            ST_NAME = request.form.get('st_name')
+            ST_FATHER = request.form.get('st_ft_name')
+            ST_MOTHER = request.form.get('st_mt_name')
+            ST_CLASS = request.form.get('st_class')
+            ST_DOB = request.form.get('st_dob')
+            ST_ADDRESS = request.form.get('st_add')
+            ST_MOBILE = int(request.form.get('st_mob'))
+            ST_ADHAAR = int(request.form.get('st_adhaar'))
+            ST_PEN = int(request.form.get('st_pen'))
+            ST_EMAIL = request.form.get('st_email')
+            return render_template('admission_form/payment.html',ST_NAME=ST_NAME,ST_FATHER=ST_FATHER,ST_MOTHER=ST_MOTHER,ST_CLASS=ST_CLASS,ST_DOB=ST_DOB,ST_ADDRESS=ST_ADDRESS,ST_MOBILE=ST_MOBILE,ST_ADHAAR=ST_ADHAAR,ST_PEN=ST_PEN,ST_EMAIL=ST_EMAIL)
+    return render_template('admission_form/admissionform.html')
+
+@app.route('/ADMISSION_PAYMENT',methods=["POST","GET"])
+def payment():
+    if log_check():
+        if request.form == "POST":
+            conn,cursor = funt.Functions().data_base_function()
+            ST_NAME = request.form.get('st_name')
+            ST_FATHER = request.form.get('st_ft_name')
+            ST_MOTHER = request.form.get('st_mt_name')
+            ST_CLASS = request.form.get('st_class')
+            ST_DOB = request.form.get('st_dob')
+            ST_ADDRESS = request.form.get('st_add')
+            ST_MOBILE = int(request.form.get('st_mob'))
+            ST_ADHAAR = int(request.form.get('st_adhaar'))
+            ST_PEN = int(request.form.get('st_pen'))
+            TRANS_ID = request.form.get('transaction_id')
+            ST_EMAIL = request.form.get('st_email')
+            cursor.execute('INSERT INTO ADMISSION_REQUEST VALUES(?,?,?,?,?,?,?,?,?,?,?,?)',(ST_NAME,ST_FATHER,ST_MOTHER,ST_CLASS,ST_DOB,ST_ADDRESS,ST_MOBILE,ST_ADHAAR,ST_EMAIL,ST_PEN,TRANS_ID,"PENDING"))
+            funt.Functions().data_base_function(conn)
+            return redirect(url_for(welcometoadmissionform))
+        return render_template('admission_form/payment.html')
+    else:
+        return redirect(url_for('welcometoadmissionform'))
+
+@app.route("/admission_request_manual",methods=["POST","GET"])
+def admission_request_manual():
+    if log_check():
+        conn,cursor = funt.Functions().data_base_function()
+        if request.method == "POST":
+            if request.form.get('action_type') == "ACCEPT":
+                cursor.execute('INSERT INTO STUDENT_DATA(Adm_ID,Name,Father,Mother,CLASS,DOB,Address,MOBILE,Adhaar,PEN) VALUES(?,?,?,?,?,?,?,?,?,?);',
+                (request.form.get('adm_no'),request.form.get('st_name'),request.form.get('st_ft_name'),request.form.get('st_mt_name'),request.form.get('st_class'),request.form.get('st_dob'),request.form.get('st_add'),request.form.get('st_mob'),request.form.get('st_adhaar'),request.form.get('st_pen')))
+                cursor.execute('INSERT INTO PASSWORDS(LOG_TYPE,USER_ID,PASSWORD) VALUES(?,?,?)',('STUDENT',request.form.get('adm_no'),funt.Functions().crt_pwd(request.form.get('pwd'))))
+                d,t = funt.Functions().get_date_time()
+                cursor.execute('INSERT INTO LOG_HISTORY VALUES(?,?,?)',(request.form.get('adm_no'),'STUDENT',f'CREATED,{d},{t}'))
+                cursor.execute('INSERT INTO SINGLE_LOG VALUES(?,?,?)',('STUDENT',request.form.get('adm_no'),0))
+
+                #send email to student
+                cursor.execute('SELECT EMAIL FROM STUDENT_DATA WHERE SR = ?',(request.form.get('sr'),))
+                student_email = cursor.fetchone()
+                funt.Functions().email_sender(student_email,'ADMISSION REQUEST ACCEPTED',html_content=f'''
+                <link rel="stylesheet" href="https://github.com/DIAMONDPUBLICSCHOOL/SCHOOL-WEB-APP/blob/main/static/css/style.css">
+                <h1>DIAMOND PUBLIC SCHOOL (D.P.S.)</h1>
+                <img src="https://github.com/DIAMONDPUBLICSCHOOL/SCHOOL-WEB-APP/blob/main/static/images/SYMBOLS.png" alt="SYMBOL" height="100px" width="100px">
+                <h1>CONGRATULATIONS!!!</h1>
+                <h2>YOUR ADMISSION REQUEST HAS BEEN ACCEPTED.<h2> 
+                <b>YOUR ADMISSION NUMBER IS {request.form.get("adm_no")}.<br>
+                YOUR PASSWORD IS {request.form.get("pwd")}.</b>''')
+
+                cursor.execute('DELETE FROM ADMISSION_REQUEST WHERE SR = ?',(request.form.get('sr'),))
+                funt.Functions().data_base_function(conn)
+                return render_template('confirmation.html')
+            
+            elif request.form.get('action_type') == "REJECT":
+                #send email to student
+                cursor.execute('SELECT EMAIL FROM STUDENT_DATA WHERE SR = ?',(request.form.get('sr'),))
+                student_email = cursor.fetchone()
+                funt.Functions().email_sender(student_email,'ADMISSION REQUEST REJECTED',html_content=f'YOUR ADMISSION REQUEST HAS BEEN REJECTED. YOUR ADMISSION NUMBER IS {request.form.get("adm_no")}.')
+                cursor.execute('UPDATE ADMISSION_REQUEST SET STATUS = "REJECTED" WHERE SR = ?',(request.form.get('sr'),))
+                funt.Functions().data_base_function(conn)
+                return render_template('confirmation.html')
+            
+            else:
+                return render_template('admin/functions/admission_request.html',code="SOMETHING WENT WRONG!!!")
+        cursor.execute('SELECT * FROM ADMISSION_REQUEST WHERE STATUS = "PENDING";')
+        data = cursor.fetchall()
+        funt.Functions().data_base_function(conn)
+        return render_template('admin/functions/admission_request.html',code=cc.Admission_request().admission_request(data))
+    else:
+        return redirect(url_for('welcome_page'))
+
+
+
 if __name__== "__main__":
     app.run(debug=True)
 

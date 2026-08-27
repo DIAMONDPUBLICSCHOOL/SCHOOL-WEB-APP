@@ -314,7 +314,6 @@ class Online_classes(content_creator):
     
     def student_code_online(self,st_class,day):
         html_text = ''
-        day='MONDAY'##########
         if day.upper() == "SUNDAY":
             return "<h2>TODAY IS SUNDAY !!!</h2>"
         conn,cursor = funt.Data().data_base_function()
@@ -334,7 +333,7 @@ class Online_classes(content_creator):
         in_data = cursor.fetchone()
         if in_data is None:
             return '<h2>CLASSES NOT SCHEDULED.</h2>'
-        data = in_data.split(';')
+        data = in_data[0].split(';')
         for i in range(len(time)):
             d1,d2,d3 = tuple(data[i].split(','))
             if d1 and d3:
@@ -601,7 +600,33 @@ class Data_Sync:
         funt.Data().data_base_function(conn)
         return html_text
 
-
+class Admission_request:
+    def admission_request(self):
+        html_text = ''
+        conn,cursor = funt.Data().data_base_function()
+        cursor.execute('SELECT NAME,FATHER,MOTHER,DOB,MOBILE,CLASS,EMAIL,ADDRESS,MOBILE,ADHAAR,PEN,TRANSACTION_ID,SR FROM ADMISSION_REQUEST;')
+        for item in cursor.fetchall():
+            name,father,mother,dob,mobile,cls,email,add,mod,adhaar,pen,trans_id,sr = item
+            html_text += f'''<div id="notifi"><div id="noti_heading">REQUEST ID:- {sr} <div style="float: right;"><i class="fa fa-user-plus"></i></div></div>
+        <b>NAME:- {name}<br>FATHER:- {father}<br>MOTHER:- {mother}<br>D.O.B.:- {dob}<br>MOBILE:- {mobile}<br>CLASS:- {cls}<br>EMAIL:- {email}<br>ADDRESS:- {add}</b><br>MOBILE:- {mod}<br><br>TRANSACTION ID:- {trans_id}<br><br>
+        <form action="/admission_request_manual" method="post"><input type="text" name="name" value="{name}" hidden>
+        <input type="text" name="father" value="{father}" hidden>
+        <input type="text" name="mother" value="{mother}" hidden>
+        <input type="text" name="dob" value="{dob}" hidden>
+        <input type="text" name="mobile" value="{mobile}" hidden>
+        <input type="text" name="cls" value="{cls}" hidden>
+        <input type="text" name="email" value="{email}" hidden>
+        <input type="text" name="add" value="{add}" hidden>
+        <input type="text" name="mod" value="{mod}" hidden>
+        <input type="text" name="adhaar" value="{adhaar}" hidden>   
+        <input type="text" name="pen" value="{pen}" hidden>
+        <input type="text" name="trans_id" value="{trans_id}" hidden>
+        <input type="text" name="sr" value="{sr}" hidden>
+        <button id="nor_btn">ACCEPT REQUEST <i class="fa fa-check"></i></button>
+        </form>
+        </div>\n'''
+        funt.Data().data_base_function(conn)
+        return html_text
 
 
 

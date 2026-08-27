@@ -5,6 +5,8 @@ from reportlab.platypus import Table, TableStyle, Paragraph
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 import my_cryptography as crypt
+import smtplib
+from email.message import EmailMessage
 
 class Data:
     def __init__(self):
@@ -103,7 +105,28 @@ class Functions(Data):
             cursor.execute('UPDATE PASSWORDS SET PASSWORD = ? WHERE LOG_TYPE = ? AND USER_ID = ?',(en_pwd,user_type,user_id))
             self.data_base_function(conn)
             return True
-            
+
+    def email_sender(self,receiver_email,subject,message=None,html_content=None):
+        if not message and not html_content:
+            return False
+        msg = EmailMessage()
+        msg["Subject"] = subject
+        msg["From"] = "@gmail.com"
+        msg["To"] = receiver_email
+        if message:
+            msg.set_content(message)
+        if html_content:
+            msg.add_alternative(html_content, subtype="html")
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+            server.starttls()
+            server.login("@gmail.com","")
+            server.send_message(msg)
+        return True
+       
+    # def crt_pdf_html(self,data,filename):
+    #     from weasyprint import HTML
+    #     HTML(string=data).write_pdf("output.pdf")
+    #     return True
     
     def crt_pdf(self,data,pdf_name,land=False,content=[]):
         element = []
