@@ -317,6 +317,11 @@ class Online_classes(content_creator):
         if day.upper() == "SUNDAY":
             return "<h2>TODAY IS SUNDAY !!!</h2>"
         conn,cursor = funt.Data().data_base_function()
+        d,_ = funt.Functions().get_date_time()
+        cursor.execute('SELECT REASON FROM HOLIDAYS WHERE DATE = ?',(d,))
+        reason = cursor.fetchone()
+        if reason is not None:
+            return f"<h2>TODAY IS HOLIDAY !!!<br>REASON: {reason[0]}</h2>"
         time = ["09:00a.m. - 09:30a.m.","09:30a.m. - 10:00a.m.","10:00a.m. - 10:30a.m.","10:30a.m. - 11:00a.m.","11:00a.m. - 11:30a.m.","11:30a.m. - 12:00a.m.","12:00a.m. - 12:30a.m.","12:30a.m. - 01:00p.m."]
         cursor.execute('SELECT ID,Name FROM TEACHER_DATA')
         teach_dic =  dict(cursor.fetchall())
@@ -588,12 +593,12 @@ class Data_Sync:
 <fieldset>
 <ul class="lines">
 <li><input type="checkbox" required>I AM AGREED TO UPDATE ALL THE DATA. [FILLED ABOVE].</li>
-<li><input type="checkbox" required>I AM AGREED TO RESET DATA TYPES HOMEWORK, ATTANDACE, CLASS TEST / EXAM TERMS, REPORT CARD.</li>
+<li><input type="checkbox" required>I AM AGREED TO RESET DATA TYPES HOMEWORK, ATTANDACE, CLASS TEST / EXAM TERMS, REPORT CARD & HOLIDAYS.</li>
 <li><input type="checkbox" required>I AM AGREED TO PROCEED FEES DATA OF STUDENTS INTO NEW SESSION.</li>
 <hr>
 <li><input type="checkbox" required>I HAVE READ ALL THE <a href="" target="_blank">INSTRUCTIONS & DIRECTIONS</a> TO USE THIS PROCESS.</li>
 </ul>
-<code><b><i>NOTE :- </i> ABOVE DATA FILLED BY YOU CANNOT BE CHANGED. ONLY REMOVING OF STUDENT ALLOW.</b></code>
+<code><b><i>NOTE :- </i> ABOVE DATA FILLED BY YOU CANNOT BE CHANGED. ONLY REMOVING OF STUDENT IS ALLOWED.</b></code>
 <button id="nor_btn"><b>COMMIT DATA <i class="fa fa-upload"></i></b></button></form>
 </fieldset>
 '''
@@ -604,10 +609,10 @@ class Admission_request:
     def admission_request(self):
         html_text = ''
         conn,cursor = funt.Data().data_base_function()
-        cursor.execute('SELECT NAME,FATHER,MOTHER,DOB,MOBILE,CLASS,EMAIL,ADDRESS,MOBILE,ADHAAR,PEN,TRANSACTION_ID,SR FROM ADMISSION_REQUEST;')
+        cursor.execute('SELECT NAME,FATHER,MOTHER,DOB,MOBILE,CLASS,EMAIL,ADDRESS,MOBILE,ADHAAR,PEN,TRANSACTION_ID,DATE,TIME,SR FROM ADMISSION_REQUEST;')
         for item in cursor.fetchall():
-            name,father,mother,dob,mobile,cls,email,add,mod,adhaar,pen,trans_id,sr = item
-            html_text += f'''<div id="notifi"><div id="noti_heading">REQUEST ID:- {sr} <div style="float: right;"><i class="fa fa-user-plus"></i></div></div>
+            name,father,mother,dob,mobile,cls,email,add,mod,adhaar,pen,trans_id,date,time,sr = item
+            html_text += f'''<div id="notifi"><div id="noti_heading">REQUEST ID:- {sr} <br>DAET:- {date} <br>TIME:- {time}</div><div style="float: right;"><i class="fa fa-user-plus"></i></div></div>
         <b>NAME:- {name}<br>FATHER:- {father}<br>MOTHER:- {mother}<br>D.O.B.:- {dob}<br>MOBILE:- {mobile}<br>CLASS:- {cls}<br>EMAIL:- {email}<br>ADDRESS:- {add}</b><br>MOBILE:- {mod}<br><br>TRANSACTION ID:- {trans_id}<br><br>
         <form action="/admission_request_manual" method="post"><input type="text" name="name" value="{name}" hidden>
         <input type="text" name="father" value="{father}" hidden>

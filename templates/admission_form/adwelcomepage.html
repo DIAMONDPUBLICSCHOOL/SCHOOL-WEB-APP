@@ -9,15 +9,19 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <style>
-        /* b{color:} */
+        body{margin:5px 5px;padding:6px 10px;display: flex;flex-direction: column;justify-content: center;}
+        article{font-size: 25px;width:auto;}
     </style>
 </head>
-<body>
-    <h1>WELCOME!!</h1>
-    <h2>TO DIAMOND PUBLIC SCHOOL, JALESAR</h2>
-    <article>OUR SCHOOL GIVES WINGS TO STUDENT TO FLY IN FUTUTRE SKY!!!</article>
-    <b>ENROLL NOW!!!</b>
-    <a href="{{url_for('admission_form')}}"><button>FILL ADMISSION FORM</button></a>
-    <a id="class" href="https://sites.google.com/view/diamondpublicschool-com" target="_blank">KNOW MORE.....</a>
+<body background="{{url_for('static',filename='images/admission_background.avif')}}">
+    <h1>WELCOME TO !!</h1>
+    <h2>DIAMOND PUBLIC SCHOOL, JALESAR</h2>
+    <article>OUR SCHOOL GIVES WINGS TO STUDENT TO FLY IN FUTUTRE SKY!!! <br>
+    <b style="color:blue;">ENROLL NOW!!!</b></article>
+    <fieldset>
+    <a href="{{url_for('admission_form')}}"><button id="nor_btn" style="font-size: 20px;">FILL ADMISSION FORM <i class="fa fa-edit"></i></button></a></fieldset>
+    <div style="font-size: 22px;float:right;padding: 10px 10px;">
+    <a style="color:blue;float:right;text-decoration:none;" href="https://sites.google.com/view/diamondpublicschool-com" target="_blank">KNOW MORE.....</a></div>
+    <b><i>NOTE:- </i>FOR ANY TYPE OF ISSUE CONTACT US ON MOBILE NO. +919897432207 & +918273998585.</b>
 </body>
 </html>

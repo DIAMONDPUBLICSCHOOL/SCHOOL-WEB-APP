@@ -49,8 +49,8 @@
   <div id="user_info"><img src="{{url_for('static',filename='images/user.png')}}" alt="USER"><br><b>USER:- <font>ADMIN</font></b><br><a href="{{url_for('logout')}}"><button id="log">LOGOUT <i class="fa fa-sign-out"></i></button></a></div>
             <fieldset>
                 <legend><b>SERVICES</b></legend>
-                <a href="{{url_for('add_student')}}"><button id="dash_btn"><b id="btn"><i class="fa fa-user"></i></b><br><br>ADD STUDENT</button></a>
-                <a href="{{url_for('add_teacher')}}"><button id="dash_btn"><b id="btn"><i class="fa fa-user"></i></b><br><br>ADD TEACHER</button></a>
+                <a href="{{url_for('add_student')}}"><button id="dash_btn"><b id="btn">+<i class="fa fa-user"></i></b><br><br>ADD STUDENT</button></a>
+                <a href="{{url_for('add_teacher')}}"><button id="dash_btn"><b id="btn">+<i class="fa fa-user"></i></b><br><br>ADD TEACHER</button></a>
                 <a href="{{url_for('student_manual')}}"><button id="dash_btn"><b id="btn"><i class="fa fa-user-circle-o"></i></b><br><br>EDIT STUDENT DATA</button></a>
                 <a href="{{url_for('teacher_manual')}}"><button id="dash_btn"><b id="btn"><i class="fa fa-user-circle-o"></i></b><br><br>EDIT TEACHER DATA</button></a>
                 <a href="{{url_for('change_pwd')}}"><button id="dash_btn"><b id="btn"><i class="fa fa-key"></i></b><br><br>CHANGE PASSWORD</button></a>

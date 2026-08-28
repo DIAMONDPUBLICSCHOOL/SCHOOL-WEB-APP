@@ -111,7 +111,7 @@ class Functions(Data):
             return False
         msg = EmailMessage()
         msg["Subject"] = subject
-        msg["From"] = "@gmail.com"
+        msg["From"] = "nishantkushwah7536@gmail.com"######################################
         msg["To"] = receiver_email
         if message:
             msg.set_content(message)
@@ -119,7 +119,7 @@ class Functions(Data):
             msg.add_alternative(html_content, subtype="html")
         with smtplib.SMTP("smtp.gmail.com", 587) as server:
             server.starttls()
-            server.login("@gmail.com","")
+            server.login("nishantkushwah7536@gmail.com","pass////1234")###################################
             server.send_message(msg)
         return True
        
@@ -284,24 +284,29 @@ class Data_sync(Functions):
                     cursor.execute('DELETE FROM BLOCK_USER WHERE USER_ID = ? AND USER_TYPE = "STUDENT";',(int(item),))
                 else:
                     pass
+            self.data_base_function(conn)
             data_sync_dic[str(d)[:4]]["STATUS"]["CLASSES"]="PASS"
         except:
+            conn.close()
             data_sync_dic[str(d)[:4]]["STATUS"]["CLASSES"]="FAILED"
-        conn.commit()
 
         ###data reset
+        conn,cursor = self.data_base_function()
         try:
             cursor.execute('DELETE FROM ATTANDANCE;')
             cursor.execute('DELETE FROM EXAM_DATA;')
             cursor.execute('DELETE FROM STUDENT_TEST_DATA;')
             cursor.execute('DELETE FROM TEST_DATA;')
             cursor.execute('DELETE FROM HW_DATA;')
+            cursor.execute('DELETE FROM HOLIDAYS;')
+            self.data_base_function(conn)
             data_sync_dic[str(d)[:4]]["STATUS"]["DATA_RESET"]="PASS"
         except:
             data_sync_dic[str(d)[:4]]["STATUS"]["DATA_RESET"]="FAILED"
-        conn.commit()
+            conn.close()
 
         ###fees data
+        conn,cursor = self.data_base_function()
         try:
             fees_session = str(d)[:4]
             cursor.execute('SELECT Adm_ID,CLASS FROM STUDENT_DATA;')
@@ -312,11 +317,11 @@ class Data_sync(Functions):
                 if rest_fees is not None:
                     fees = rest_fees[0] + Data().class_fees(st_class)
                     cursor.execute('INSERT INTO FEES_DATA VALUES(?,?,?,?,?)',(0,item[0],0,fees,fees_session+1))
+            self.data_base_function(conn)
             data_sync_dic[str(d)[:4]]["STATUS"]["FEES"]="PASS"
         except:
             data_sync_dic[str(d)[:4]]["STATUS"]["FEES"]="FAILED"
-        conn.commit()
-        self.data_base_function(conn)
+            conn.close()
 
         ###last step
         with open('datasync.json','w') as f:

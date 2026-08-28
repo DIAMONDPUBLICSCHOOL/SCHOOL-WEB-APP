@@ -640,6 +640,23 @@ def online_class_manager():
     else:
         return redirect(url_for('welcome_page'))
 
+@app.route('/online_class_holidays',methods=["GET","POST"])
+def online_class_holidays():
+    if log_check():
+        if request.method == "POST":
+            conn,cursor = funt.Data().data_base_function()
+            cursor.execute('SELECT REASON FROM HOLIDAYS WHERE DATE = ?',(request.form.get('date'),))
+            reason = cursor.fetchone()
+            if reason is None:
+                cursor.execute('INSERT INTO HOLIDAYS(DATE,REASON) VALUES(?,?)',(request.form.get('date'),request.form.get('reason')))
+            else:
+                cursor.execute('UPDATE HOLIDAYS SET REASON = ? WHERE DATE = ?',(request.form.get('reason'),request.form.get('date')))
+            funt.Data().data_base_function(conn)
+            return render_template('confirmation.html')
+        return render_template('admin/functions/online_class_holidays.html')
+    else:
+        return redirect(url_for('welcome_page'))
+
 @app.route('/export_data',methods=["GET","POST"])
 def export_data():
     if log_check():
@@ -860,7 +877,8 @@ def payment():
             ST_PEN = int(request.form.get('st_pen'))
             TRANS_ID = request.form.get('transaction_id')
             ST_EMAIL = request.form.get('st_email')
-            cursor.execute('INSERT INTO ADMISSION_REQUEST VALUES(?,?,?,?,?,?,?,?,?,?,?,?)',(ST_NAME,ST_FATHER,ST_MOTHER,ST_CLASS,ST_DOB,ST_ADDRESS,ST_MOBILE,ST_ADHAAR,ST_EMAIL,ST_PEN,TRANS_ID,"PENDING"))
+            d,t = funt.Functions().get_date_time()
+            cursor.execute('INSERT INTO ADMISSION_REQUEST VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)',(ST_NAME,ST_FATHER,ST_MOTHER,ST_CLASS,ST_DOB,ST_ADDRESS,ST_MOBILE,ST_ADHAAR,ST_EMAIL,ST_PEN,TRANS_ID,d,t,"PENDING"))
             funt.Functions().data_base_function(conn)
             return redirect(url_for(welcometoadmissionform))
         return render_template('admission_form/payment.html')
@@ -910,7 +928,7 @@ def admission_request_manual():
         cursor.execute('SELECT * FROM ADMISSION_REQUEST WHERE STATUS = "PENDING";')
         data = cursor.fetchall()
         funt.Functions().data_base_function(conn)
-        return render_template('admin/functions/admission_request.html',code=cc.Admission_request().admission_request(data))
+        return render_template('admin/functions/admission_request.html',code=cc.Admission_request().admission_request())
     else:
         return redirect(url_for('welcome_page'))
 
