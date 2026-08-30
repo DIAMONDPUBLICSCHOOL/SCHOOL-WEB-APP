@@ -15,7 +15,7 @@ b{font-size:64;}</style>
     <img src="static/images/SYMBOLS.png" alt="SYMBOL">
     <li>DIAMOND PUBLIC SCHOOL</li>
   </ul>
-<div id="user_info"><img src="{{url_for('static',filename='images/user.png')}}" alt="USER"><br>{{info|safe}}
+{{info|safe}}
 <br><a href="/complains"><button id="comp">REPORT COMPLAIN <i class="fa fa-exclamation-triangle alert-icon"></i></button></a><a href="/change_pwd"><button id="pwd">CHANGE PASSWORD <i class="fa fa-key"></i></button></a><a href="{{url_for('logout')}}"><button id="log">LOGOUT <i class="fa fa-sign-out"></i></button></a>
 </div>
 <a href="{{url_for('online_classes_teacher')}}"><button id="dash_btn" class="dashbtn"><b><i class="fa fa-tv"></i></b><br><br>ONLINE CLASSES</button></a>

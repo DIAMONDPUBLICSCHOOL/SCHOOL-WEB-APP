@@ -442,7 +442,10 @@ class Report_card(content_creator):
         cursor.execute('SELECT Class FROM STUDENT_DATA WHERE Adm_ID = ?',(st_id,))
         st_class = cursor.fetchone()[0]
         cursor.execute('SELECT TERM_1,TERM_2 FROM EXAM_DATA WHERE Adm_ID = ?',(st_id,))
-        row = cursor.fetchall()[0]
+        li = cursor.fetchone()#
+        if li is None:
+            return "<h2>NO DATA FOUND!!!</h2>"
+        row = list(li)#[0]
         term1,term2 = row[0].split(';'),row[1].split(';')
         sub = super().subject_list(st_class)
         if len(term1) == len(term2):
@@ -468,6 +471,7 @@ class Report_card(content_creator):
                 fft += ft
                 html_text += f"<th>{ft}</th><th>{grade(ft,200)}</th></tr>"
             html_text += f'<tr><th colspan="5"></th><th>{tff1}</th><th colspan="4"></th><th>{tff2}</th><th>{fft}</th><th>{grade(fft,len(sub)*200)}</th></tr></table>'
+            funt.Functions().crt_pdf_html(html_text,f'REPORT_CARD_{st_id}')
             # html_text += f'<a href="{funt.Export().report_card(html_text)}" download><button id="nor_btn">DOWNLOAD REPORT CARD  <i class="fa fa-download"></i></button></a>'
         else:
             html_text = "<h2>ERROR CAUSED IN DATABASE!!!</h2>"
@@ -609,14 +613,15 @@ class Admission_request:
     def admission_request(self):
         html_text = ''
         conn,cursor = funt.Data().data_base_function()
-        cursor.execute('SELECT NAME,FATHER,MOTHER,DOB,MOBILE,CLASS,EMAIL,ADDRESS,MOBILE,ADHAAR,PEN,TRANSACTION_ID,DATE,TIME,SR FROM ADMISSION_REQUEST;')
+        cursor.execute('SELECT NAME,FATHER,MOTHER,DOB,MOBILE,GENDER,CLASS,EMAIL,ADDRESS,MOBILE,ADHAAR,PEN,TRANSACTION_ID,DATE,TIME,SR FROM ADMISSION_REQUEST;')
         for item in cursor.fetchall():
-            name,father,mother,dob,mobile,cls,email,add,mod,adhaar,pen,trans_id,date,time,sr = item
+            name,father,mother,dob,mobile,gender,cls,email,add,mod,adhaar,pen,trans_id,date,time,sr = item
             html_text += f'''<div id="notifi"><div id="noti_heading">REQUEST ID:- {sr} <br>DAET:- {date} <br>TIME:- {time}</div><div style="float: right;"><i class="fa fa-user-plus"></i></div></div>
-        <b>NAME:- {name}<br>FATHER:- {father}<br>MOTHER:- {mother}<br>D.O.B.:- {dob}<br>MOBILE:- {mobile}<br>CLASS:- {cls}<br>EMAIL:- {email}<br>ADDRESS:- {add}</b><br>MOBILE:- {mod}<br><br>TRANSACTION ID:- {trans_id}<br><br>
+        <b>NAME:- {name}<br>FATHER:- {father}<br>MOTHER:- {mother}<br>GENDER:- {gender}<br>D.O.B.:- {dob}<br>MOBILE:- {mobile}<br>CLASS:- {cls}<br>EMAIL:- {email}<br>ADDRESS:- {add}</b><br>MOBILE:- {mod}<br><br>TRANSACTION ID:- {trans_id}<br><br>
         <form action="/admission_request_manual" method="post"><input type="text" name="name" value="{name}" hidden>
         <input type="text" name="father" value="{father}" hidden>
         <input type="text" name="mother" value="{mother}" hidden>
+        <input type="text" name="gender" value="{gender}" hidden>
         <input type="text" name="dob" value="{dob}" hidden>
         <input type="text" name="mobile" value="{mobile}" hidden>
         <input type="text" name="cls" value="{cls}" hidden>

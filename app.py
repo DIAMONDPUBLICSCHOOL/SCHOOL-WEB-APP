@@ -67,10 +67,14 @@ def dashboard():
     if log_check():
         conn,cursor = funt.Data().data_base_function()
         if session["role"] == "STUDENT":
-            cursor.execute('SELECT Name,Father,Mother,Class,DOB,Address,MOBILE FROM STUDENT_DATA WHERE Adm_ID = ?',(session['user_id'],))
-            Name,Father,Mother,Class,DOB,Address,MOBILE = cursor.fetchone()
+            cursor.execute('SELECT Name,Father,Mother,Gender,Class,DOB,Address,MOBILE FROM STUDENT_DATA WHERE Adm_ID = ?',(session['user_id'],))
+            Name,Father,Mother,gender,Class,DOB,Address,MOBILE = cursor.fetchone()
+            if gender != "Male" and gender != "Female":
+                gender = '<i class="fa fa-user"></i>'
+            else:
+                gender = gender.lower()+'_user.png'
             funt.Data().data_base_function(conn)
-            return render_template("student/dashboard.html",info=f'''NAME:- <font>{Name.upper()}</font><br>FATHER NAME:- <font>{Father.upper()}</font><br>MOTHER NAME:- <font>{Mother.upper()}</font><br>CLASS :- <font>{Class}</font><br>ADDRESS :- <font>{Address.upper()}</font><br>D.O.B. :- <font>{DOB.upper()}</font><br>MOBILE NO.:- <font>{MOBILE}</font>''')
+            return render_template("student/dashboard.html",info=f'''<div id="user_info"><img src="static/images/{gender}" alt="{gender}"><br><br>NAME:- <font>{Name.upper()}</font><br>FATHER NAME:- <font>{Father.upper()}</font><br>MOTHER NAME:- <font>{Mother.upper()}</font><br>CLASS :- <font>{Class}</font><br>ADDRESS :- <font>{Address.upper()}</font><br>D.O.B. :- <font>{DOB.upper()}</font><br>MOBILE NO.:- <font>{MOBILE}</font>''')
         elif session["role"] == "TEACHER":
             cursor.execute('SELECT Name,Father,Mother,Mobile FROM TEACHER_DATA WHERE ID = ?',(session['user_id'],))
             Name,Father,Mother,Mobile = cursor.fetchone()
@@ -471,6 +475,7 @@ def add_student():
             ST_NAME = request.form.get('st_name')
             ST_FATHER = request.form.get('st_ft_name')
             ST_MOTHER = request.form.get('st_mt_name')
+            ST_GENDER = request.form.get('st_gender')
             ST_CLASS = request.form.get('st_class')
             ST_DOB = request.form.get('st_dob')
             ST_ADDRESS = request.form.get('st_add')
@@ -489,15 +494,15 @@ def add_student():
                 ST_DATA_LI3.append(row[2])
             if ST_ID in ST_DATA_LI1:
                 return render_template('admin/functions/add_st.html',error="STUDENT ID ALREADY TAKEN. (ENTER ANOTHER ADMISSION NO.)!!!",
-                e1=ST_NAME,e2=ST_FATHER,e3=ST_MOTHER,e4=ST_CLASS,e5=ST_DOB,e6=ST_ADDRESS,e7=ST_MOBILE,e8=ST_ADHAAR,e9=ST_PEN,e11=r_pwd)
+                e1=ST_NAME,e2=ST_FATHER,e3=ST_MOTHER,e4=ST_CLASS,e5=ST_DOB,e6=ST_ADDRESS,e7=ST_MOBILE,e8=ST_ADHAAR,e9=ST_PEN,e11=r_pwd,e12=ST_GENDER)
             if ST_ADHAAR in ST_DATA_LI2:
                 return render_template('admin/functions/add_st.html',error="STUDENT ADHAAR ALREADY REGISTERED!!!",
-                e1=ST_NAME,e2=ST_FATHER,e3=ST_MOTHER,e4=ST_CLASS,e5=ST_DOB,e6=ST_ADDRESS,e7=ST_MOBILE,e9=ST_PEN,e10=ST_ID,e11=r_pwd)
+                e1=ST_NAME,e2=ST_FATHER,e3=ST_MOTHER,e4=ST_CLASS,e5=ST_DOB,e6=ST_ADDRESS,e7=ST_MOBILE,e9=ST_PEN,e10=ST_ID,e11=r_pwd,e12=ST_GENDER)
             if ST_PEN in ST_DATA_LI3:
                 return render_template('admin/functions/add_st.html',error="STUDENT PEN IS ALREADY REGISTERED!!!",
-                e1=ST_NAME,e2=ST_FATHER,e3=ST_MOTHER,e4=ST_CLASS,e5=ST_DOB,e6=ST_ADDRESS,e7=ST_MOBILE,e8=ST_ADHAAR,e10=ST_ID,e11=r_pwd)
-            cursor.execute('INSERT INTO STUDENT_DATA(Adm_ID,Name,Father,Mother,CLASS,DOB,Address,MOBILE,Adhaar,PEN) VALUES(?,?,?,?,?,?,?,?,?,?);',
-            (ST_ID,ST_NAME,ST_FATHER,ST_MOTHER,ST_CLASS,ST_DOB,ST_ADDRESS,ST_MOBILE,ST_ADHAAR,ST_PEN))
+                e1=ST_NAME,e2=ST_FATHER,e3=ST_MOTHER,e4=ST_CLASS,e5=ST_DOB,e6=ST_ADDRESS,e7=ST_MOBILE,e8=ST_ADHAAR,e10=ST_ID,e11=r_pwd,e12=ST_GENDER)
+            cursor.execute('INSERT INTO STUDENT_DATA(Adm_ID,Name,Father,Mother,Gender,CLASS,DOB,Address,MOBILE,Adhaar,PEN) VALUES(?,?,?,?,?,?,?,?,?,?,?);',
+            (ST_ID,ST_NAME,ST_FATHER,ST_MOTHER,ST_GENDER,ST_CLASS,ST_DOB,ST_ADDRESS,ST_MOBILE,ST_ADHAAR,ST_PEN))
             cursor.execute('INSERT INTO PASSWORDS(LOG_TYPE,USER_ID,PASSWORD) VALUES(?,?,?)',('STUDENT',ST_ID,ST_PWD))
             val = ''
             for item in cc.content_creator().subject_list(ST_CLASS):
@@ -522,6 +527,7 @@ def add_teacher():
             T_NAME = request.form.get('T_name')
             T_FATHER = request.form.get('T_ft_name')
             T_MOTHER = request.form.get('T_mt_name')
+            T_GENDER = request.form.get('T_gender')
             T_DOB = request.form.get('T_dob')
             T_ADDRESS = request.form.get('T_add')
             T_MOBILE = request.form.get('T_mob')
@@ -536,12 +542,12 @@ def add_teacher():
                 T_DATA_LI2.append(str(row[1]))
             if T_ID_ in T_DATA_LI1:
                 return render_template('admin/functions/add_t.html',error="TEACHER ID ALREADY TAKEN!!!",
-                e1=T_NAME,e2=T_FATHER,e3=T_MOTHER,e4=T_ADDRESS,e5=T_DOB,e6=T_ADHAAR,e8=r_pwd,e9=T_MOBILE)
+                e1=T_NAME,e2=T_FATHER,e3=T_MOTHER,e4=T_ADDRESS,e5=T_DOB,e6=T_ADHAAR,e8=r_pwd,e9=T_MOBILE,e10=T_GENDER)
             if T_ADHAAR in T_DATA_LI2:
                 return render_template('admin/functions/add_t.html',error="TEACHER ADHAAR IS ALREADY REGISTERED!!!"
-                ,e1=T_NAME,e2=T_FATHER,e3=T_MOTHER,e4=T_ADDRESS,e5=T_DOB,e7=T_ID_,e8=r_pwd,e9=T_MOBILE)
-            cursor.execute('INSERT INTO TEACHER_DATA(ID,Name,Father,Mother,DOB,Address,MOBILE,Adhaar) VALUES(?,?,?,?,?,?,?,?);',
-            (T_ID_,T_NAME,T_FATHER,T_MOTHER,T_DOB,T_ADDRESS,T_MOBILE,T_ADHAAR))
+                ,e1=T_NAME,e2=T_FATHER,e3=T_MOTHER,e4=T_ADDRESS,e5=T_DOB,e7=T_ID_,e8=r_pwd,e9=T_MOBILE,e10=T_GENDER)
+            cursor.execute('INSERT INTO TEACHER_DATA(ID,Name,Father,Mother,Gender,DOB,Address,MOBILE,Adhaar) VALUES(?,?,?,?,?,?,?,?,?);',
+            (T_ID_,T_NAME,T_FATHER,T_MOTHER,T_GENDER,T_DOB,T_ADDRESS,T_MOBILE,T_ADHAAR))
             cursor.execute('INSERT INTO PASSWORDS(LOG_TYPE,USER_ID,PASSWORD) VALUES(?,?,?);',("TEACHER",T_ID_,T_PWD))
             d,t = funt.Functions().get_date_time()
             cursor.execute('INSERT INTO LOG_HISTORY VALUES(?,?,?)',(T_ID_,'TEACHER',f'CREATED,{d},{t}'))
@@ -845,42 +851,55 @@ def welcometoadmissionform():
 
 @app.route('/ADMISSION_FORM',methods=["POST","GET"])
 def admission_form():
-    if request.form == 'POST':
-            session['role']=session['name']="ADMISSION"
-            session['user_id']=session['ip']=request.form.get('ip_address') if not request.form.get('ip_address') else 'NONE'
-            ST_NAME = request.form.get('st_name')
-            ST_FATHER = request.form.get('st_ft_name')
-            ST_MOTHER = request.form.get('st_mt_name')
-            ST_CLASS = request.form.get('st_class')
-            ST_DOB = request.form.get('st_dob')
-            ST_ADDRESS = request.form.get('st_add')
-            ST_MOBILE = int(request.form.get('st_mob'))
-            ST_ADHAAR = int(request.form.get('st_adhaar'))
-            ST_PEN = int(request.form.get('st_pen'))
-            ST_EMAIL = request.form.get('st_email')
-            return render_template('admission_form/payment.html',ST_NAME=ST_NAME,ST_FATHER=ST_FATHER,ST_MOTHER=ST_MOTHER,ST_CLASS=ST_CLASS,ST_DOB=ST_DOB,ST_ADDRESS=ST_ADDRESS,ST_MOBILE=ST_MOBILE,ST_ADHAAR=ST_ADHAAR,ST_PEN=ST_PEN,ST_EMAIL=ST_EMAIL)
+    if request.method == 'POST':
+        session['role']=session['name']="ADMISSION"
+        session['user_id']=session['ip']=request.form.get('ip_address') if not request.form.get('ip_address') else 'NONE'
+        ST_NAME = request.form.get('st_name')
+        ST_FATHER = request.form.get('st_ft_name')
+        ST_MOTHER = request.form.get('st_mt_name')
+        ST_GENDER = request.form.get('st_gender')
+        ST_CLASS = request.form.get('st_class')
+        ST_DOB = request.form.get('st_dob')
+        ST_ADDRESS = request.form.get('st_add')
+        ST_MOBILE = int(request.form.get('st_mob'))
+        ST_ADHAAR = int(request.form.get('st_adhaar'))
+        ST_PEN = int(request.form.get('st_pen'))
+        ST_EMAIL = request.form.get('st_email')
+        return render_template('admission_form/payment.html',ST_NAME=ST_NAME,ST_FATHER=ST_FATHER,ST_MOTHER=ST_MOTHER,ST_GENDER=ST_GENDER,ST_CLASS=ST_CLASS,ST_DOB=ST_DOB,ST_ADDRESS=ST_ADDRESS,ST_MOBILE=ST_MOBILE,ST_ADHAAR=ST_ADHAAR,ST_PEN=ST_PEN,ST_EMAIL=ST_EMAIL)
     return render_template('admission_form/admissionform.html')
 
 @app.route('/ADMISSION_PAYMENT',methods=["POST","GET"])
 def payment():
-    if log_check():
-        if request.form == "POST":
+    if session['role'] != 'ADMISSION':
+        if request.method == "POST":
             conn,cursor = funt.Functions().data_base_function()
             ST_NAME = request.form.get('st_name')
             ST_FATHER = request.form.get('st_ft_name')
             ST_MOTHER = request.form.get('st_mt_name')
+            ST_GENDER = request.form.get('st_gender')
             ST_CLASS = request.form.get('st_class')
             ST_DOB = request.form.get('st_dob')
             ST_ADDRESS = request.form.get('st_add')
             ST_MOBILE = int(request.form.get('st_mob'))
             ST_ADHAAR = int(request.form.get('st_adhaar'))
             ST_PEN = int(request.form.get('st_pen'))
-            TRANS_ID = request.form.get('transaction_id')
             ST_EMAIL = request.form.get('st_email')
+            TRANS_ID = request.form.get('transaction_id')
             d,t = funt.Functions().get_date_time()
-            cursor.execute('INSERT INTO ADMISSION_REQUEST VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)',(ST_NAME,ST_FATHER,ST_MOTHER,ST_CLASS,ST_DOB,ST_ADDRESS,ST_MOBILE,ST_ADHAAR,ST_EMAIL,ST_PEN,TRANS_ID,d,t,"PENDING"))
+            cursor.execute('INSERT INTO ADMISSION_REQUEST VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',(ST_NAME,ST_FATHER,ST_MOTHER,ST_GENDER,ST_CLASS,ST_DOB,ST_ADDRESS,ST_MOBILE,ST_ADHAAR,ST_EMAIL,ST_PEN,TRANS_ID,d,t,"PENDING"))
             funt.Functions().data_base_function(conn)
-            return redirect(url_for(welcometoadmissionform))
+            #send email to student
+            cursor.execute('SELECT EMAIL FROM STUDENT_DATA WHERE SR = ?',(request.form.get('sr'),))
+            student_email = cursor.fetchone()
+            funt.Functions().email_sender(student_email,'ADMISSION REQUEST SENDED',html_content=f'''
+            <link rel="stylesheet" href="https://github.com/DIAMONDPUBLICSCHOOL/SCHOOL-WEB-APP/blob/main/static/css/style.css">
+            <h1>DIAMOND PUBLIC SCHOOL (D.P.S.)</h1>
+            <img src="https://github.com/DIAMONDPUBLICSCHOOL/SCHOOL-WEB-APP/blob/main/static/images/SYMBOLS.png" alt="SYMBOL" height="100px" width="100px">
+            <h2>YOUR ADMISSION REQUEST HAS BEEN SENDED.<h2> 
+            <b>YOUR ADMISSION REQUEST SR NUMBER IS {request.form.get("adm_no")}.<br>
+            REAGARDS:-<br>
+            DPS CS TEAM</b><br>''')
+            return redirect(url_for('welcometoadmissionform'))
         return render_template('admission_form/payment.html')
     else:
         return redirect(url_for('welcometoadmissionform'))
@@ -891,8 +910,8 @@ def admission_request_manual():
         conn,cursor = funt.Functions().data_base_function()
         if request.method == "POST":
             if request.form.get('action_type') == "ACCEPT":
-                cursor.execute('INSERT INTO STUDENT_DATA(Adm_ID,Name,Father,Mother,CLASS,DOB,Address,MOBILE,Adhaar,PEN) VALUES(?,?,?,?,?,?,?,?,?,?);',
-                (request.form.get('adm_no'),request.form.get('st_name'),request.form.get('st_ft_name'),request.form.get('st_mt_name'),request.form.get('st_class'),request.form.get('st_dob'),request.form.get('st_add'),request.form.get('st_mob'),request.form.get('st_adhaar'),request.form.get('st_pen')))
+                cursor.execute('INSERT INTO STUDENT_DATA(Adm_ID,Name,Father,Mother,Gender,CLASS,DOB,Address,MOBILE,Adhaar,PEN) VALUES(?,?,?,?,?,?,?,?,?,?);',
+                (request.form.get('adm_no'),request.form.get('st_name'),request.form.get('st_ft_name'),request.form.get('st_mt_name'),request.form.get('st_gender'),request.form.get('st_class'),request.form.get('st_dob'),request.form.get('st_add'),request.form.get('st_mob'),request.form.get('st_adhaar'),request.form.get('st_pen')))
                 cursor.execute('INSERT INTO PASSWORDS(LOG_TYPE,USER_ID,PASSWORD) VALUES(?,?,?)',('STUDENT',request.form.get('adm_no'),funt.Functions().crt_pwd(request.form.get('pwd'))))
                 d,t = funt.Functions().get_date_time()
                 cursor.execute('INSERT INTO LOG_HISTORY VALUES(?,?,?)',(request.form.get('adm_no'),'STUDENT',f'CREATED,{d},{t}'))
@@ -906,9 +925,11 @@ def admission_request_manual():
                 <h1>DIAMOND PUBLIC SCHOOL (D.P.S.)</h1>
                 <img src="https://github.com/DIAMONDPUBLICSCHOOL/SCHOOL-WEB-APP/blob/main/static/images/SYMBOLS.png" alt="SYMBOL" height="100px" width="100px">
                 <h1>CONGRATULATIONS!!!</h1>
-                <h2>YOUR ADMISSION REQUEST HAS BEEN ACCEPTED.<h2> 
+                <h2>YOUR ADMISSION REQUEST HAS BEEN ACCEPTED.<h2>
                 <b>YOUR ADMISSION NUMBER IS {request.form.get("adm_no")}.<br>
-                YOUR PASSWORD IS {request.form.get("pwd")}.</b>''')
+                YOUR PASSWORD IS {request.form.get("pwd")}.<br>
+                REAGARDS:-<br>
+                DPS CS TEAM<br></b>''')
 
                 cursor.execute('DELETE FROM ADMISSION_REQUEST WHERE SR = ?',(request.form.get('sr'),))
                 funt.Functions().data_base_function(conn)
@@ -918,7 +939,9 @@ def admission_request_manual():
                 #send email to student
                 cursor.execute('SELECT EMAIL FROM STUDENT_DATA WHERE SR = ?',(request.form.get('sr'),))
                 student_email = cursor.fetchone()
-                funt.Functions().email_sender(student_email,'ADMISSION REQUEST REJECTED',html_content=f'YOUR ADMISSION REQUEST HAS BEEN REJECTED. YOUR ADMISSION NUMBER IS {request.form.get("adm_no")}.')
+                funt.Functions().email_sender(student_email,'ADMISSION REQUEST REJECTED',html_content=f'''YOUR ADMISSION REQUEST HAS BEEN REJECTED. YOUR ADMISSION REQUEST SR NUMBER IS {request.form.get("adm_no")}.<br>
+                REAGARDS:-<br>
+                DPS CS TEAM<br>''')
                 cursor.execute('UPDATE ADMISSION_REQUEST SET STATUS = "REJECTED" WHERE SR = ?',(request.form.get('sr'),))
                 funt.Functions().data_base_function(conn)
                 return render_template('confirmation.html')
@@ -926,7 +949,6 @@ def admission_request_manual():
             else:
                 return render_template('admin/functions/admission_request.html',code="SOMETHING WENT WRONG!!!")
         cursor.execute('SELECT * FROM ADMISSION_REQUEST WHERE STATUS = "PENDING";')
-        data = cursor.fetchall()
         funt.Functions().data_base_function(conn)
         return render_template('admin/functions/admission_request.html',code=cc.Admission_request().admission_request())
     else:

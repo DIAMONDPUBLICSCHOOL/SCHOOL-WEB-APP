@@ -18,15 +18,27 @@
         <fieldset>
             <h2>TERMS AND CONDITIONS:-</h2>
             <ul>
-                <li>ENTER THE CORRECT TRANSACTION ID. IF YOU ENTER WRONG ID IT CAN LEADS TO CANCELLATION OF YOUR CURRENT ADMISSION FORM.</li>
+                <li>ENTER THE CORRECT TRANSACTION ID. IF YOU ENTER WRONG ID IT CAN LEADS TO CANCELLATION OF YOUR CURRENT ADMISSION REQUEST.</li>
                 <li>AFTER SENDING THE ADMISSION REQUEST YOU GOT A CONFIRMATION EMAIL ON YOUR REGISTERED EMAIL ID FOR CONFIRMATION OF ADMISSION SENDING REQUEST.</li>
                 <li>WITHIN 24 OR 48 HOURS YOU GOT AN EMAIL OF CONFIRMATION OR CANCELLATION OF ADMISSION. <br>IF YOU NOT GOT AN EMAIL CONTACT ON MOBILE NO. +919897432207 & +918273998585.</li>
             </ul>
             <p style="float: right;"><b>REGARDS:- </b><br>DPS CS TEAM</p>
             <hr>
-            <b>ENTER PAYMENT TRANSACTION ID <label>*</label></b>
-            <input type="text" name="transaction_id" id="nor_input" required>
-            <button id="nor_btn">SEND REQUEST</button>
+            <form action="{{url_for('payment')}}" method="post">
+                <input type="text" name="ST_NAME" value="{{ST_NAME}}" hidden>
+                <input type="text" name="ST_FATHER" value="{{ST_FATHER}}" hidden>
+                <input type="text" name="ST_MOTHER" value="{{ST_MOTHER}}" hidden>
+                <input type="text" name="ST_CLASS" value="{{ST_CLASS}}" hidden>
+                <input type="date" name="ST_DOB" value="{{ST_DOB}}" hidden>
+                <input type="text" name="ST_ADDRESS" value="{{ST_ADDRESS}}" hidden>
+                <input type="number" name="ST_MOBILE" value="{{ST_MOBILE}}" hidden>
+                <input type="number" name="ST_ADHAAR" value="{{ST_ADHAAR}}" hidden>
+                <input type="number" name="ST_PEN" value="{{ST_PEN}}" hidden>
+                <input type="email" name="ST_EMAIL" value="{{ST_EMAIL}}" hidden><br><br>
+                <b>ENTER PAYMENT TRANSACTION ID <label>*</label></b>
+                <input type="password" name="transaction_id" id="nor_input" placeholder="ENTER ADMISSION FEES TRANSACTION ID" required>
+                <button id="nor_btn">SEND REQUEST</button>
+            </form>
         </fieldset>
    </fieldset>
 </body>
