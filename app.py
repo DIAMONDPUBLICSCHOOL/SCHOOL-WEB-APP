@@ -674,6 +674,25 @@ def export_data():
         return render_template('admin/functions/export_data.html')
     else:
         return redirect(url_for('welcome_page'))
+    
+#################only for download report card and fees slip
+@app.route('/dwn_reportcard',methods=["GET","POST"])
+def dwn_reportcard():
+    if log_check():
+        if request.method == "POST":
+            report_card_data = cc.Report_card().view_report_card(request.form.get('st_id'),data_only=True)
+            return send_file(report_card_data, as_attachment=True)
+        return redirect(url_for('dashboard'))
+    else:
+        return redirect(url_for('welcome_page'))
+
+@app.route('/dwn_feeslip',methods=["GET","POST"])
+def dwn_feeslip():
+    if log_check():
+        pass
+    else:
+        return redirect(url_for('welcome_page'))
+#########################################
 
 @app.route('/fees_slip',methods=["GET","POST"])
 def fees_slip():

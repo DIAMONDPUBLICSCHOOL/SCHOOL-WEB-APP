@@ -409,7 +409,7 @@ class Report_card(content_creator):
         funt.Data().data_base_function(conn)
         return html_text
     
-    def view_report_card(self,st_id):
+    def view_report_card(self,st_id,data_only=False):
         def add(data):
             try:
                 data = int(data)
@@ -473,7 +473,10 @@ class Report_card(content_creator):
                 html_text += f"<th>{ft}</th><th>{grade(ft,200)}</th></tr>"
             html_text += f'<tr><th colspan="5"></th><th>{tff1}</th><th colspan="4"></th><th>{tff2}</th><th>{fft}</th><th>{grade(fft,len(sub)*200)}</th></tr></table>'
             funt.Functions().crt_pdf_html(html_text,f'REPORT_CARD_{st_id}')
-            html_text += f'<a href="{funt.Export().report_card(html_text)}" download><button id="nor_btn">DOWNLOAD REPORT CARD  <i class="fa fa-download"></i></button></a>'
+            if data_only == False:
+                html_text += f'<form action="/dwn_reportcard" method="post"><input type="number" name="st_id" value="{st_id}" hidden><button id="nor_btn">DOWNLOAD REPORT CARD  <i class="fa fa-download"></i></button></form>'
+            else:
+                pass #qr codes & other data can be added here
         else:
             html_text = "<h2>ERROR CAUSED IN DATABASE!!!</h2>"
         funt.Data().data_base_function(conn)
@@ -666,12 +669,14 @@ h1,h2{{text-align:center;}}
     
     def student_passwords(self):
         html_text = '''<table border="3">
-        <tr><th>USER ID</th><th>PASSWORD</th></tr>
+        <tr><th>USER ID</th><th>NAME</th><th>FATHER</th><th>MOTHER</th><th>DOB</th><th>CLASS</th><th>PASSWORD</th></tr>
         '''
         conn,cursor = funt.Data().data_base_function()
         cursor.execute('SELECT USER_ID,PASSWORD FROM PASSWORDS WHERE LOG_TYPE="STUDENT"')
         for item in cursor.fetchall():
-            html_text += f'<tr><th>{item[0]}</th><th>{crypt.log_pin_decypt(item[1])}</th></tr>'
+            cursor.execute('SELECT NAME,FATHER,MOTHER,DOB,CLASS FROM STUDENT_DATA WHERE Adm_ID = ?',(item[0],))
+            name,father,mother,dob,class_= cursor.fetchone()
+            html_text += f'<tr><th>{item[0]}</th><th>{name}</th><th>{father}</th><th>{mother}</th><th>{dob}</th><th>{class_}</th><th>{crypt.log_pin_decypt(item[1])}</th></tr>'
         funt.Functions().data_base_function(conn)
         return html_text + "<tr><th><b><i><u>NOTE:-</u></i> PLEASE DO NOT SHARE YOUR LOGIN CREDENTIALS WITH ANYONE.</b></th></tr></table>"
 
@@ -689,11 +694,13 @@ h1,h2{{text-align:center;}}
     
     def teachers_passwords(self):
         html_text = '''<table border="3">
-        <tr><th>USER ID</th><th>PASSWORD</th></tr>
+        <tr><th>USER ID</th><th>NAME</th><th>FATHER</th><th>MOTHER</th><th>DOB</th><th>PASSWORD</th></tr>
         '''
         conn,cursor = funt.Data().data_base_function()
         cursor.execute('SELECT USER_ID,PASSWORD FROM PASSWORDS WHERE LOG_TYPE="TEACHER"')
         for item in cursor.fetchall():
-            html_text += f'<tr><th>{item[0]}</th><th>{crypt.log_pin_decypt(item[1])}</th></tr>'
+            cursor.execute('SELECT NAME,FATHER,MOTHER,DOB FROM TEACHER_DATA WHERE ID = ?',(item[0],))
+            name,father,mother,dob = cursor.fetchone()
+            html_text += f'<tr><th>{item[0]}</th><th>{name}</th><th>{father}</th><th>{mother}</th><th>{dob}</th><th>{crypt.log_pin_decypt(item[1])}</th></tr>'
         funt.Functions().data_base_function(conn)
         return html_text + "<tr><th><b><i><u>NOTE:-</u></i> PLEASE DO NOT SHARE YOUR LOGIN CREDENTIALS WITH ANYONE.</b></th></tr></table>"
