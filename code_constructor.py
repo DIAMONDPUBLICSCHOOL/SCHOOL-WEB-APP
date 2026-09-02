@@ -1,4 +1,5 @@
 import functions as funt
+import my_cryptography as crypt
 
 class content_creator:
     def __init__(self):
@@ -472,7 +473,7 @@ class Report_card(content_creator):
                 html_text += f"<th>{ft}</th><th>{grade(ft,200)}</th></tr>"
             html_text += f'<tr><th colspan="5"></th><th>{tff1}</th><th colspan="4"></th><th>{tff2}</th><th>{fft}</th><th>{grade(fft,len(sub)*200)}</th></tr></table>'
             funt.Functions().crt_pdf_html(html_text,f'REPORT_CARD_{st_id}')
-            # html_text += f'<a href="{funt.Export().report_card(html_text)}" download><button id="nor_btn">DOWNLOAD REPORT CARD  <i class="fa fa-download"></i></button></a>'
+            html_text += f'<a href="{funt.Export().report_card(html_text)}" download><button id="nor_btn">DOWNLOAD REPORT CARD  <i class="fa fa-download"></i></button></a>'
         else:
             html_text = "<h2>ERROR CAUSED IN DATABASE!!!</h2>"
         funt.Data().data_base_function(conn)
@@ -638,5 +639,61 @@ class Admission_request:
         funt.Data().data_base_function(conn)
         return html_text
 
+class Export:
+    def Export_data_bridge(self,filename):
+        d,t = funt.Functions().get_date_time()
+        filetype = {'STUDENTS DATA':self.student_data(),'STUDENTS PASSWORDS':self.student_passwords(),'TEACHERS DATA':self.teachers_data(),'TEACHERS PASSWORDS':self.teachers_passwords()}
+        real_filename = filename.replace(' ','_')+f"{d},{t}.pdf"
+        return f"""<style>
+body{{margin:10px 10px;padding:12px 20px;}}
+h1,h2{{text-align:center;}}
+</style>
+<body>
+<h1>DIAMOND PUBLIC SCHOOL</h1>
+<h2>{filename}</h2>
+"""+filetype[filename]+"""
+<b><i><u>NOTE:-</u></i> THIS IS GENEARTED BY COMPUTERISED SYSTEM NO SIGNATURE REQUIRED.</b></body>
+""",real_filename
+    
+    def student_data(self):
+        html_text = '''<table border="3"><tr><th>ADM. ID.</th><th>NAME</th><th>FATHER</th><th>MOTHER</th><th>GENDER</th><th>CLASS</th><th>D.O.B.</th><th>ADDRESS</th><th>MOBILE</th><th>ADHAAR</th></tr>'''
+        conn,cursor = funt.Data().data_base_function()
+        cursor.execute('SELECT Adm_ID,NAME,FATHER,MOTHER,GENDER,CLASS,DOB,ADDRESS,MOBILE,ADHAAR FROM STUDENT_DATA;')
+        for item in cursor.fetchall():
+            html_text += f'<tr><th>{item[0]}</th><th>{item[1]}</th><th>{item[2]}</th><th>{item[3]}</th><th>{item[4]}</th><th>{item[5]}</th><th>{item[6]}</th><th>{item[7]}</th><th>{item[8]}</th><th>{item[9]}</th></tr>'
+        funt.Functions().data_base_function(conn)
+        return html_text + "</table>"
+    
+    def student_passwords(self):
+        html_text = '''<table border="3">
+        <tr><th>USER ID</th><th>PASSWORD</th></tr>
+        '''
+        conn,cursor = funt.Data().data_base_function()
+        cursor.execute('SELECT USER_ID,PASSWORD FROM PASSWORDS WHERE LOG_TYPE="STUDENT"')
+        for item in cursor.fetchall():
+            html_text += f'<tr><th>{item[0]}</th><th>{crypt.log_pin_decypt(item[1])}</th></tr>'
+        funt.Functions().data_base_function(conn)
+        return html_text + "<tr><th><b><i><u>NOTE:-</u></i> PLEASE DO NOT SHARE YOUR LOGIN CREDENTIALS WITH ANYONE.</b></th></tr></table>"
 
-
+    
+    def teachers_data(self):
+        html_text = '''<table border="3">
+        <tr><th>ID</th><th>NAME</th><th>FATHER</th><th>MOTHER</th><th>GENDER</th><th>CLASS</th><th>D.O.B.</th><th>ADDRESS</th><th>MOBILE</th></tr>
+        '''
+        conn,cursor = funt.Data().data_base_function()
+        cursor.execute('SELECT ID,NAME,FATHER,MOTHER,GENDER,DOB,ADDRESS,MOBILE FROM TEACHER_DATA;')
+        for item in cursor.fetchall():
+            html_text += f'<tr><th>{item[0]}</th><th>{item[1]}</th><th>{item[2]}</th><th>{item[3]}</th><th>{item[4]}</th><th>{item[5]}</th><th>{item[6]}</th><th>{item[7]}</th><th>{item[8]}</th></tr>'
+        funt.Functions().data_base_function(conn)
+        return html_text + "</table>"
+    
+    def teachers_passwords(self):
+        html_text = '''<table border="3">
+        <tr><th>USER ID</th><th>PASSWORD</th></tr>
+        '''
+        conn,cursor = funt.Data().data_base_function()
+        cursor.execute('SELECT USER_ID,PASSWORD FROM PASSWORDS WHERE LOG_TYPE="TEACHER"')
+        for item in cursor.fetchall():
+            html_text += f'<tr><th>{item[0]}</th><th>{crypt.log_pin_decypt(item[1])}</th></tr>'
+        funt.Functions().data_base_function(conn)
+        return html_text + "<tr><th><b><i><u>NOTE:-</u></i> PLEASE DO NOT SHARE YOUR LOGIN CREDENTIALS WITH ANYONE.</b></th></tr></table>"

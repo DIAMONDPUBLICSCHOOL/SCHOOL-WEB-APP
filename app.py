@@ -1,4 +1,4 @@
-from flask import Flask,render_template,request,redirect,session,url_for
+from flask import Flask,render_template,request,redirect,session,url_for,send_file
 import random,json,os,my_cryptography
 import code_constructor as cc
 import functions as funt
@@ -668,22 +668,9 @@ def export_data():
     if log_check():
         if request.method == "POST":
             exp_type = request.form.get('btn_type')
-            if exp_type == "1":
-                funt.Export().student_data()
-                return render_template('admin/functions/export_data.html',
-                code=f'''<a href="{url_for('static',filename='files/STUDENT_DETAILS.pdf')}" download><button id="nor_btn">DOWNLOAD <i class="fa fa-download"></i></button></a>''')
-            elif exp_type == "2":
-                funt.Export().student_pwd()
-                return render_template('admin/functions/export_data.html',
-                code=f'''<a href="{url_for('static',filename='files/STUDENT_PASSWORDS.pdf')}" download><button id="nor_btn">DOWNLOAD <i class="fa fa-download"></i></button></a>''')
-            elif exp_type == "3":
-                funt.Export().teacher_data()
-                return render_template('admin/functions/export_data.html',
-                code=f'''<a href="{url_for('static',filename='files/TEACHER_DETAILS.pdf')}" download><button id="nor_btn">DOWNLOAD <i class="fa fa-download"></i></button></a>''')
-            elif exp_type == "4":
-                funt.Export().teacher_pwd()
-                return render_template('admin/functions/export_data.html',
-                code=f'''<a href="{url_for('static',filename='files/TEACHER_PASSWORDS.pdf')}" download><button id="nor_btn">DOWNLOAD <i class="fa fa-download"></i></button></a>''')
+            file_data,filename  = cc.Export().Export_data_bridge(exp_type)
+            file = funt.Functions().crt_pdf_html(file_data)
+            return send_file(file,mimetype="application/pdf",as_attachment=True,download_name=filename)
         return render_template('admin/functions/export_data.html')
     else:
         return redirect(url_for('welcome_page'))

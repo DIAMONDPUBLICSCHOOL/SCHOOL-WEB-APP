@@ -4,10 +4,11 @@ import sqlite3,my_cryptography,datetime,json,subprocess,os
 # from reportlab.platypus import Table, TableStyle, Paragraph
 # from reportlab.lib import colors
 # from reportlab.lib.styles import getSampleStyleSheet
-import my_cryptography as crypt
 import smtplib
+import my_cryptography as crypt
 from email.message import EmailMessage
-
+from playwright.sync_api import sync_playwright
+        
 class Data:
     def __init__(self):
         super().__init__()
@@ -113,21 +114,31 @@ class Functions(Data):
         msg["Subject"] = subject
         msg["From"] = "nishantkushwah7536@gmail.com"######################################
         msg["To"] = receiver_email
-        if message:
-            msg.set_content(message)
         if html_content:
             msg.add_alternative(html_content, subtype="html")
+        elif message:
+            msg.set_content(message)
+        else:
+            raise ValueError("Either message or html_content must be provided.")
         with smtplib.SMTP("smtp.gmail.com", 587) as server:
             server.starttls()
-            server.login("nishantkushwah7536@gmail.com","pass////1234")###################################
+            server.login("nishantkushwah7536@gmail.com","//////////////////")###################################
             server.send_message(msg)
         return True
-       
-    def crt_pdf_html(self,data,filename):
-        from weasyprint import HTML
-        HTML(string=data).write_pdf(f"{filename}.pdf")#store in user computer [xxx]
-        return True
-    
+    from playwright.sync_api import sync_playwright
+
+    def crt_pdf_html(self,data):
+        from io import BytesIO
+        with sync_playwright() as p:
+            browser = p.chromium.launch()
+            page = browser.new_page()
+            page.set_content(data)
+            pdf = page.pdf(format="A4")
+            browser.close()
+            pdf_file = BytesIO(pdf)
+            pdf_file.seek(0)
+            return pdf_file
+
     # def crt_pdf(self,data,pdf_name,land=False,content=[]):
     #     element = []
     #     styles = getSampleStyleSheet()
