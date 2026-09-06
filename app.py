@@ -69,17 +69,21 @@ def dashboard():
         if session["role"] == "STUDENT":
             cursor.execute('SELECT Name,Father,Mother,Gender,Class,DOB,Address,MOBILE FROM STUDENT_DATA WHERE Adm_ID = ?',(session['user_id'],))
             Name,Father,Mother,gender,Class,DOB,Address,MOBILE = cursor.fetchone()
-            if gender != "Male" and gender != "Female":
-                gender = '<i class="fa fa-user"></i>'
+            if gender.upper() != "MALE" and gender.upper() != "FEMALE":
+                gender_code = '<i class="fa fa-user"></i>'
             else:
-                gender = gender.lower()+'_user.png'
+                gender_code = f'<img src="static/images/{gender.lower()}_user.png" alt="{gender.upper()}">'
             funt.Data().data_base_function(conn)
-            return render_template("student/dashboard.html",info=f'''<div id="user_info"><img src="static/images/{gender}" alt="{gender}"><br><br>NAME:- <font>{Name.upper()}</font><br>FATHER NAME:- <font>{Father.upper()}</font><br>MOTHER NAME:- <font>{Mother.upper()}</font><br>CLASS :- <font>{Class}</font><br>ADDRESS :- <font>{Address.upper()}</font><br>D.O.B. :- <font>{DOB.upper()}</font><br>MOBILE NO.:- <font>{MOBILE}</font>''')
+            return render_template("student/dashboard.html",info=f'''<div id="user_info">{gender_code}<br><br>NAME:- <font>{Name.upper()}</font><br>FATHER NAME:- <font>{Father.upper()}</font><br>MOTHER NAME:- <font>{Mother.upper()}</font><br>CLASS :- <font>{Class}</font><br>ADDRESS :- <font>{Address.upper()}</font><br>D.O.B. :- <font>{DOB.upper()}</font><br>MOBILE NO.:- <font>{MOBILE}</font>''')
         elif session["role"] == "TEACHER":
-            cursor.execute('SELECT Name,Father,Mother,Mobile FROM TEACHER_DATA WHERE ID = ?',(session['user_id'],))
-            Name,Father,Mother,Mobile = cursor.fetchone()
+            cursor.execute('SELECT Name,Father,Mother,Mobile,Gender FROM TEACHER_DATA WHERE ID = ?',(session['user_id'],))
+            Name,Father,Mother,Mobile,gender = cursor.fetchone()
+            if gender.upper() != "MALE" and gender.upper() != "FEMALE":
+                gender_code = '<i class="fa fa-user"></i>'
+            else:
+                gender_code = f'<img src="static/images/{gender.lower()}_user.png" alt="{gender.upper()}">'
             funt.Data().data_base_function(conn)
-            return render_template("teacher/dashboard.html",info=f'''NAME:- <font>{Name.upper()}</font><br>FATHER NAME:-<font>{Father.upper()}</font><br>MOTHER NAME:-<font>{Mother.upper()}</font><br>MOBILE NO.:-<font>{Mobile}</font>''')
+            return render_template("teacher/dashboard.html",info=f'''<div id="user_info">{gender_code}<br><br>NAME:- <font>{Name.upper()}</font><br>FATHER NAME:-<font>{Father.upper()}</font><br>MOTHER NAME:-<font>{Mother.upper()}</font><br>MOBILE NO.:-<font>{Mobile}</font>''')
         elif session["role"] == "ADMIN":
             funt.Data().data_base_function(conn)
             return render_template("admin/dashboard.html")
@@ -123,24 +127,26 @@ def report_card():
                 conn,cursor = funt.Data().data_base_function()
                 c_class = request.form.get('c_class')
                 re_type = request.form.get('stage')
+                # here "st" in stage like select class, select student not terms 1 & 2
                 if re_type == "st1":
                     funt.Data().data_base_function(conn)
                     return render_template("teacher/functions/report_card.html",code=cc.Report_card().select_st(c_class))
                 st_id = request.form.get('st_del')
+
                 if re_type == "st2":
                     funt.Data().data_base_function(conn)
                     return render_template("teacher/functions/report_card.html",code=cc.Report_card().select_st(c_class),code2=cc.Report_card().teach_st(int(re_type[-1]) -1,st_id,c_class))
+                
                 data = ''
-                for i in range(cc.content_creator().subject_list(c_class)):
+                for i in range(len(cc.content_creator().subject_list(c_class))):
                     var = (f't{i+1}_1',f't{i+1}_2',f't{i+1}_3',f't{i+1}_4')
                     data += f'{request.form.get(var[0])},{request.form.get(var[1])},{request.form.get(var[2])},{request.form.get(var[3])};'
                 data = data[:-1]
-                
                 if re_type == "st3":
-                    cursor.execute('UPDATE EXAM_DATA SET TERM_1 = ? WHERE Adm_ID = ?',(data,st_id))
+                    cursor.execute(f'UPDATE EXAM_DATA SET TERM_1 = ? WHERE Adm_ID = ?',(data,st_id))
                     funt.Data().data_base_function(conn)
                     return render_template("teacher/functions/report_card.html",code=cc.Report_card().select_st(c_class),code2=cc.Report_card().teach_st(int(re_type[-1]) -1,st_id,c_class)) 
-                cursor.execute('UPDATE EXAM_DATA SET TERM_2 = ? WHERE Adm_ID = ?',(data,st_id))
+                cursor.execute(f'UPDATE EXAM_DATA SET TERM_2 = ? WHERE Adm_ID = ?',(data,st_id))
                 funt.Data().data_base_function(conn)
                 return render_template("teacher/functions/report_card.html")
             return render_template("teacher/functions/report_card.html")
@@ -371,7 +377,7 @@ def teacher_hw_sender():
     else:
         return redirect(url_for('welcome_page'))
 
-@app.route('/attandance',methods=["POST","GET"]) 
+@app.route('/student_attandance',methods=["POST","GET"]) 
 def st_attendance_teacher():
     if log_check():
         if request.method == "POST":
@@ -414,19 +420,24 @@ def online_classes_teacher():
 @app.route('/command_box',methods=["GET","POST"])
 def command_box():
     if log_check():
-        if request.method == "POST":
-            if 'universal_admin' not in session:
+        if 'universal_admin' not in session:
+            if request.method == "POST":
                 if str(request.form.get('pin')).strip() == my_cryptography.log_pin_decypt('gAAAAABqVkB7NZlVRW0g-LsW2GP7XACyePFv4GAqN-tN4rZccW-ZNb9bVPjET06Gb8f7o2UjP_VxrretZpszQEbzJjO0IczrR-PKLxlA3r-tMf-uArCdKbg='):
                     session['universal_admin'] = True
                     return render_template('admin/functions/command_box.html')
                 else:
                     session['universal_admin'] = False
-            elif session['universal_admin']:
+                    return redirect(url_for('dashboard'))
+            else:
+                return redirect(url_for('dashboard'))
+        elif session['universal_admin']:
+            if request.method == "POST":
                 output,error = funt.Functions().command_box(str(request.form.get('command')).strip())
                 return render_template('admin/functions/command_box.html',output=output,error=error)
             else:
-                return redirect(url_for('dashboard'))
-        return redirect(url_for('dashboard'))
+                return render_template('admin/functions/command_box.html')
+        else:
+            return redirect(url_for('dashboard'))
     else:
         return redirect(url_for('welcome_page'))
 

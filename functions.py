@@ -1,5 +1,5 @@
 import sqlite3,my_cryptography,datetime,json,subprocess,os
-import smtplib
+import smtplib,sys
 import my_cryptography as crypt
 from email.message import EmailMessage
 from playwright.sync_api import sync_playwright
@@ -34,13 +34,10 @@ class Functions(Data):
     def command_box(self,command):
         with open('output.py', 'w') as f:
             f.write(command)
-        result = subprocess.run(['python','output.py'],capture_output=True,text=True)
+        result = subprocess.run([sys.executable,'output.py'],capture_output=True,text=True)
         output = result.stdout
         error = result.stderr
-        conn,cursor = self.data_base_function()
-        cursor.execute('INSERT INTO com_history(command, output, error) VALUES(?,?,?)',(command, output, error))
-        self.data_base_function(conn)
-        # self.system_checker()
+        open('output.py', 'w').close()
         return output, error
 
     def date_show_mon(self,d):

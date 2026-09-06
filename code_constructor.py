@@ -489,14 +489,21 @@ class Report_card(content_creator):
         cursor.execute('SELECT Class FROM STUDENT_DATA WHERE Adm_ID = ?',(st_id,))
         c_class = cursor.fetchone()[0]
         cursor.execute('SELECT TERM_1,TERM_2 FROM EXAM_DATA WHERE Adm_ID = ?',(st_id,))
-        row = cursor.fetchall()
         data = super().subject_list(c_class)
-        for i in range(len(data)):
-            t_1,t_2,t_3,t_4 = row[0][stage - 1].split(';')[i].split(',')
-            html_text += f'''<tr><th>{data[i]}</th><th><input type="number" value="{t_1}" name="t{i+1}_1" min="0" max="10"></th>
-            <th><input type="number" value="{t_2}" name="t{i+1}_2" min="0" max="5"></th>
-            <th><input type="number" value="{t_3}" name="t{i+1}_3" min="0" max="5"></th>
-            <th><input type="number" value="{t_4}" name="t{i+1}_4" min="0" max="80"></th></tr>'''
+        row = cursor.fetchone()
+        if row is None:
+            for i in range(len(data)):
+                html_text += f'''<tr><th>{data[i]}</th><th><input type="number" name="t{i+1}_1" min="0" max="10"></th>
+                <th><input type="number" name="t{i+1}_2" min="0" max="5"></th>
+                <th><input type="number" name="t{i+1}_3" min="0" max="5"></th>
+                <th><input type="number" name="t{i+1}_4" min="0" max="80"></th></tr>'''
+        else:
+            for i in range(len(data)):
+                t_1,t_2,t_3,t_4 = list(row)[0][stage - 1].split(';')[i].split(',')
+                html_text += f'''<tr><th>{data[i]}</th><th><input type="number" value="{t_1}" name="t{i+1}_1" min="0" max="10"></th>
+                <th><input type="number" value="{t_2}" name="t{i+1}_2" min="0" max="5"></th>
+                <th><input type="number" value="{t_3}" name="t{i+1}_3" min="0" max="5"></th>
+                <th><input type="number" value="{t_4}" name="t{i+1}_4" min="0" max="80"></th></tr>'''
         if stage < 2:
             html_text += '</table><button id="nor_btn">NEXT >>></button>'
         else:
@@ -678,7 +685,7 @@ h1,h2{{text-align:center;}}
             name,father,mother,dob,class_= cursor.fetchone()
             html_text += f'<tr><th>{item[0]}</th><th>{name}</th><th>{father}</th><th>{mother}</th><th>{dob}</th><th>{class_}</th><th>{crypt.log_pin_decypt(item[1])}</th></tr>'
         funt.Functions().data_base_function(conn)
-        return html_text + "<tr><th><b><i><u>NOTE:-</u></i> PLEASE DO NOT SHARE YOUR LOGIN CREDENTIALS WITH ANYONE.</b></th></tr></table>"
+        return html_text + '<tr><th colspan="7"><b><i><u>NOTE:-</u></i> PLEASE DO NOT SHARE YOUR LOGIN CREDENTIALS WITH ANYONE.</b></th></tr></table>'
 
     
     def teachers_data(self):
@@ -703,4 +710,4 @@ h1,h2{{text-align:center;}}
             name,father,mother,dob = cursor.fetchone()
             html_text += f'<tr><th>{item[0]}</th><th>{name}</th><th>{father}</th><th>{mother}</th><th>{dob}</th><th>{crypt.log_pin_decypt(item[1])}</th></tr>'
         funt.Functions().data_base_function(conn)
-        return html_text + "<tr><th><b><i><u>NOTE:-</u></i> PLEASE DO NOT SHARE YOUR LOGIN CREDENTIALS WITH ANYONE.</b></th></tr></table>"
+        return html_text + '<tr><th colspan="7"><b><i><u>NOTE:-</u></i> PLEASE DO NOT SHARE YOUR LOGIN CREDENTIALS WITH ANYONE.</b></th></tr></table>'
