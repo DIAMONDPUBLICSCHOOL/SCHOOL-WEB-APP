@@ -705,10 +705,13 @@ def dwn_reportcard():
     else:
         return redirect(url_for('welcome_page'))
 
-@app.route('/dwn_feeslip',methods=["GET","POST"])
-def dwn_feeslip():
+@app.route('/download_fees_slip',methods=["GET","POST"])
+def download_fees_slip():
     if log_check():
-        pass
+        if request.method == "POST":
+            fees_slip_data = cc.Fees_slip().view_fees_slip(request.form.get('st_id'),request.form.get('amount'))###############
+            return send_file(fees_slip_data, as_attachment=True)
+        return redirect(url_for('dashboard'))
     else:
         return redirect(url_for('welcome_page'))
 #########################################
@@ -761,7 +764,7 @@ def fees_slip():
                 FEES_ID = max(FEES_ID_LI)
                 cursor.execute('INSERT INTO FEES_DATA(FEES_ID,Adm_id,CURRENT_DEPOSIT,REST,SESSION) VALUES(?,?,?,?);',(FEES_ID,st_id,fees_amount,fees-fees_amount,fees_session))
                 funt.Export().fees_slip_export(st_id,fees_amount,fees-fees_amount)
-                code2=f'''<a href="{url_for('static',filename='files/FEES_SLIP.pdf')}" download><button id="nor_btn">DOWNLOAD FEES RECIEPT <i class="fa fa-download"></i></button></a>'''
+                code2=f'''<form action="/download_fees_slip" method="post"><input name="st_id" value="{st_id}" hidden><button id="nor_btn">DOWNLOAD FEES RECIEPT <i class="fa fa-download"></i></button></form>'''
                 funt.Data().data_base_function(conn)
                 return render_template('admin/functions/fees_slip.html',
                 code="DATA SAVED SUCCESFULLY!!!",code2=code2,st_id=st_id,st_name=st_name,st_father=st_father,st_mother=st_mother,st_class=st_class)

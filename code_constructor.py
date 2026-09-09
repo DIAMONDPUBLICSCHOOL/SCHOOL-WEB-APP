@@ -695,7 +695,7 @@ h1,h2{{text-align:center;}}
         conn,cursor = funt.Data().data_base_function()
         cursor.execute('SELECT ID,NAME,FATHER,MOTHER,GENDER,DOB,ADDRESS,MOBILE FROM TEACHER_DATA;')
         for item in cursor.fetchall():
-            html_text += f'<tr><th>{item[0]}</th><th>{item[1]}</th><th>{item[2]}</th><th>{item[3]}</th><th>{item[4]}</th><th>{item[5]}</th><th>{item[6]}</th><th>{item[7]}</th><th>{item[8]}</th></tr>'
+            html_text += f'<tr><th>{item[0]}</th><th>{item[1]}</th><th>{item[2]}</th><th>{item[3]}</th><th>{item[4]}</th><th>{item[5]}</th><th>{item[6]}</th><th>{item[7]}</th></tr>'
         funt.Functions().data_base_function(conn)
         return html_text + "</table>"
     
@@ -711,3 +711,42 @@ h1,h2{{text-align:center;}}
             html_text += f'<tr><th>{item[0]}</th><th>{name}</th><th>{father}</th><th>{mother}</th><th>{dob}</th><th>{crypt.log_pin_decypt(item[1])}</th></tr>'
         funt.Functions().data_base_function(conn)
         return html_text + '<tr><th colspan="7"><b><i><u>NOTE:-</u></i> PLEASE DO NOT SHARE YOUR LOGIN CREDENTIALS WITH ANYONE.</b></th></tr></table>'
+
+class Fees_slip:
+    def view_fees_slip(self,st_id,amount):
+        html_text = ''
+        conn,cursor = funt.Data().data_base_function()
+        cursor.execute('SELECT NAME,FATHER,MOTHER,CLASS,DOB,MOBILE,ADDRESS FROM STUDENT_DATA WHERE Adm_ID = ?',(st_id,))
+        data = cursor.fetchone()
+        if data is None:
+            return '<h2>DATA NOT FOUND!!!</h2>'
+        name,father,mother,cls,dob,mobile,add = data
+        html_text += f"""
+<fieldset><h1>DIAMOND PUBLIC SCHOOL</h1>
+<h2>FEES SLIP</h2>
+<h3>MOBILE:+919897432207,+918273998585::EMAIL:DPSJALESAR@GMAIL.COM</h3>
+<hr><hr>
+<fieldset>
+<b>STUDENT ADM.NO. :- </b>{st_id}<br>
+<b>STUDENT NAME :- </b>{name}<br>
+<b>STUDENT CLASS :- </b>{cls} <b>D.O.B. :- </b> {dob}<br>
+<b>FATHER'S NAME :- </b>{father}<br>
+<b>MOTHER'S NAME :- </b>{mother}<br>
+<b>MOBILE NUMBER :- </b>{mobile}<br>
+</fieldset>
+<table border="3">
+<tr><th>FACILITIES</th><th>AMOUNT</th></tr>
+<tr><th>TUTION FESS</th><th>{amount}</th></tr>
+<tr><th>SPORTS FEES</th><th>-</th></tr>
+<tr><th>COMPUTER FEES</th><th>-</th></tr>
+<tr><th>FURNITURE FEES</th><th>-</th></tr>
+<tr><th>ELECTRICITY FEES</th><th>-</th></tr>
+<tr><th>OTHERS</th><th>-</th></tr>
+<tr><th>TOTAL</th><th>₹{amount}.00/-</th></tr>
+<tr><th colspan="2"><b><i><u>NOTE:-</u></i> PLEASE KEEP THIS FEES SLIP CAREFULLY.</b></th></tr>
+</table>
+<br><br><br>
+<b>CASHIER</b>
+</fieldset>"""
+
+
