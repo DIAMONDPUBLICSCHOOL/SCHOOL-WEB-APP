@@ -142,6 +142,14 @@ def report_card():
                     var = (f't{i+1}_1',f't{i+1}_2',f't{i+1}_3',f't{i+1}_4')
                     data += f'{request.form.get(var[0])},{request.form.get(var[1])},{request.form.get(var[2])},{request.form.get(var[3])};'
                 data = data[:-1]
+                cursor.execute('SELECT * FROM EXAM_DATA WHERE Adm_ID = ?',(st_id,))
+                if cursor.fetchone() is None:
+                    sub = ''
+                    cursor.execute('SELECT CLASS FROM STUDENT_DATA WHERE Adm_ID = ?',(st_id,))
+                    for _ in range(len(cc.content_creator().subject_list(cursor.fetchone()[0]))-1):
+                        sub += ',,,;'
+                    cursor.execute('INSERT INTO EXAM_DATA VALUES (?,?,?)',(st_id,sub,sub))
+                    conn.commit()
                 if re_type == "st3":
                     cursor.execute(f'UPDATE EXAM_DATA SET TERM_1 = ? WHERE Adm_ID = ?',(data,st_id))
                     funt.Data().data_base_function(conn)
