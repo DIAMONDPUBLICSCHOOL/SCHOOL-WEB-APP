@@ -6,9 +6,10 @@ import functions as funt
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY')
 
-@app.errorhandler(Exception)
-def handle_all_errors(e):
-   return render_template('error.html')
+# NEVER DISCOMMENT THE BELOW CODE WHEN YOU ARE REPAIRING THIS APP.!!!!!!!!!!!!!!
+# @app.errorhandler(Exception)
+# def handle_all_errors(e):
+#    return render_template('error.html')
 
 def log_check():
     if ("user_id" not in session or "role" not in session or "name" not in session or "ip" not in session or "session_token" not in session):
