@@ -1,29 +1,26 @@
 from flask import Flask,render_template,request,redirect,session,url_for,send_file
-import random,json,os,my_cryptography
+import random,json,os,my_cryptography,uuid
 import code_constructor as cc
 import functions as funt
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY')
 
-# @app.errorhandler(Exception)
-# def handle_all_errors(e):
-#    return render_template('error.html')
+@app.errorhandler(Exception)
+def handle_all_errors(e):
+   return render_template('error.html')
 
 def log_check():
-    if "user_id" not in session or "role" not in session or"name" not in session or 'ip' not in session:
+    if ("user_id" not in session or "role" not in session or "name" not in session or "ip" not in session or "session_token" not in session):
         return False
-    else:
-        if session['role'] != 'ADMIN':
-            conn,cursor = funt.Functions().data_base_function()
-            cursor.execute('SELECT SECRET_ID FROM SINGLE_LOG WHERE USER_TYPE = ? AND USER_ID = ?',(session['role'],session['user_id']))
-            data = cursor.fetchone()
-            if data is None:
-                cursor.execute('INSERT INTO SINGLE_LOG VALUES(?,?,?)',(session['role'],session['user_id'],int(session['secret_id'])))
-            funt.Functions().data_base_function(conn)
-            if int(data[0]) != int(session['secret_id']):
-                return redirect(url_for('logout'))
-        return True
+    conn,cursor = funt.Functions().data_base_function()
+    cursor.execute("""SELECT SESSION_TOKEN FROM ACTIVE_SESSIONS WHERE USER_ID = ? AND USER_TYPE = ?""", (str(session["user_id"]), session["role"]))
+    row = cursor.fetchone()
+    funt.Functions().data_base_function(conn)
+    if row is None or row[0] != session["session_token"]:
+        session.clear()
+        return False
+    return True
 
 @app.route("/", methods=["GET","POST"])
 def welcome_page():
@@ -46,14 +43,17 @@ def welcome_page():
             session["role"] = log_type
             session["name"] = row
             session['ip'] = ip
-            session['secret_id'] = int(random.randint(10000,99999))
+            session_token = uuid.uuid4().hex
+            session["session_token"] = session_token
+            cursor.execute("""INSERT INTO ACTIVE_SESSIONS(USER_ID, USER_TYPE, SESSION_TOKEN) VALUES (?, ?, ?) ON CONFLICT(USER_ID, USER_TYPE) DO UPDATE SET SESSION_TOKEN = excluded.SESSION_TOKEN""", (str(U_N), log_type, session_token))
+            conn.commit()
             if session['role'] != 'ADMIN':
                 cursor.execute('UPDATE SINGLE_LOG SET SECRET_ID = ? WHERE USER_TYPE = ? AND USER_ID = ?',(session['secret_id'],log_type,U_N))
                 cursor.execute('SELECT HISTORY FROM LOG_HISTORY WHERE USER_ID = ? AND USER_TYPE = ?',(U_N,log_type))
                 his = cursor.fetchone()[0]
                 d,t = funt.Functions().get_date_time()
                 his += f';{ip.replace(',','').replace(';','')},{str(d).replace(',','').replace(';','')},{str(t).replace(',','').replace(';','')}'
-                cursor.execute('UPDATE LOG_HISTORY SET HISTORY= ? WHERE USER_ID = ? AND USER_TYPE = ?',(his,U_N,log_type))
+                cursor.execute('UPDATE LOG_HISTORY SET HISTORY = ? WHERE USER_ID = ? AND USER_TYPE = ?',(his,U_N,log_type))
             cursor.execute('SELECT * FROM BLOCK_USER WHERE USER_ID = ? AND USER_TYPE = ?',(U_N,log_type))
             if cursor.fetchone() is not None:
                 funt.Data().data_base_function()
@@ -531,7 +531,6 @@ def add_student():
             cursor.execute('INSERT INTO EXAM_DATA VALUES(?,?,?)',(ST_ID,val,val))
             d,t = funt.Functions().get_date_time()
             cursor.execute('INSERT INTO LOG_HISTORY VALUES(?,?,?)',(ST_ID,'STUDENT',f'CREATED,{d},{t}'))
-            cursor.execute('INSERT INTO SINGLE_LOG VALUES(?,?,?)',('STUDENT',ST_ID,0))
             funt.Data().data_base_function(conn)
             return render_template('confirmation.html')
         return render_template('admin/functions/add_st.html')
@@ -571,7 +570,6 @@ def add_teacher():
             cursor.execute('INSERT INTO PASSWORDS(LOG_TYPE,USER_ID,PASSWORD) VALUES(?,?,?);',("TEACHER",T_ID_,T_PWD))
             d,t = funt.Functions().get_date_time()
             cursor.execute('INSERT INTO LOG_HISTORY VALUES(?,?,?)',(T_ID_,'TEACHER',f'CREATED,{d},{t}'))
-            cursor.execute('INSERT INTO SINGLE_LOG VALUES(?,?,?)',('TEACHER',T_ID_,0))
             funt.Data().data_base_function(conn)
             return render_template('confirmation.html')
         return render_template('admin/functions/add_t.html')
