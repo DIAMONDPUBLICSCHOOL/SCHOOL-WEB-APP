@@ -17,9 +17,11 @@ def log_check():
         if session['role'] != 'ADMIN':
             conn,cursor = funt.Functions().data_base_function()
             cursor.execute('SELECT SECRET_ID FROM SINGLE_LOG WHERE USER_TYPE = ? AND USER_ID = ?',(session['role'],session['user_id']))
-            user_secret_id = int(cursor.fetchone()[0])
+            data = cursor.fetchone()
+            if data is None:
+                cursor.execute('INSERT INTO SINGLE_LOG VALUES(?,?,?)',(session['role'],session['user_id'],int(session['secret_id'])))
             funt.Functions().data_base_function(conn)
-            if user_secret_id != int(session['secret_id']):
+            if int(data[0]) != int(session['secret_id']):
                 return redirect(url_for('logout'))
         return True
 
@@ -40,14 +42,13 @@ def welcome_page():
             else:
                 row = ('ADMIN',)
             ip = request.form.get('ip_address')
-            user_secret_id = int(random.randint(10000,99999))
             session["user_id"] = U_N
             session["role"] = log_type
             session["name"] = row
             session['ip'] = ip
-            session['secret_id'] = user_secret_id
+            session['secret_id'] = int(random.randint(10000,99999))
             if session['role'] != 'ADMIN':
-                cursor.execute('UPDATE SINGLE_LOG SET SECRET_ID = ? WHERE USER_TYPE = ? AND USER_ID = ?',(user_secret_id,log_type,U_N))#########
+                cursor.execute('UPDATE SINGLE_LOG SET SECRET_ID = ? WHERE USER_TYPE = ? AND USER_ID = ?',(session['secret_id'],log_type,U_N))
                 cursor.execute('SELECT HISTORY FROM LOG_HISTORY WHERE USER_ID = ? AND USER_TYPE = ?',(U_N,log_type))
                 his = cursor.fetchone()[0]
                 d,t = funt.Functions().get_date_time()
