@@ -49,7 +49,6 @@ def welcome_page():
             cursor.execute("""INSERT INTO ACTIVE_SESSIONS(USER_ID, USER_TYPE, SESSION_TOKEN) VALUES (?, ?, ?) ON CONFLICT(USER_ID, USER_TYPE) DO UPDATE SET SESSION_TOKEN = excluded.SESSION_TOKEN""", (str(U_N), log_type, session_token))
             conn.commit()
             if session['role'] != 'ADMIN':
-                cursor.execute('UPDATE SINGLE_LOG SET SECRET_ID = ? WHERE USER_TYPE = ? AND USER_ID = ?',(session['secret_id'],log_type,U_N))
                 cursor.execute('SELECT HISTORY FROM LOG_HISTORY WHERE USER_ID = ? AND USER_TYPE = ?',(U_N,log_type))
                 his = cursor.fetchone()[0]
                 d,t = funt.Functions().get_date_time()
