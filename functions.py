@@ -211,24 +211,19 @@ class Export(Functions):
         self.data_base_function(conn)
         return
     
-    def fees_slip_export(self,st_id,fees_amount,rest):
-        conn,cursor = self.data_base_function()
-        cursor.execute('SELECT Name,Father,Mother,Class FROM STUDENT_DATA WHERE Adm_ID = ?;',(st_id,))
-        st_name,st_father,st_mother,st_class = cursor.fetchone()
-        pdf = f"FEES_SLIP.pdf"
-        cursor.execute("SELECT FEES_ID FROM FEES_DATA ORDER BY FEES_ID DESC;")
-        receipt_id = int(cursor.fetchone()[0]) + 1
-        d,t = super().get_date_time()
-        content = ["FEES SLIP;h2",f"RECEIPT NO :- {receipt_id};h3",f"DATE/TIME :- {d}{t};h3",f"ADMISSION NO.:- {st_id};h3",f"NAME :- {st_name};h3",f"FATHER NAME:- {st_father};h3",f"MOTHER NAME :- {st_mother};h3",f"CLASS :- {st_class};h3"]
-        Fees_list = [["ACCECCIRORIES","AMOUNT"],["TUTION FEES","-"],["ELECTRICITY FEES","-"],["MAINTENANCE FEES","-"],["FURNITURE FEES","-"],["OTHER FEES","-"],["TOTAL FEES",fees_amount],["REST FEES:-",rest]]
-        super().crt_pdf(Fees_list,pdf,content=content)
-        self.data_base_function(conn)
-        return
-
-    def report_card(self,html_text):
-        a = ''
-        return
-
+    # def fees_slip_export(self,st_id,fees_amount,rest):
+    #     conn,cursor = self.data_base_function()
+    #     cursor.execute('SELECT Name,Father,Mother,Class FROM STUDENT_DATA WHERE Adm_ID = ?;',(st_id,))
+    #     st_name,st_father,st_mother,st_class = cursor.fetchone()
+    #     pdf = f"FEES_SLIP.pdf"
+    #     cursor.execute("SELECT FEES_ID FROM FEES_DATA ORDER BY FEES_ID DESC;")
+    #     receipt_id = int(cursor.fetchone()[0]) + 1
+    #     d,t = super().get_date_time()
+    #     content = ["FEES SLIP;h2",f"RECEIPT NO :- {receipt_id};h3",f"DATE/TIME :- {d}{t};h3",f"ADMISSION NO.:- {st_id};h3",f"NAME :- {st_name};h3",f"FATHER NAME:- {st_father};h3",f"MOTHER NAME :- {st_mother};h3",f"CLASS :- {st_class};h3"]
+    #     Fees_list = [["ACCECCIRORIES","AMOUNT"],["TUTION FEES","-"],["ELECTRICITY FEES","-"],["MAINTENANCE FEES","-"],["FURNITURE FEES","-"],["OTHER FEES","-"],["TOTAL FEES",fees_amount],["REST FEES:-",rest]]
+    #     super().crt_pdf(Fees_list,pdf,content=content)
+    #     self.data_base_function(conn)
+    #     return
 
 class Data_sync(Functions):
     def __init__(self):

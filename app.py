@@ -110,12 +110,12 @@ def noti_view():
     else:
         return redirect(url_for('welcome_page'))
 
-@app.route('/videos')
-def videos():
-    if log_check():
-        return render_template('videos.html',code=cc.Videos_Sender().videos_creater())
-    else:
-        return redirect(url_for('welcome_page'))
+# @app.route('/videos')
+# def videos():
+#     if log_check():
+#         return render_template('videos.html',code=cc.Videos_Sender().videos_creater())
+#     else:
+#         return redirect(url_for('welcome_page'))
 
 @app.route("/report_card",methods=["GET","POST"])
 def report_card():
@@ -239,7 +239,7 @@ def homework_view():
         cursor.execute('SELECT CLASS FROM STUDENT_DATA WHERE Adm_ID = ?',(session['user_id'],))
         st_class = cursor.fetchone()[0]
         funt.Data().data_base_function(conn)
-        return render_template("student/functions/hw.html",code=cc.Homework().hw_creator(st_class))
+        return render_template("student/functions/hw.html",code=cc.Homework().hw_code(st_class))
     else:
         return redirect(url_for('welcome_page'))
 
@@ -275,7 +275,7 @@ def student_class_test():
     else:
         return redirect(url_for('welcome_page'))
 
-@app.route('/class_tests/testpaper',methods=["GET","POST"])
+@app.route('/testpaper',methods=["GET","POST"])
 def testpaper():
     if log_check():
         test_id = request.form.get('test_id')
@@ -283,7 +283,7 @@ def testpaper():
     else:
         return redirect(url_for('welcome_page'))
 
-@app.route('/class_tests/testpaper/test_submittion',methods=["POST","GET"])
+@app.route('/test_submittion',methods=["POST","GET"])
 def test_submittion():
     if log_check():
         conn,cursor = funt.Data().data_base_function()
@@ -464,27 +464,27 @@ def noti_sender():
     else:
         return redirect(url_for('welcome_page'))
 
-@app.route('/admin_video_sender',methods=["GET","POST"])
-def admin_video_sender():
-    if log_check():
-        if request.method == "POST":
-            conn,cursor = funt.Functions().data_base_function()
-            capt = request.form.get('caption')
-            video_ = request.files['video']
-            if video_.content_type != 'video/mp4':
-                return render_template('admin/functions/videos_sender.html',status='FILE IS NOT IN MP4!!!',caption=capt)
-            video_.seek(0,2)
-            size = video_.tell()
-            video_.seek(0)
-            if size > 1024 * 1024 * 10: #10MB
-                return render_template('admin/functions/videos_sender.html',status='FILE IS LARGER THAN 10MB!!!',caption=capt)
-            d,t = funt.Functions().get_date_time()
-            cursor.execute('INSERT INTO MEDIA_DATA VALUES(?,?,?,?,?)',('VIDEO',d,str(t).strip()[:-3],capt,video_))
-            funt.Functions().data_base_function(conn)
-            return render_template('confirmation.html')
-        return render_template('admin/functions/videos_sender.html')
-    else:
-        return redirect(url_for('welcome_page'))
+# @app.route('/admin_video_sender',methods=["GET","POST"])
+# def admin_video_sender():
+#     if log_check():
+#         if request.method == "POST":
+#             conn,cursor = funt.Functions().data_base_function()
+#             capt = request.form.get('caption')
+#             video_ = request.files['video']
+#             if video_.content_type != 'video/mp4':
+#                 return render_template('admin/functions/videos_sender.html',status='FILE IS NOT IN MP4!!!',caption=capt)
+#             video_.seek(0,2)
+#             size = video_.tell()
+#             video_.seek(0)
+#             if size > 1024 * 1024 * 10: #10MB
+#                 return render_template('admin/functions/videos_sender.html',status='FILE IS LARGER THAN 10MB!!!',caption=capt)
+#             d,t = funt.Functions().get_date_time()
+#             cursor.execute('INSERT INTO MEDIA_DATA VALUES(?,?,?,?,?)',('VIDEO',d,str(t).strip()[:-3],capt,video_))
+#             funt.Functions().data_base_function(conn)
+#             return render_template('confirmation.html')
+#         return render_template('admin/functions/videos_sender.html')
+#     else:
+#         return redirect(url_for('welcome_page'))
 
 @app.route('/add_student',methods=["GET","POST"])
 def add_student():
@@ -693,27 +693,6 @@ def export_data():
     else:
         return redirect(url_for('welcome_page'))
     
-#################only for download report card and fees slip
-@app.route('/dwn_reportcard',methods=["GET","POST"])
-def dwn_reportcard():
-    if log_check():
-        if request.method == "POST":
-            report_card_data = cc.Report_card().view_report_card(request.form.get('st_id'),data_only=True)
-            return send_file(report_card_data, as_attachment=True)
-        return redirect(url_for('dashboard'))
-    else:
-        return redirect(url_for('welcome_page'))
-
-@app.route('/download_fees_slip',methods=["GET","POST"])
-def download_fees_slip():
-    if log_check():
-        if request.method == "POST":
-            fees_slip_data = cc.Fees_slip().view_fees_slip(request.form.get('st_id'),request.form.get('amount'))###############
-            return send_file(fees_slip_data, as_attachment=True)
-        return redirect(url_for('dashboard'))
-    else:
-        return redirect(url_for('welcome_page'))
-#########################################
 
 @app.route('/fees_slip',methods=["GET","POST"])
 def fees_slip():
@@ -726,14 +705,21 @@ def fees_slip():
             row = cursor.fetchone()
             if row is None:
                 return render_template('admin/functions/fees_slip.html',error="ID NOT FOUND!!!")
-            st_name,st_father,st_mother,st_class = row
-            cursor.execute('SELECT REST FROM FEES_DATA WHERE Adm_ID = ?',(st_id,))
-            if cursor.fetchone() is None:
+            st_name,st_father,st_mother,st_class = row########################
+            with open('datasync.json',"r") as f:
+                sync_data = json.load(f)
+            sync_data_list = [int(item) for item in sync_data.keys() if item.isdigit()]
+            fees_session = max(sync_data_list)
+            cursor.execute('SELECT REST FROM FEES_DATA WHERE Adm_ID = ? AND SESSION = ? ORDER BY FEES_ID DESC;',(st_id,fees_session-1))
+            data = cursor.fetchone()
+            if data is None:
                 fees = funt.Data().class_fees(st_class)
             else:
-                cursor.execute('SELECT REST FROM FEES_DATA WHERE Adm_ID = ?',(st_id,))
-                for row in cursor.fetchall():
-                    fees = row[0]
+                fees = data[0][0]
+                fees += funt.Data().class_fees(st_class)#########################
+                # cursor.execute('SELECT REST FROM FEES_DATA WHERE Adm_ID = ?',(st_id,))
+                # for row in cursor.fetchall():
+                #     fees = row[0]
 
             if re_type == "st1":
                 if fees == 0:
@@ -745,8 +731,7 @@ def fees_slip():
                     <input type="number" name="fees_amount" id="nor_input" min="1" max="{fees}" placeholder="ENTER FEES AMOUNT" required>
                     <button id="nor_btn">SAVE DATA</button>'''
                 funt.Data().data_base_function(conn)
-                return render_template('admin/functions/fees_slip.html',
-                code=code,st_id=st_id,st_name=st_name,st_father=st_father,st_mother=st_mother,st_class=st_class)
+                return render_template('admin/functions/fees_slip.html',code=code,st_id=st_id,st_name=st_name,st_father=st_father,st_mother=st_mother,st_class=st_class)
             
             elif re_type == "st2":
                 with open('datasync.json',"r") as f:
@@ -754,19 +739,24 @@ def fees_slip():
                 sync_data_list = [int(item) for item in sync_data.keys() if item.isdigit()]
                 fees_session = max(sync_data_list)
                 fees_amount = int(request.form.get('fees_amount'))
-                cursor.execute('SELECT FEES_ID FROM FEES_DATA ORDER BY FEES_ID DESC;')
-                FEES_ID_LI = []
-                for item in cursor.fetchall():
-                    d = item[0]
-                    if d != 0:
-                        FEES_ID_LI.append(int(d))
-                FEES_ID = max(FEES_ID_LI)
-                cursor.execute('INSERT INTO FEES_DATA(FEES_ID,Adm_id,CURRENT_DEPOSIT,REST,SESSION) VALUES(?,?,?,?);',(FEES_ID,st_id,fees_amount,fees-fees_amount,fees_session))
-                funt.Export().fees_slip_export(st_id,fees_amount,fees-fees_amount)
-                code2=f'''<form action="/download_fees_slip" method="post"><input name="st_id" value="{st_id}" hidden><button id="nor_btn">DOWNLOAD FEES RECIEPT <i class="fa fa-download"></i></button></form>'''
+                cursor.execute('SELECT FEES_ID FROM FEES_DATA;')
+                li = cursor.fetchall()
+                if len(li) == 0:
+                    slip_no = 1
+                else:
+                    slip_no = max([int(item[0]) for item in li])
+                # for item in cursor.fetchall():
+                #     d = item[0]
+                #     if d != 0:
+                #         FEES_ID_LI.append(int(d))
+                # FEES_ID = max(FEES_ID_LI)
+                # cursor.execute('INSERT INTO FEES_DATA(FEES_ID,Adm_id,CURRENT_DEPOSIT,REST,SESSION) VALUES(?,?,?,?);',(FEES_ID,st_id,fees_amount,fees-fees_amount,fees_session))
+                cursor.execute('INSERT INTO FEES_DATA VALUES(?,?,?,?);',(st_id,fees_amount,fees-fees_amount,fees_session))
+                cc.Fees_slip().view_fees_slip(st_id,fees_amount,slip_no)
+                code2=f'''<form action="/download_fees_slip" method="post"><input name="st_id" value="{st_id}" hidden><input name="slip_no" value="{slip_no}" hidden><input name="fees_amount" value="{fees_amount}" hidden><button id="nor_btn">DOWNLOAD FEES RECIEPT <i class="fa fa-download"></i></button></form>'''
                 funt.Data().data_base_function(conn)
                 return render_template('admin/functions/fees_slip.html',
-                code="DATA SAVED SUCCESFULLY!!!",code2=code2,st_id=st_id,st_name=st_name,st_father=st_father,st_mother=st_mother,st_class=st_class)
+                code="<script>alert('DATA SAVED SUCCESFULLY!!!');</script>",code2=code2,st_id=st_id,st_name=st_name,st_father=st_father,st_mother=st_mother,st_class=st_class)
         return render_template('admin/functions/fees_slip.html')
     else:
         return redirect(url_for('welcome_page'))
@@ -869,6 +859,30 @@ def sync_db_new_session():
         return render_template('admin/functions/sync_db_new_session.html',code=funt.Data_sync().data_sync_status_funt())
     else:
         return redirect(url_for('welcome_page'))
+
+#################only for download report card and fees slip
+@app.route('/dwn_reportcard',methods=["GET","POST"])
+def dwn_reportcard():
+    if log_check():
+        # if session['role'] != 'ADMIN':
+        #     return redirect(url_for('dashboard'))
+        report_card_data = cc.Report_card().view_report_card(request.form.get('st_id'),data_only=True)
+        file = funt.Functions().crt_pdf_html(report_card_data)
+        return send_file(file, as_attachment=True,download_name=f"Report_card_{request.form.get('st_id')}.pdf")
+    else:
+        return redirect(url_for('welcome_page'))
+
+@app.route('/download_fees_slip',methods=["GET","POST"])
+def download_fees_slip():
+    if log_check():
+        if request.method == "POST":
+            fees_slip_data = cc.Fees_slip().view_fees_slip(request.form.get('st_id'),request.form.get('fees_amount'),request.form.get('slip_no'))###############
+            file = funt.Functions().crt_pdf_html(fees_slip_data)
+            return send_file(file, as_attachment=True,download_name=f"Fees_slip_{request.form.get('slip_no')}_{request.form.get('st_id')}.pdf")
+        return redirect(url_for('dashboard'))
+    else:
+        return redirect(url_for('welcome_page'))
+#########################################
 
 ############ ADMISSION FORM CODE
 

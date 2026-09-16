@@ -1,0 +1,32 @@
+# THIS FILE IS INDEPENDENT OF THE MAIN APP AND CAN BE RUN SEPARATELY.
+# THIS FILE ONLY SENDS REQUESTS TO THE SERVER AND CHECKS IF THE SERVER IS UP OR NOT.
+
+import requests,time,datetime
+print('========== REQUEST SENDING MODULE ==========')
+request_urls={
+"LOGIN PAGE":"https://dpjalesar.onrender.com",
+"DASHBOARD":"https://dpjalesar.onrender.com/dashboard",
+"ADMISSION PAGE":"https://dpjalesar.onrender.com/DPSADMISSION_FORM",}
+set_time = 10 #every 10 seconds
+fail = 0
+i = 0
+while True:
+	if fail >= 3:
+		break
+	for item in request_urls.keys():
+		t = datetime.datetime.now().strftime("%H:%M:%S")
+		d = datetime.date.today()
+		if int(requests.get(request_urls[item],headers={"User-Agent": "Chrome/5.0"}).status_code) == 200:
+			print(f'SUCCESS!!! [{d},{t}] --> {item}\n{request_urls[item]}')
+			fail = 0
+			time.sleep(set_time)
+		else:
+			print(f'FAILED!! [{d},{t}] --> {item}\n{request_urls[item]}')
+			fail += 1
+			time.sleep(set_time)
+			
+if fail >= 3:
+	while True:
+		i+=1
+		print(f'{i}. SYSTEM GOT AN ERROR !!!\n[{d},{t}]')
+		time.sleep(0.1)
