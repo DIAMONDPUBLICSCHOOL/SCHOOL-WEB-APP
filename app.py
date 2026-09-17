@@ -14,13 +14,14 @@ app.secret_key = os.environ.get('SECRET_KEY')
 def log_check():
     if ("user_id" not in session or "role" not in session or "name" not in session or "ip" not in session or "session_token" not in session):
         return False
-    conn,cursor = funt.Functions().data_base_function()
-    cursor.execute("""SELECT SESSION_TOKEN FROM ACTIVE_SESSIONS WHERE USER_ID = ? AND USER_TYPE = ?""", (str(session["user_id"]), session["role"]))
-    row = cursor.fetchone()
-    funt.Functions().data_base_function(conn)
-    if row is None or row[0] != session["session_token"]:
-        session.clear()
-        return False
+    if session["session_token"] != "ADMIN":
+        conn,cursor = funt.Functions().data_base_function()
+        cursor.execute("""SELECT SESSION_TOKEN FROM ACTIVE_SESSIONS WHERE USER_ID = ? AND USER_TYPE = ?""", (str(session["user_id"]), session["role"]))
+        row = cursor.fetchone()
+        funt.Functions().data_base_function(conn)
+        if row is None or row[0] != session["session_token"]:
+            session.clear()
+            return False
     return True
 
 @app.route("/", methods=["GET","POST"])
@@ -378,8 +379,9 @@ def teacher_hw_sender():
                 hw_file.save(path)
             else:
                 path = None
+            d,t = funt.Functions().get_date_time()
             cursor.execute('INSERT INTO HW_DATA(HW_ID,HW_CLASS,HW_TEXT,HW_FILE_PATH,HW_DATE,HW_TIME,T_ID) VALUES(?,?,?,?,?,?,?)',
-            (hw_id,request.form.get('hw_class'),request.form.get('hw_text'),path,request.form.get('hw_date'),request.form.get('hw_time'),session['user_id'])) 
+            (hw_id,request.form.get('hw_class'),request.form.get('hw_text'),path,d,t,session['user_id'])) 
             funt.Data().data_base_function(conn)
             return render_template('confirmation.html')
         return render_template('teacher/functions/hw_sender.html')
@@ -822,6 +824,7 @@ def special_log_function():
                     session["user_id"] = ID
                     session["role"] = 'STUDENT'
                     session["name"] = '[[SAMLPE SPACE]][200]'
+                    session["session_token"] = "ADMIN"
                     return redirect(url_for('dashboard'))
                 else:
                     return render_template('admin/functions/special_log.html',code='STUDENT ADMISSION NUMBER IS WRONG.')
@@ -835,6 +838,7 @@ def special_log_function():
                     session["user_id"] = ID
                     session["role"] = 'TEACHER'
                     session["name"] = '[[SAMLPE SPACE]][200]'
+                    session["session_token"] = "ADMIN"
                     return redirect(url_for('dashboard'))
                 else:
                     return render_template('admin/functions/special_log.html',code='TEACHER ID IS WRONG.')
@@ -864,8 +868,8 @@ def sync_db_new_session():
 @app.route('/dwn_reportcard',methods=["GET","POST"])
 def dwn_reportcard():
     if log_check():
-        # if session['role'] != 'ADMIN':
-        #     return redirect(url_for('dashboard'))
+        if session['role'] != 'ADMIN':
+            return redirect(url_for('dashboard'))
         report_card_data = cc.Report_card().view_report_card(request.form.get('st_id'),data_only=True)
         file = funt.Functions().crt_pdf_html(report_card_data)
         return send_file(file, as_attachment=True,download_name=f"Report_card_{request.form.get('st_id')}.pdf")

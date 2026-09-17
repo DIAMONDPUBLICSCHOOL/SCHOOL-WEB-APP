@@ -52,7 +52,7 @@ class Tests(content_creator):
     def generate_test_code(self,test_id):
         conn,cursor = funt.Data().data_base_function()
         cursor.execute('SELECT * FROM TEST_DATA WHERE TEST_ID = ?',(test_id,))
-        test_id,question_data,d,t1,sub,cls,marks,teach_id = cursor.fetchone()
+        test_id,question_data,d,t1,sub,_,marks,teach_id = cursor.fetchone()
         cursor.execute('SELECT ID,Name FROM TEACHER_DATA')
         teach_dic =  dict(cursor.fetchall())
         def teach_name(teach_id,teach_dic=teach_dic):
@@ -65,7 +65,14 @@ class Tests(content_creator):
                 t_name = '[UNDEFINED]'
             return t_name
         t2 = funt.Functions().change_time(min=30,Time=str(t1))
-        html_text = f'''<form id="myForm" action="test_submittion" method="POST"><div id="noti_heading"><h3>TEST ID :- {test_id}<br>TEACHER NAME :- {teach_name(teach_id)}<br>CLASS :- {cls}<br>SUBJECT :- {sub}<br>MARKS :- {marks}</h3><h3 style="margin:0px 0px;padding:0px 0px;color:white;" id="demo{test_id}"></h3></div></fieldset><fieldset>
+        html_text = f'''<form id="myForm" action="test_submittion" method="POST">
+<div id="noti_heading">
+<b>TIME LEFT :- </b><h3 style="margin:0px 0px;padding:0px 0px;color:white;" id="demo{test_id}"></h3></div>
+<h3 style="float: left;">TEST ID :- {test_id}<br>
+TEACHER NAME :- {teach_name(teach_id)}<br></h3>
+<h3 style="float:right;">SUBJECT :- {sub}<br>
+MAXIMUM MARKS :- {marks}</h3></h3>
+</fieldset><fieldset>
 <input name="test_id" value="{test_id}" hidden><script>
 var x'''+f'''{test_id}'''+''' = setInterval(function() {
 var distance'''+f'''{test_id}'''+''' = new Date("'''+f'''{d} {t2}'''+'''").getTime() - new Date().getTime();
@@ -98,7 +105,7 @@ form.submit();}}, 1000);
                 html_text += self.long_field(parts, no)
             else:
                 html_text += f"<p>Invalid Question Format: {item}</p>"
-        html_text += '''<button id="nor_btn" type="submit"">Submit</button></form>'''
+        html_text += '''<button id="nor_btn" type="submit""><b>SUBMIT</b> <i class="fa fa-paper-plane"></i></button></form>'''
         return html_text
 
     def test_manual_student(self,st_id):
@@ -166,10 +173,10 @@ document.getElementById("'''+f'''testbtn{test_id}'''+'''").style.display = "none
         cursor.execute('SELECT TOTAL_MARKS,DATA FROM TEST_DATA WHERE TEST_ID = ?',(test_id,))
         t_marks = int(cursor.fetchone()[0])
         cursor.execute('SELECT Adm_ID,ANSWERS FROM STUDENT_TEST_DATA WHERE TEST_ID = ?',(test_id,))
-        data = cursor.fetchall()
-        if data[0][1] is None:
-            return '<h2>TEST DATA ALREADY SAVED!!!</h2>'
-        for item in data[0][1].split('?next?=/'):
+        data = cursor.fetchone()
+        if data is None:
+            return '<h2>NO STUDENT ATTEMPTED TEST YET!!!</h2>'
+        for item in list(data)[0][1].split('?next?=/'):
             html_text += f'<th>{item.split('ans?=')[0]}</th>'
         html_text += f"<th>TOTAL MARKS [{t_marks}]</th></tr>"
         for item in data:
@@ -541,8 +548,8 @@ th,td{{padding: 8px;text-align: left;}}
         cursor.execute('SELECT Class FROM STUDENT_DATA WHERE Adm_ID = ?',(st_id,))
         c_class = cursor.fetchone()[0]
         cursor.execute('SELECT TERM_1,TERM_2 FROM EXAM_DATA WHERE Adm_ID = ?',(st_id,))
-        data = super().subject_list(c_class)
         row = cursor.fetchone()
+        data = super().subject_list(c_class)
         if row is None:
             for i in range(len(data)):
                 html_text += f'''<tr><th>{data[i]}</th><th><input type="number" name="t{i+1}_1" min="0" max="10"></th>
@@ -551,7 +558,7 @@ th,td{{padding: 8px;text-align: left;}}
                 <th><input type="number" name="t{i+1}_4" min="0" max="80"></th></tr>'''
         else:
             for i in range(len(data)):
-                t_1,t_2,t_3,t_4 = list(row)[0][stage - 1].split(';')[i].split(',')
+                t_1,t_2,t_3,t_4 = list(row)[stage - 1].split(';')[i].split(',')
                 html_text += f'''<tr><th>{data[i]}</th><th><input type="number" value="{t_1}" name="t{i+1}_1" min="0" max="10"></th>
                 <th><input type="number" value="{t_2}" name="t{i+1}_2" min="0" max="5"></th>
                 <th><input type="number" value="{t_3}" name="t{i+1}_3" min="0" max="5"></th>
@@ -578,7 +585,7 @@ class Attandance(content_creator):
     def load_sub(self,st_class):
         if funt.Functions().get_day().strip().upper() == "SUNDAY":
             return f'<h2>TODAY IS SUNDAY!!!</h2>'
-        html_text = f'''<input name="subject" value="{st_class}" hidden><b>CHOOSE SUBJECT <label>*</label></b>
+        html_text = f'''<input name="st_class" value="{st_class}" hidden><b>CHOOSE SUBJECT <label>*</label></b>
         <select id="nor_opt" name="subject" required><option value="">---SELECT---</option>'''
         for item in super().subject_list(st_class):
             html_text += f'\n<option value="{item}">{item}</option>'
@@ -587,37 +594,35 @@ class Attandance(content_creator):
     
     def load_attandance_teacher(self,c_class,subject):
         date,_ = funt.Functions().get_date_time()
-        html_text = f'<input name="st_class" value="{c_class}" hidden><input name="subject" value="{subject}" hidden><table border="2"><tr><th colspan="2">CLASS :- {c_class}</th><th colspan="3">ATTANDANCE</th></tr><tr><th>ADM. ID.</th><th>NAME</th><th>PRESENT</th><th>ABSENT</th><th>NOT STATED</th></tr>'
+        html_text = f'<input name="st_class" value="{c_class}" hidden><input name="subject" value="{subject}" hidden><table border="2"><tr><th colspan="3">CLASS :- {c_class}</th><th colspan="3">ATTANDANCE</th></tr><tr><th>ADM. ID.</th><th>NAME</th><th>FATHER NAME</th><th>PRESENT</th><th>ABSENT</th></tr>'
         conn,cursor = funt.Data().data_base_function()
-        cursor.execute('SELECT Adm_ID,Name FROM STUDENT_DATA WHERE Class = ?',(c_class,))
+        cursor.execute('SELECT Adm_ID,Name,Father FROM STUDENT_DATA WHERE Class = ?',(c_class,))
         at_data = cursor.fetchall()
         for item in at_data:
             cursor.execute('SELECT Status FROM ATTANDANCE WHERE Adm_ID = ? AND DATE = ? AND SUBJECT = ?',(item[0],date,subject))
             stat = cursor.fetchone()
             if stat is not None:
                 if stat[0] == 'P':
-                    html_text += f'<tr><th>{item[0]}</th><th>{item[1]}</th><td><input type="radio" name="{item[0]}" value="P" checked required></td><td><input type="radio" name="{item[0]}" value="A" required></td><td><input type="radio" name="{item[0]}" value="NA" required></td></tr>'
-                elif stat[0] == 'A':
-                    html_text += f'<tr><th>{item[0]}</th><th>{item[1]}</th><td><input type="radio" name="{item[0]}" value="P" required></td><td><input type="radio" name="{item[0]}" value="A" checked required></td><td><input type="radio" name="{item[0]}" value="NA" required></td></tr>'
+                    html_text += f'<tr><th>{item[0]}</th><th>{item[1]}</th><th>{item[2]}</th><td><input type="radio" name="{item[0]}" value="P" checked required></td><td><input type="radio" name="{item[0]}" value="A" required></td></tr>'
                 else:
-                    html_text += f'<tr><th>{item[0]}</th><th>{item[1]}</th><td><input type="radio" name="{item[0]}" value="P" required></td><td><input type="radio" name="{item[0]}" value="A" required></td><td><input type="radio" name="{item[0]}" value="NA" checked required></td></tr>'
+                    html_text += f'<tr><th>{item[0]}</th><th>{item[1]}</th><th>{item[2]}</th><td><input type="radio" name="{item[0]}" value="P" required></td><td><input type="radio" name="{item[0]}" value="A" checked required></td></td></tr>'
             else:
-                html_text += f'<tr><th>{item[0]}</th><th>{item[1]}</th><td><input type="radio" name="{item[0]}" value="P" required></td><td><input type="radio" name="{item[0]}" value="A" required></td><td><input type="radio" name="{item[0]}" value="NA" checked required></td></tr>'
+                html_text += f'<tr><th>{item[0]}</th><th>{item[1]}</th><th>{item[2]}</th><td><input type="radio" name="{item[0]}" value="P" required></td><td><input type="radio" name="{item[0]}" value="A" required></td></tr>'
         html_text += '</table><button id="nor_btn">SUBMIT</button>'
         funt.Data().data_base_function(conn)
         return html_text
     
     def load_student_attandance(self,st_id,month,sub):
-        html_text = f'<input name="stage" value="st2" hidden><table border="3"><tr><th>DATE</th><th>PRESENT [P]<br>ABSENT [A]<br>NOT STATED [NA]</th></tr>'
+        html_text = f'<input name="stage" value="st2" hidden><table border="3"><tr><th>DATE</th><th>PRESENT [P]<br>ABSENT [A]</th></tr>'
         def my_font(status):
             if status == 'P':
                 properties = 'background:green;'
             elif status == 'A':
                 properties = 'background:red;'
-            elif status == 'NA':
-                properties = 'background:grey;'
-            elif status == 'S':
-                properties = 'background:black;'
+            # elif status == 'H':
+            #     properties = 'background:yellow;color:black;'
+            # elif status == 'S':
+            #     properties = 'background:black;'
             return f'<mark style="{properties}color:white;padding:2px 2px;">{status}</mark>'
         conn,cursor = funt.Data().data_base_function()
         cursor.execute('SELECT Date,Status FROM ATTANDANCE WHERE Adm_ID = ? AND Subject = ?',(st_id,sub))
