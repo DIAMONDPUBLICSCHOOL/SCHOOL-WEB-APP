@@ -47,10 +47,11 @@ class Tests(content_creator):
 
     def long_field(self, da, num):
         opt_mar = da[1].split('<---MARKS--->')
-        return f'<div id="TEST_CONTENT"><p>{da[0]}<textarea rows="5" id="nor_input" name="answer{num}" placeholder="ENTER YOUR ANSWER"</textarea>{opt_mar[0]}<div class="MARKS"><b>MARK: {opt_mar[1]}</b></p></div></div><br>'
+        return f'<div id="TEST_CONTENT"><p>{da[0]}<textarea rows="5" id="nor_input" name="answer{num}" placeholder="ENTER YOUR ANSWER"></textarea>{opt_mar[0]}<div class="MARKS"><b>MARK: {opt_mar[1]}</b></p></div></div><br>'
     #test
-    def generate_test_code(self,test_id):
+    def generate_test_code(self,test_id,teacher_entity=False):
         conn,cursor = funt.Data().data_base_function()
+        html_text = ''
         cursor.execute('SELECT * FROM TEST_DATA WHERE TEST_ID = ?',(test_id,))
         test_id,question_data,d,t1,sub,_,marks,teach_id = cursor.fetchone()
         cursor.execute('SELECT ID,Name FROM TEACHER_DATA')
@@ -65,7 +66,8 @@ class Tests(content_creator):
                 t_name = '[UNDEFINED]'
             return t_name
         t2 = funt.Functions().change_time(min=30,Time=str(t1))
-        html_text = f'''<form id="myForm" action="test_submittion" method="POST">
+        if teacher_entity == False:
+            html_text += f'''<form id="myForm" action="test_submittion" method="POST">
 <div id="noti_heading">
 <b>TIME LEFT :- </b><h3 style="margin:0px 0px;padding:0px 0px;color:white;" id="demo{test_id}"></h3></div>
 <h3 style="float: left;">TEST ID :- {test_id}<br>
@@ -105,7 +107,8 @@ form.submit();}}, 1000);
                 html_text += self.long_field(parts, no)
             else:
                 html_text += f"<p>Invalid Question Format: {item}</p>"
-        html_text += '''<button id="nor_btn" type="submit""><b>SUBMIT</b> <i class="fa fa-paper-plane"></i></button></form>'''
+        if teacher_entity == False:
+            html_text += '''<button id="nor_btn" type="submit""><b>SUBMIT</b> <i class="fa fa-paper-plane"></i></button></form>'''
         return html_text
 
     def test_manual_student(self,st_id):
@@ -168,13 +171,15 @@ document.getElementById("'''+f'''testbtn{test_id}'''+'''").style.display = "none
         return html_text
 
     def teacher_test_checker(self,test_id):
-        html_text = '<input name="stage" value="st3" hidden><table border="3"><tr><th>ADM. ID.</th>'
+        html_text = f'''<fieldset><legend>TEST PAPER</legend>{self.generate_test_code(test_id,teacher_entity=True)}</fieldset><br><br><br>'''
+        html_text += '<input name="stage" value="st3" hidden><table border="3"><tr><th>ADM. ID.</th>'
         conn,cursor = funt.Data().data_base_function()
         cursor.execute('SELECT TOTAL_MARKS,DATA FROM TEST_DATA WHERE TEST_ID = ?',(test_id,))
-        t_marks = int(cursor.fetchone()[0])
+        marks,data = cursor.fetchone()
+        t_marks = int(marks)
         cursor.execute('SELECT Adm_ID,ANSWERS FROM STUDENT_TEST_DATA WHERE TEST_ID = ?',(test_id,))
-        data = cursor.fetchone()
-        if data is None:
+        data = cursor.fetchall()
+        if len(data) == 0:
             return '<h2>NO STUDENT ATTEMPTED TEST YET!!!</h2>'
         for item in list(data)[0][1].split('?next?=/'):
             html_text += f'<th>{item.split('ans?=')[0]}</th>'
@@ -192,7 +197,9 @@ document.getElementById("'''+f'''testbtn{test_id}'''+'''").style.display = "none
         conn,cursor = funt.Data().data_base_function()
         cursor.execute('SELECT TEST_ID,DATE,TIME,SUBJECT,CLASS FROM TEST_DATA WHERE T_ID = ? AND CLASS = ?',(t_id,c_class))
         for item in cursor.fetchall():
-            html_text +=f'<option value="{int(item[0])}">{int(item[0])} --> {item[4]} -->{item[1]},{item[2]} --> {item[3]}</option>'
+            cursor.execute('SELECT OBTAIN_MARKS FROM STUDENT_TEST_DATA WHERE TEST_ID = ?',(int(item[0]),))
+            if cursor.fetchone() is None:
+                html_text +=f'<option value="{int(item[0])}">{int(item[0])} --> {item[4]} -->{item[1]},{item[2]} --> {item[3]}</option>'
         funt.Data().data_base_function(conn)
         return html_text + '</select><button id="nor_btn">LOAD TEST DATA</button>'
     

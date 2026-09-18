@@ -114,7 +114,7 @@ class Functions(Data):
             raise ValueError("Either message or html_content must be provided.")
         with smtplib.SMTP("smtp.gmail.com", 587) as server:
             server.starttls()
-            server.login(msg['From'],"//////////////////")###################################
+            server.login(msg['From'],"//////////////////")
             server.send_message(msg)
         return True
     from playwright.sync_api import sync_playwright

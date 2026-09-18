@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIAMOND PUBLIC SCHOOL</title>
+    <link rel="icon" type="image/png" href="{{url_for('static',filename='images/SYMBOLS.png')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+    <fieldset>
+        <h1>SLEEP MODE BOX</h1>
+        <div class="warning">
+            <ul>
+                <li><b>THIS FUNCTION IS USED FOR MADE APP SLEEP.</b></li>
+                <li><b>AFTER APPLYING SLEEP MODE, ONLY ADMIN CAN LOGIN.</b></li>
+                <li><b>STUDENTS & TEACHER DIDN'T HAVE SUPPORT OF ANY THING.</b></li>
+            </ul>
+        </div>
+        <form action="{{url_for('sleep_mode')}}" method="post">
+        {{code|safe}}
+        </form>
+    </fieldset>
+</body>
+</html>

@@ -64,17 +64,22 @@
                 <button onclick="alert('CURRENTLY DISABLED.')" id="dash_btn"><b id="btn"><i class="fa fa-address-card-o"></i></b><br><br>UPLOAD VIDEOES</button>
             </fieldset>
             <fieldset>
-                <legend><b>RETRIVER</b></legend>
-                <a href="{{url_for('fees_slip')}}"><button id="dash_btn" ><b id="btn"><i class="fa fa-list"></i></b><br><br>FEES SLIP</button></a>
-                <a href="{{url_for('export_data')}}"><button id="dash_btn"><b id="btn"><i class="fa fa-user-circle"></i></b><br><br>EXPORT DATA</button></a>
-                <a href="{{url_for('complains')}}"><button id="dash_btn"><b id="btn"><i class="fa fa-info"></i></b><br><br>COMPLAINS</button></a>
-            </fieldset>
-            <fieldset>
                 <legend><b>SPECIAL FUNCTIONS</b></legend>
                 <a href="{{url_for('block_user')}}"><button id="dash_btn"><b id="btn"><i class="bi bi-person-x-fill"></i></b><br><br>BLOCK USER</button></a>
                 <a href="{{url_for('special_log_function')}}"><button id="dash_btn"><b id="btn"><i class="fa fa-envelope"></i></b><br><br>SPECIAL LOG [WITH DIFFERENT SESSIONS]</button></a>
                 <a href="{{url_for('user_log_history')}}"><button id="dash_btn"><b id="btn"><i class="fa fa-sign-in"></i></b><br><br>VIEW USER LOG HISTORY</button></a>
                 <a href="{{url_for('sync_db_new_session')}}"><button id="dash_btn"><b id="btn">&#x21BB;<br></b>SYNC DATABASE [NEXT SESSION]</button></a>
+            </fieldset>
+            <fieldset>
+                <legend><b>RETRIVER</b></legend>
+                <button id="dash_btn" onclick="alert('NOT AVAILABLE CURRENTLY')"><b id="btn"><i class="fa fa-list"></i></b><br><br>FEES SLIP</button>
+                <!-- <a href="{{url_for('fees_slip')}}"><button id="dash_btn" ><b id="btn"><i class="fa fa-list"></i></b><br><br>FEES SLIP</button></a> -->
+                <a href="{{url_for('export_data')}}"><button id="dash_btn"><b id="btn"><i class="fa fa-user-circle"></i></b><br><br>EXPORT DATA</button></a>
+                <a href="{{url_for('complains')}}"><button id="dash_btn"><b id="btn"><i class="fa fa-info"></i></b><br><br>COMPLAINS</button></a>
+            </fieldset>
+            <fieldset>
+                <legend>OTHER FUNCTIONS</legend>
+                <a href="{{url_for('sleep_mode')}}"><button id="dash_btn"><b id="btn"><i class="fa fa-moon-o"></i></b><br><br>SLEEP MODE<br><br><b><i><u>NOTE:-</u> FIRST LOGIN UNIVERSAL ADMIN THROW COMMAND BOX.</i></b></button></a>
             </fieldset>
         <ul id="nav">
         <button style="margin: 10px 10px;" onclick="alert('EXPORT RESPOSTIORY DIRECTLY.')">EXPORT FULL SOURCE CODE<b> <  ></b></button>

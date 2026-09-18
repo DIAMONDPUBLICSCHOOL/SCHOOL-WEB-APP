@@ -864,6 +864,23 @@ def sync_db_new_session():
     else:
         return redirect(url_for('welcome_page'))
 
+@app.route('/sleep_mode',methods=['GET','POST'])
+def sleep_mode():
+    if log_check():
+        # if session['universal_admin']:
+        #     code = '''<fieldset>
+        #     <legend>SLEEP MODE</legend>
+        #     <b>ENTER SLEEP MODE PIN <label>*</label></b>
+        #     <input type="number" name="pincode" id="nor_input" placeholder="ENTER SLEEP MODE PIN" required>
+        #     <button id="nor_btn">VERIFY PIN</button>
+        # </fieldset>'''
+        #     if request.form == "POST":
+        #         return
+        #     return render_template('',code=code)
+        return redirect(url_for('dashboard'))
+    else:
+        return redirect(url_for('welcome_page'))
+
 #################only for download report card and fees slip
 @app.route('/dwn_reportcard',methods=["GET","POST"])
 def dwn_reportcard():
