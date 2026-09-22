@@ -1,5 +1,5 @@
 # THIS FILE IS INDEPENDENT OF THE MAIN APP AND CAN BE RUN SEPARATELY.
-# THIS FILE ONLY SENDS REQUESTS TO THE SERVER AND CHECKS IF THE SERVER IS UP OR NOT.
+# THIS FILE ONLY SENDS REQUESTS TO THE SERVER FOR UP.
 
 import requests,time,datetime
 print('========== REQUEST SENDING MODULE ==========')
@@ -16,7 +16,7 @@ while True:
 	for item in request_urls.keys():
 		t = datetime.datetime.now().strftime("%H:%M:%S")
 		d = datetime.date.today()
-		if int(requests.get(request_urls[item],headers={"User-Agent": "Chrome/5.0"}).status_code) == 200:
+		if int(requests.head(request_urls[item],headers={"User-Agent": "Chrome/5.0"}).status_code) == 200:
 			print(f'SUCCESS!!! [{d},{t}] --> {item}\n{request_urls[item]}')
 			fail = 0
 			time.sleep(set_time)

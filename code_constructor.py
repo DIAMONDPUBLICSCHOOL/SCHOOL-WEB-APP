@@ -601,8 +601,12 @@ class Attandance(content_creator):
     
     def load_attandance_teacher(self,c_class,subject):
         date,_ = funt.Functions().get_date_time()
-        html_text = f'<input name="st_class" value="{c_class}" hidden><input name="subject" value="{subject}" hidden><table border="2"><tr><th colspan="3">CLASS :- {c_class}</th><th colspan="3">ATTANDANCE</th></tr><tr><th>ADM. ID.</th><th>NAME</th><th>FATHER NAME</th><th>PRESENT</th><th>ABSENT</th></tr>'
         conn,cursor = funt.Data().data_base_function()
+        cursor.execute('SELECT REASON FROM HOLIDAYS WHERE DATE = ?',(date,))
+        rea = cursor.fetchone()
+        if rea is not None:
+            return f'''<h2>TODAY IS HOLIDAY</h2><h2>REAON:- {rea[0]}</h2>'''
+        html_text = f'<input name="st_class" value="{c_class}" hidden><input name="subject" value="{subject}" hidden><table border="2"><tr><th colspan="3">CLASS :- {c_class}</th><th colspan="3">ATTANDANCE</th></tr><tr><th>ADM. ID.</th><th>NAME</th><th>FATHER NAME</th><th>PRESENT</th><th>ABSENT</th></tr>'
         cursor.execute('SELECT Adm_ID,Name,Father FROM STUDENT_DATA WHERE Class = ?',(c_class,))
         at_data = cursor.fetchall()
         for item in at_data:
@@ -691,24 +695,14 @@ class Admission_request:
         cursor.execute('SELECT NAME,FATHER,MOTHER,DOB,MOBILE,GENDER,CLASS,EMAIL,ADDRESS,MOBILE,ADHAAR,PEN,TRANSACTION_ID,DATE,TIME,SR FROM ADMISSION_REQUEST;')
         for item in cursor.fetchall():
             name,father,mother,dob,mobile,gender,cls,email,add,mod,adhaar,pen,trans_id,date,time,sr = item
-            html_text += f'''<div id="notifi"><div id="noti_heading">REQUEST ID:- {sr} <br>DAET:- {date} <br>TIME:- {time}</div><div style="float: right;"><i class="fa fa-user-plus"></i></div></div>
-        <b>NAME:- {name}<br>FATHER:- {father}<br>MOTHER:- {mother}<br>GENDER:- {gender}<br>D.O.B.:- {dob}<br>MOBILE:- {mobile}<br>CLASS:- {cls}<br>EMAIL:- {email}<br>ADDRESS:- {add}</b><br>MOBILE:- {mod}<br><br>TRANSACTION ID:- {trans_id}<br><br>
-        <form action="/admission_request_manual" method="post"><input type="text" name="name" value="{name}" hidden>
-        <input type="text" name="father" value="{father}" hidden>
-        <input type="text" name="mother" value="{mother}" hidden>
-        <input type="text" name="gender" value="{gender}" hidden>
-        <input type="text" name="dob" value="{dob}" hidden>
-        <input type="text" name="mobile" value="{mobile}" hidden>
-        <input type="text" name="cls" value="{cls}" hidden>
-        <input type="text" name="email" value="{email}" hidden>
-        <input type="text" name="add" value="{add}" hidden>
-        <input type="text" name="mod" value="{mod}" hidden>
-        <input type="text" name="adhaar" value="{adhaar}" hidden>   
-        <input type="text" name="pen" value="{pen}" hidden>
-        <input type="text" name="trans_id" value="{trans_id}" hidden>
-        <input type="text" name="sr" value="{sr}" hidden>
-        <button id="nor_btn">ACCEPT REQUEST <i class="fa fa-check"></i></button>
-        </form>
+            html_text += f'''<div id="notifi"><div id="noti_heading">REQUEST ID:- {sr} <br>DATE:- {date} <br>TIME:- {time}<div style="float: right;"><i class="fa fa-user-plus"></i></div></div><table border="3">
+        <tr><th>NAME</th><td>{name}</td></tr><tr><th>FATHER</th><td>{father}</td></tr><tr><th>MOTHER</th><td>{mother}</td></tr><tr><th>GENDER</th><td>{gender}</td></tr><tr><th>D.O.B.</th><td>{dob}</td></tr>
+        <tr><th>MOBILE</th><td>{mobile}</td></tr><tr><th>CLASS</th><td>{cls}</td></tr><tr><th>EMAIL</th><td>{email}</td></tr><tr><th>ADDRESS</th><td>{add}</td></tr><tr><th>MOBILE</th><td>{mod}</td></tr>
+        <tr><th>ADHAAR</th><td>{adhaar}</td><tr><th>PEN</th><td>{pen}</td></tr>
+        </table>
+        <code style="color:red;font-size:20;">TRANSACTION ID:- {trans_id}</code></b><br><br>
+        <button onclick="run(re,{sr})" id="nor_btn" style="background:red;width:40%;">REJECT REQUEST &times;</button>
+        <button onclick="run(acc,{sr})" id="nor_btn" style="background:green;width:40%;">ACCEPT REQUEST <i class="fa fa-check"></i></button>
         </div>\n'''
         funt.Data().data_base_function(conn)
         return html_text
