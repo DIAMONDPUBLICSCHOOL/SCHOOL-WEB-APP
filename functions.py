@@ -99,28 +99,50 @@ class Functions(Data):
             self.data_base_function(conn)
             return True
 
+    # def email_sender(self,receiver_email,subject,message=None,html_content=None):
+    #     if not message and not html_content:
+    #         return False
+    #     msg = EmailMessage()
+    #     msg["Subject"] = subject
+    #     msg["From"] = "nishantkushwah7536@gmail.com"######################################
+    #     msg["To"] = receiver_email
+    #     if html_content:
+    #         msg.add_alternative(html_content, subtype="html")
+    #     elif message:
+    #         msg.set_content(message)
+    #     else:
+    #         raise ValueError("Either message or html_content must be provided.")
+    #     try:
+    #         email_pass = os.environ.get('EMAIL_PASS')
+    #         with smtplib.SMTP("smtp.gmail.com", 587) as server:
+    #             server.starttls()
+    #             server.login(msg['From'],email_pass is not None)
+    #             print(len(email_pass))
+    #             server.send_message(msg)
+    #         return True
+    #     except Exception as e:
+    #         return False
     def email_sender(self,receiver_email,subject,message=None,html_content=None):
-        if not message and not html_content:
+        print("EMAIL: function started")
+        email_pass = os.environ.get("EMAIL_PASS")
+        print("EMAIL_PASS exists:", email_pass is not None)
+        if email_pass is None:
+            print("EMAIL ERROR: EMAIL_PASS is None")
             return False
-        msg = EmailMessage()
-        msg["Subject"] = subject
-        msg["From"] = "nishantkushwah7536@gmail.com"######################################
-        msg["To"] = receiver_email
-        if html_content:
-            msg.add_alternative(html_content, subtype="html")
-        elif message:
-            msg.set_content(message)
-        else:
-            raise ValueError("Either message or html_content must be provided.")
+        print("EMAIL: before SMTP connection")
         try:
-            email_pass = os.environ.get('EMAIL_PASS')
-            with smtplib.SMTP("smtp.gmail.com", 587) as server:
-                server.starttls()
-                server.login(msg['From'],email_pass is not None)
-                print(len(email_pass))
-                server.send_message(msg)
+            server = smtplib.SMTP("smtp.gmail.com", 587, timeout=15)
+            print("EMAIL: SMTP connected")
+            server.starttls()
+            print("EMAIL: STARTTLS completed")
+            server.login("your-email@gmail.com", email_pass)
+            print("EMAIL: login successful")
+            server.send_message(message)
+            print("EMAIL: message sent")
+            server.quit()
             return True
         except Exception as e:
+            print("EMAIL ERROR:", repr(e))
             return False
         
     from playwright.sync_api import sync_playwright
