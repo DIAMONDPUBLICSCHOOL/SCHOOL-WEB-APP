@@ -112,13 +112,16 @@ class Functions(Data):
             msg.set_content(message)
         else:
             raise ValueError("Either message or html_content must be provided.")
-        with smtplib.SMTP("smtp.gmail.com", 587) as server:
-            server.starttls()
-            server.login(msg['From'],os.getenv('EMAIL_PASS'))
-            server.send_message(msg)
-        return True
+        try:
+            with smtplib.SMTP("smtp.gmail.com", 587) as server:
+                server.starttls()
+                server.login(msg['From'],os.environ.get('EMAIL_PASS'))
+                server.send_message(msg)
+            return True
+        except Exception as e:
+            return False
+        
     from playwright.sync_api import sync_playwright
-
     def crt_pdf_html(self,data):
         from io import BytesIO
         with sync_playwright() as p:

@@ -17,16 +17,17 @@
     </ul>
    <fieldset style="background-color: white;">
         <h1>MAKE PAYMENT</h1>
+        {{msg|safe}}
         <fieldset style="text-align: center;">
-            <img src="" alt="150_PAYMENT_QRCODE"><br>
+            <img src="{{url_for('static',filename='images/RS150QRCODE.jpg')}}" alt="150_PAYMENT_QRCODE" height="500px" width="500px" style="text-align: center;"><br>
             <b>PAY ₹150.00/- ADMISSION FEES FOR SENDING REQUEST.</b>
         </fieldset>
         <fieldset>
             <h2>TERMS AND CONDITIONS:-</h2>
             <ul>
-                <li>ENTER THE CORRECT TRANSACTION ID. IF YOU ENTER WRONG ID IT CAN LEADS TO CANCELLATION OF YOUR CURRENT ADMISSION REQUEST.</li>
-                <li>AFTER SENDING THE ADMISSION REQUEST YOU GOT A CONFIRMATION EMAIL ON YOUR REGISTERED EMAIL ID FOR CONFIRMATION OF ADMISSION SENDING REQUEST.</li>
-                <li>WITHIN 24 OR 48 HOURS YOU GOT AN EMAIL OF CONFIRMATION OR CANCELLATION OF ADMISSION. <br>IF YOU NOT GOT AN EMAIL CONTACT ON MOBILE NO. +919897432207 & +918273998585.</li>
+                <li>ENTER THE CORRECT TRANSACTION ID. IF YOU ENTER WRONG ID, IT CAN LEADS TO CANCELLATION OF YOUR CURRENT ADMISSION REQUEST.</li>
+                <li>AFTER SENDING THE ADMISSION REQUEST YOU GOT A CONFIRMATION EMAIL ON YOUR REGISTERED EMAIL ID, FOR CONFIRMATION OF ADMISSION SENDING REQUEST.</li>
+                <li>WITHIN 24 OR 48 HOURS YOU GOT AN EMAIL OF CONFIRMATION OR CANCELLATION OF ADMISSION REQUEST. <br><b style="color: red;">IF YOU NOT GOT AN EMAIL CONTACT ON MOBILE NO. +919897432207 & +918273998585.</b></li>
             </ul>
             <p style="float: right;"><b>REGARDS:- </b><br>DPS CS TEAM</p>
             <hr>

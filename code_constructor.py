@@ -692,7 +692,7 @@ class Admission_request:
     def admission_request(self):
         html_text = ''
         conn,cursor = funt.Data().data_base_function()
-        cursor.execute('SELECT NAME,FATHER,MOTHER,DOB,MOBILE,GENDER,CLASS,EMAIL,ADDRESS,MOBILE,ADHAAR,PEN,TRANSACTION_ID,DATE,TIME,SR FROM ADMISSION_REQUEST;')
+        cursor.execute('SELECT NAME,FATHER,MOTHER,DOB,MOBILE,GENDER,CLASS,EMAIL,ADDRESS,MOBILE,ADHAAR,PEN,TRANSACTION_ID,DATE,TIME,SR FROM ADMISSION_REQUEST WHERE STATUS = "PENDING";')
         for item in cursor.fetchall():
             name,father,mother,dob,mobile,gender,cls,email,add,mod,adhaar,pen,trans_id,date,time,sr = item
             html_text += f'''<div id="notifi"><div id="noti_heading">REQUEST ID:- {sr} <br>DATE:- {date} <br>TIME:- {time}<div style="float: right;"><i class="fa fa-user-plus"></i></div></div><table border="3">

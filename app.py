@@ -929,15 +929,23 @@ def payment():
         ST_ADHAAR = int(request.form.get('ST_ADHAAR'))
         ST_PEN = request.form.get('ST_PEN')
         ST_EMAIL = request.form.get('ST_EMAIL')
+        conn,cursor = funt.Functions().data_base_function()
+        cursor.execute('SELECT * FROM STUDENT_DATA WHERE ADHAAR = ?',(request.form.get('ST_ADHAAR'),))
+        if cursor.fetchone() is not None:
+            funt.Functions().data_base_function(conn)
+            return render_template('admission_form/payment.html',msg=f'<font style="color:red">YOUR ENTERED ADHAAR [{ST_ADHAAR}] IS INVALID!!!</font>',ST_NAME=ST_NAME,ST_FATHER=ST_FATHER,ST_MOTHER=ST_MOTHER,ST_GENDER=ST_GENDER,ST_CLASS=ST_CLASS,ST_DOB=ST_DOB,ST_ADDRESS=ST_ADDRESS,ST_MOBILE=ST_MOBILE,ST_ADHAAR=ST_ADHAAR,ST_PEN=ST_PEN,ST_EMAIL=ST_EMAIL)
+        cursor.execute('SELECT * FROM STUDENT_DATA WHERE PEN = ?',(request.form.get('ST_PEN'),))
+        if cursor.fetchone() is not None:
+            funt.Functions().data_base_function(conn)
+            return render_template('admission_form/payment.html',msg=f'<font style="color:red">YOUR ENTERED PEN NO. [{ST_PEN}] IS INVALID!!!</font>',ST_NAME=ST_NAME,ST_FATHER=ST_FATHER,ST_MOTHER=ST_MOTHER,ST_GENDER=ST_GENDER,ST_CLASS=ST_CLASS,ST_DOB=ST_DOB,ST_ADDRESS=ST_ADDRESS,ST_MOBILE=ST_MOBILE,ST_ADHAAR=ST_ADHAAR,ST_PEN=ST_PEN,ST_EMAIL=ST_EMAIL)
         if request.form.get('stage') == "st1":
-            conn,cursor = funt.Functions().data_base_function()
             TRANS_ID = request.form.get('TRANSACTION_ID')
             d,t = funt.Functions().get_date_time()
             cursor.execute('INSERT INTO ADMISSION_REQUEST(NAME,FATHER,MOTHER,GENDER,CLASS,DOB,ADDRESS,MOBILE,ADHAAR,EMAIL,PEN,TRANSACTION_ID,DATE,TIME,STATUS) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',(ST_NAME,ST_FATHER,ST_MOTHER,ST_GENDER,ST_CLASS,ST_DOB,ST_ADDRESS,ST_MOBILE,ST_ADHAAR,ST_EMAIL,ST_PEN,TRANS_ID,d,t,"PENDING"))
             #send email to student
             cursor.execute('SELECT SR FROM ADMISSION_REQUEST WHERE ADHAAR = ? AND TRANSACTION_ID = ?',(ST_ADHAAR,TRANS_ID))
             sr = cursor.fetchone()[0]
-            funt.Functions().email_sender(ST_EMAIL,'THANK FOR SENDING ADMISSION REQUEST',html_content=f'''
+            if not (funt.Functions().email_sender(ST_EMAIL,'THANK FOR SENDING ADMISSION REQUEST',html_content=f'''
             <h1 style="color:red;text-align:center;">DIAMOND PUBLIC SCHOOL (D.P.S.)</h1>
             <h2 style="color:blue;text-align:center;">BADE MIYAN DARGAH ROAD, NEAR EX:- KAILASPATI TALKIES , JALESAR (ETAH)</h2>
             <h3style="color:green;text-align:center;">YOUR ADMISSION REQUEST HAS BEEN SENDED.<h3> 
@@ -945,9 +953,12 @@ def payment():
             <p style="font-size:12;">
             <code><b><i>NOTE :-</i> PLEASE KEEP THIS SR NUMBER SAVE.</b></code><br>
             REGARDS:-<br>
-            DPS CS TEAM<br></p>''')
-            funt.Functions().data_base_function(conn)
+            DPS CS TEAM<br></p>''')):
+                cursor.execute('DELETE FROM ADMISSION_REQUEST WHERE SR = ?',(sr))
+                funt.Functions().data_base_function(conn)
+                return render_template('admission_form/payment.html',msg=f'<font style="color:red">YOUR ENTERED EMAIL [{ST_EMAIL}] IS INVALID!!!</font><button style="background:white;border:none;" onclick="history.back()">⬅️</button>',ST_NAME=ST_NAME,ST_FATHER=ST_FATHER,ST_MOTHER=ST_MOTHER,ST_GENDER=ST_GENDER,ST_CLASS=ST_CLASS,ST_DOB=ST_DOB,ST_ADDRESS=ST_ADDRESS,ST_MOBILE=ST_MOBILE,ST_ADHAAR=ST_ADHAAR,ST_PEN=ST_PEN,ST_EMAIL=ST_EMAIL)
             return redirect(url_for('welcometoadmissionform'))
+        funt.Functions().data_base_function(conn)
         return render_template('admission_form/payment.html',ST_NAME=ST_NAME,ST_FATHER=ST_FATHER,ST_MOTHER=ST_MOTHER,ST_GENDER=ST_GENDER,ST_CLASS=ST_CLASS,ST_DOB=ST_DOB,ST_ADDRESS=ST_ADDRESS,ST_MOBILE=ST_MOBILE,ST_ADHAAR=ST_ADHAAR,ST_PEN=ST_PEN,ST_EMAIL=ST_EMAIL)
     else:
         return redirect(url_for('welcometoadmissionform'))
@@ -961,12 +972,12 @@ def admission_request_manual():
                 cursor.execute('SELECT * FROM STUDENT_DATA WHERE Adm_ID = ?',(request.form.get('st_adm'),))
                 if cursor.fetchone() is not None:
                     return render_template('admin/functions/admission_request.html',code=cc.Admission_request().admission_request(),msg="ADMISSION NO. ALREDAY TAKEN.")
-                #cursor.execute('INSERT INTO STUDENT_DATA(Adm_ID,Name,Father,Mother,Gender,CLASS,DOB,Address,MOBILE,Adhaar,PEN) VALUES(?,?,?,?,?,?,?,?,?,?);',
-                #(request.form.get('adm_no'),request.form.get('st_name'),request.form.get('st_ft_name'),request.form.get('st_mt_name'),request.form.get('st_gender'),request.form.get('st_class'),request.form.get('st_dob'),request.form.get('st_add'),request.form.get('st_mob'),request.form.get('st_adhaar'),request.form.get('st_pen')))
+                cursor.execute('SELECT * FROM ADMISSION_REQUEST WHERE SR = ?',(request.form.get('sr'),))
+                _,name,father,mother,gender,cls,dob,address,mobile,adhaar,_,pen,_,d,t,_ = cursor.fetchone()
+                cursor.execute('INSERT INTO STUDENT_DATA VALUES(?,?,?,?,?,?,?,?,?,?,?);',(request.form.get('st_adm'),name,father,mother,gender,cls,dob,address,mobile,adhaar,pen))
                 cursor.execute('INSERT INTO PASSWORDS(LOG_TYPE,USER_ID,PASSWORD) VALUES(?,?,?)',('STUDENT',request.form.get('adm_no'),funt.Functions().crt_pwd(request.form.get('pwd'))))
                 d,t = funt.Functions().get_date_time()
                 cursor.execute('INSERT INTO LOG_HISTORY VALUES(?,?,?)',(request.form.get('adm_no'),'STUDENT',f'CREATED,{d},{t}'))
-                cursor.execute('INSERT INTO SINGLE_LOG VALUES(?,?,?)',('STUDENT',request.form.get('adm_no'),0))
 
                 #send email to student
                 cursor.execute('SELECT EMAIL FROM STUDENT_DATA WHERE SR = ?',(request.form.get('sr'),))
@@ -983,7 +994,7 @@ def admission_request_manual():
                 <b>REAGARDS:-</b><br>
                 DPS CS TEAM<br>''')
 
-                cursor.execute('DELETE FROM ADMISSION_REQUEST WHERE SR = ?',(request.form.get('sr'),))
+                cursor.execute('UPDATE INTO ADMISSION_REQUEST SET STATUS = ? WHERE SR = ?',('ACCEPTED',request.form.get('sr')))
                 funt.Functions().data_base_function(conn)
                 return render_template('confirmation.html')
             
