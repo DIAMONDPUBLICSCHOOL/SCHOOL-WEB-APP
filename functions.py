@@ -113,9 +113,11 @@ class Functions(Data):
         else:
             raise ValueError("Either message or html_content must be provided.")
         try:
+            email_pass = os.environ.get('EMAIL_PASS')
             with smtplib.SMTP("smtp.gmail.com", 587) as server:
                 server.starttls()
-                server.login(msg['From'],os.environ.get('EMAIL_PASS'))
+                server.login(msg['From'],email_pass is not None)
+                print(len(email_pass))
                 server.send_message(msg)
             return True
         except Exception as e:
