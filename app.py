@@ -964,6 +964,8 @@ def payment():
                 funt.Functions().data_base_function(conn)
                 return render_template('other_pages/admission_form/payment.html',msg=f'<font style="color:red">YOUR ENTERED EMAIL [{ST_EMAIL}] IS INVALID!!!</font><button style="background:white;border:none;" onclick="history.back()">⬅️</button>',ST_NAME=ST_NAME,ST_FATHER=ST_FATHER,ST_MOTHER=ST_MOTHER,ST_GENDER=ST_GENDER,ST_CLASS=ST_CLASS,ST_DOB=ST_DOB,ST_ADDRESS=ST_ADDRESS,ST_MOBILE=ST_MOBILE,ST_ADHAAR=ST_ADHAAR,ST_PEN=ST_PEN,ST_EMAIL=ST_EMAIL)
             return redirect(url_for('welcometoadmissionform'))
+        else:
+            pass
         funt.Functions().data_base_function(conn)
         return render_template('other_pages/admission_form/payment.html',ST_NAME=ST_NAME,ST_FATHER=ST_FATHER,ST_MOTHER=ST_MOTHER,ST_GENDER=ST_GENDER,ST_CLASS=ST_CLASS,ST_DOB=ST_DOB,ST_ADDRESS=ST_ADDRESS,ST_MOBILE=ST_MOBILE,ST_ADHAAR=ST_ADHAAR,ST_PEN=ST_PEN,ST_EMAIL=ST_EMAIL)
     else:

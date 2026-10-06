@@ -136,8 +136,8 @@ class Functions(Data):
         # except Exception as e:
         #     return False
 
-    from playwright.sync_api import sync_playwright
     def crt_pdf_html(self,data):
+        from playwright.sync_api import sync_playwright
         from io import BytesIO
         with sync_playwright() as p:
             browser = p.chromium.launch()
