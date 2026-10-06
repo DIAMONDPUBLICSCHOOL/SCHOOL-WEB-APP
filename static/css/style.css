@@ -5,7 +5,7 @@ label{color: red;}
 img{float: center;}
 #nor_input,#nor_opt{width: 100%;margin:10px 10px;padding:12px 20px;border: 3px solid green;display:inline-block;box-sizing: border-box;}
 #nor_btn{color: white;background: blue;border-radius:50px;border: 3px solid green;width: 98%;margin:10px 10px;padding: 12px 20px;}
-#dash_btn{width: 48.4%;background:blue;border:2px solid red;border-radius:50px;height:24%;padding: 5px;margin: 2px 2px;color:white;}
+#dash_btn{width: 46%;background:blue;border:2px solid red;border-radius:50px;height:24%;padding: 5px;margin: 2px 2px;color:white;}
 #nav_btn{background: transparent;color: white;width: 33%;border-radius:50px;border: none;}
 .test_btn{background: green;color: orange;width: 100%;margin:10px 10px;padding: 12px 20px;border-radius: 50px;}
 #hw_btn{width: 40%;background: green;border-radius: 10px;color: white;margin:5px 5px;padding: 6px 10px;}
@@ -29,9 +29,9 @@ body {margin: 0;padding: 0;}
 div#user_info{text-align: center;font-weight: bold;margin:10px 10px;padding:12px 20px;}
 div#user_info img{border: 1px solid green;border-radius: 50%;width: 200px;height: 200px;}
 div#user_info font{color: red;}
-div#user_info #comp{border: 1px solid black;color: white;background: red;margin:5px 5px;padding:6px 6px;width:30%;}
-div#user_info #log{border: 1px solid black;color: white;background: rgb(55, 55, 185);margin:5px 5px;padding:6px 6px;width:30%;}
-div#user_info #pwd{border: 1px solid black;color: black;background: rgb(0, 255, 94);margin:5px 5px;padding:6px 6px;width:30%;}
+div#user_info #comp{border: 1px solid black;color: white;background: red;margin:5px 5px;padding:6px 6px;width:30%;height: 50px;}
+div#user_info #log{border: 1px solid black;color: white;background: rgb(55, 55, 185);margin:5px 5px;padding:6px 6px;width:30%;height: 50px;}
+div#user_info #pwd{border: 1px solid black;color: black;background: rgb(0, 255, 94);margin:5px 5px;padding:6px 6px;width:30%;height: 50px;}
 div#TEST_CONTENT{color: black;border: 2px solid red;background:rgb(141, 246, 149);margin:10px 10px;padding:12px 20px;border-radius: 5px;}
 textarea{resize: none;}
 article{width: 100%;border: 2px solid grey;margin:10px 10px;padding:12px 20px;color: red;text-align: center;}

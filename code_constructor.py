@@ -7,8 +7,9 @@ class content_creator:
         super().__init__()
     def subject_list(self,st_class):
         c_type_dic = {"type1":"HINDI<E.V.S.<COMPUTER<ENGLISH<G.K.<MATHS<ART","type2":"HINDI<G.K.<E.V.S.<MATHS<SANSKRIT<ENGLISH<COMPUTER<ART",
-        "type3":"MATHS<SANSKRIT<COMPUTER<ENGLISH<E.V.S.<G.K.<HINDI<ART","type4":"ENGLISH<G.K.<SANSKRIT<S.ST<MATHS<HINDI<SCIENCE<COMPUTER"}
-        classes_dic = {"1":"type1","2":"type2","3":"type2","4":"type3","5":"type3","6":"type4","7":"type4","8":"type4"}
+        "type3":"MATHS<SANSKRIT<COMPUTER<ENGLISH<E.V.S.<G.K.<HINDI<ART","type4":"ENGLISH<G.K.<SANSKRIT<S.ST<MATHS<HINDI<SCIENCE<COMPUTER",
+        "type5":"HINDI<ENGLISH<MATHS"}
+        classes_dic = {"NURSERY":"type5","LKG":"type5","UKG":"type5","1":"type1","2":"type2","3":"type2","4":"type3","5":"type3","6":"type4","7":"type4","8":"type4"}
         return c_type_dic[classes_dic[st_class]].split('<')
 
 class Complains(content_creator): 
@@ -198,7 +199,10 @@ document.getElementById("'''+f'''testbtn{test_id}'''+'''").style.display = "none
         cursor.execute('SELECT TEST_ID,DATE,TIME,SUBJECT,CLASS FROM TEST_DATA WHERE T_ID = ? AND CLASS = ?',(t_id,c_class))
         for item in cursor.fetchall():
             cursor.execute('SELECT OBTAIN_MARKS FROM STUDENT_TEST_DATA WHERE TEST_ID = ?',(int(item[0]),))
-            if cursor.fetchone() is None:
+            data = cursor.fetchone()
+            if data is None:###############reapeated task [for handle error in caused]
+                html_text +=f'<option value="{int(item[0])}">{int(item[0])} --> {item[4]} -->{item[1]},{item[2]} --> {item[3]}</option>'
+            elif not data[0]:
                 html_text +=f'<option value="{int(item[0])}">{int(item[0])} --> {item[4]} -->{item[1]},{item[2]} --> {item[3]}</option>'
         funt.Data().data_base_function(conn)
         return html_text + '</select><button id="nor_btn">LOAD TEST DATA</button>'
@@ -420,11 +424,13 @@ class Report_card(content_creator):
         cursor.execute('SELECT Adm_ID,Name FROM STUDENT_DATA WHERE Class = ?',(c_class,))
         for row in cursor.fetchall():
             html_text += f'<option value="{row[0]}">{row[0]} , {row[1]}</option>'
-        html_text += '</select><button type="submit" id="nor_btn">LOAD REPORT CARD</button>'
+        html_text += '''</select>
+        <input type="text" name="stage" value="st2" hidden>
+        <button type="submit" id="nor_btn" onclick="alert('WAIT FOR FEW SECONDS, TO LOAD...')">LOAD REPORT CARD</button>'''
         funt.Data().data_base_function(conn)
         return html_text
     
-    def view_report_card(self,st_id,data_only=False):
+    def view_report_card(self,st_id,user_type=None,data_only=False):
         def add(data):
             try:
                 data = int(data)
@@ -450,7 +456,10 @@ class Report_card(content_creator):
             else:
                 g = "E"
             return g
-        html_text = f"""<table border="3">
+        font_size = ''
+        if data_only != False:
+            font_size = 'style="font-size: 12px;"'
+        html_text = f"""<input name="st_del" value="{st_id}" hidden><table border="3" {font_size}>
         <tr><th rowspan="2">SCHOLASTIC AREAS:</th><th colspan="5">TERM - 1</th><th colspan="5">TERM - 2</th><th colspan="2">FINAL TERM</th></tr>
         <tr><th>PT-1</th><th>ACT.</th><th>N.B.</th><th>H.Y.</th><th>TOTAL</th><th>PT- 2</th><th>ACT.</th><th>N.B.</th><th>FINAL</th><th>TOTAL</th><th>TOTAL</th><th>GRADE</th></tr>
         """
@@ -458,10 +467,10 @@ class Report_card(content_creator):
         cursor.execute('SELECT Class FROM STUDENT_DATA WHERE Adm_ID = ?',(st_id,))
         st_class = cursor.fetchone()[0]
         cursor.execute('SELECT TERM_1,TERM_2 FROM EXAM_DATA WHERE Adm_ID = ?',(st_id,))
-        li = cursor.fetchone()#
+        li = cursor.fetchone()
         if li is None:
             return "<h2>NO DATA FOUND!!!</h2>"
-        row = list(li)#[0]
+        row = list(li)
         term1,term2 = row[0].split(';'),row[1].split(';')
         sub = super().subject_list(st_class)
         if len(term1) == len(term2):
@@ -472,25 +481,27 @@ class Report_card(content_creator):
                 data2 = term2[i].split(',')
                 html_text += f'''<tr><th>{sub[i]}</th>'''
                 for data in data1:
-                    t += add(data)
-                    html_text += f'<th>{data}</th>'
-                html_text += f'<th>{t}</th>'
+                    data = add(data)
+                    t += data
+                    html_text += f'<th>{str(data)}</th>'
+                html_text += f'<th>{str(t)}</th>'
                 ft = add(t)
                 tff1 += add(t)
                 t=0
                 for data in data2:
-                    t += add(data)
-                    html_text += f'<th>{data}</th>'
-                html_text += f'<th>{t}</th>'
+                    data = add(data)
+                    t += data
+                    html_text += f'<th>{str(data)}</th>'
+                html_text += f'<th>{str(t)}</th>'
                 ft+= add(t)
                 tff2 += add(t)
                 fft += ft
                 html_text += f"<th>{ft}</th><th>{grade(ft,200)}</th></tr>"
             html_text += f'<tr><th colspan="5"></th><th>{tff1}</th><th colspan="4"></th><th>{tff2}</th><th>{fft}</th><th>{grade(fft,len(sub)*200)}</th></tr></table>'
             funt.Functions().crt_pdf_html(html_text)
-            if data_only == False:
+            if data_only == False and user_type == 'ADMIN':
                 html_text += f'<form action="/dwn_reportcard" method="post"><input type="number" name="st_id" value="{st_id}" hidden><button id="nor_btn">DOWNLOAD REPORT CARD  <i class="fa fa-download"></i></button></form>'
-            else:
+            elif data_only == True:
                 cursor.execute('SELECT Name,Father,Mother,DOB,Mobile,Address,Class FROM STUDENT_DATA WHERE Adm_ID = ?',(st_id,))
                 name,father,mother,dob,mobile,address,cls = cursor.fetchone()
                 if cls.isdigit():
@@ -505,20 +516,21 @@ class Report_card(content_creator):
                 with open('datasync.json',"r") as f:
                     sync_data = json.load(f)
                 session = max([int(item) for item in sync_data.keys() if item.isdigit()])
+                qrcode_path = funt.Functions().generate_qrcode(f'https://dpsjalesar.onrender.com/verify_report_card?encrypted_text="{name},{father},{mother},{dob},{st_id},{cls},{session}-{session+1}"')
                 html_text = f'''
 <style>
 body{{padding:5px;margin: 10px;line-space: 1;}}
 h1,h4,h2{{text-align: center;}}
 fieldset{{border: 2px solid black;}}
 table{{width: 100%;border-collapse: collapse;}}
-th,td{{padding: 8px;text-align: left;}}
+th,td{{text-align: left;}}
 </style>
 <fieldset><legend>REPORT CARD</legend>
 <h1>DIAMOND PUBLIC SCHOOL</h1>
 <h4>BADE MIYAN DARGAH ROAD, NEAR EX. KAILASPATI TALKIES, JALESAR (ETAH) - UP (207302)</h4>
 <h4>EMAIL : DPSJALESAR@GMAIL.COM :: MOBILE: 9897432207 , 8273998585</h4>
 <h2>REPORT CARD {session+1}</h2>
-<table border="1">
+<table border="1" style="font-size: 12px;">
 <tr><th colspan="4" style="text-align: center;">HOLASTIC REPORT {session} - {session+1}</th></tr>
 <tr><th>-</th><th>DETAILS</th><th>-</th><th>DETAILS</th></tr>
 <tr><th>NAME</th><td>{name}</td><th>FATHER</th><td>{father}</td></tr>
@@ -529,7 +541,7 @@ th,td{{padding: 8px;text-align: left;}}
 </table><br>
 {html_text}
 <br>
-<table border="1">
+<table border="1" style="font-size: 12px;">
 <tr><th>SCHOLASTIC AREAS:</th><th>GRADE</th><th>SCHOLASTIC AREAS:</th><th>GRADE</th></tr>
 <tr><th>WORK EDUCATION</th><td>A</td><th>SINCERITY</th><td>A</td></tr>
 <tr><th>ART EDUCATION</th><td>A</td><th>BEHAVIOUR</th><td>A</td></tr>
@@ -539,6 +551,7 @@ th,td{{padding: 8px;text-align: left;}}
 <br>
 <b>CONGRATULATIONS!!!</b> YOU ARE PROMOTED TO CLASS :- <b>{ncls}</b>
 <br><br>
+<img src="{qrcode_path}" width="100px" height="100px" style="float: right;">
 <i><b><u>NOTE:-</u></b> AUTO GENERATED BY COMPUTER NO SIGNATURE REQUIRED.</i>
 </fieldset>
 '''

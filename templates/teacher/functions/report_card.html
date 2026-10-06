@@ -21,6 +21,9 @@
         <b>CHOOSE CLASS <label>*</label></b>
         <select id="nor_opt" name="c_class" required>
             <option value="">---SELECT---</option>
+            <option value="NURSERY">NURSERY</option>
+            <option value="LKG">LKG</option>
+            <option value="UKG">UKG</option>
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
@@ -34,15 +37,9 @@
         </form></fieldset>
         <fieldset>
         <form action="{{url_for('report_card')}}" method="post">
-        <input type="text" name="stage" value="st2" hidden>
         {{code|safe}}
         </form>
         </fieldset>
-        <form action="{{url_for('report_card')}}" method="post">
-        <fieldset>
-        {{code2|safe}}
-        </fieldset>
-        </form>
     </fieldset>
 <ul id="nav"><li>COPYRIGHT&copy; 2026 <code>ALL RIGHTS RESERVED.</code></li></ul>
 </body>

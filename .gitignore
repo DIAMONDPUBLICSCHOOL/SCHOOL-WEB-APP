@@ -3,3 +3,4 @@
 /.venv
 /.venv-1
 /data.db-journal
+/.env

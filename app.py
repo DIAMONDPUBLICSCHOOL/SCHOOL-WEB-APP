@@ -136,7 +136,7 @@ def report_card():
 
                 if re_type == "st2":
                     funt.Data().data_base_function(conn)
-                    return render_template("teacher/functions/report_card.html",code=cc.Report_card().select_st(c_class),code2=cc.Report_card().teach_st(int(re_type[-1]) -1,st_id,c_class))
+                    return render_template("teacher/functions/report_card.html",code=cc.Report_card().teach_st(int(re_type[-1]) -1,st_id,c_class))
                 
                 data = ''
                 for i in range(len(cc.content_creator().subject_list(c_class))):
@@ -168,7 +168,7 @@ def report_card():
                     return render_template("admin/functions/report_card.html",code=cc.Report_card().select_st(c_class))
                 elif re_type == "st2":
                     st_id = request.form.get('st_del')
-                    return render_template("admin/functions/report_card.html",code=cc.Report_card().select_st(c_class),code2=cc.Report_card().view_report_card(st_id))
+                    return render_template("admin/functions/report_card.html",code=cc.Report_card().view_report_card(st_id,user_type='ADMIN'))
             return render_template("admin/functions/report_card.html")
         else:
             return redirect(url_for('welcome_page'))
@@ -349,6 +349,13 @@ def student_test_data():
             conn,cursor = funt.Data().data_base_function()
             data_dic = request.form.to_dict(flat=True)
             data_dic.pop('stage')
+            try:
+                i=1
+                while True:
+                    data_dic.pop(f'answer{i}')
+                    i +=1
+            except:
+                pass 
             for student,item in data_dic.items():
                 Adm_ID = int(student.split('marks_')[1])
                 cursor.execute('UPDATE STUDENT_TEST_DATA SET OBTAIN_MARKS = ? WHERE Adm_ID = ?',(int(item),Adm_ID))
@@ -364,23 +371,24 @@ def teacher_hw_sender():
     if log_check():
         if request.method == 'POST':
             conn,cursor = funt.Data().data_base_function()
-            HW_ID_LIST = []
-            cursor.execute('SELECT HW_ID FROM HW_DATA;')
-            for row in cursor.fetchall():
-                HW_ID_LIST.append(row[0])
-            while True:
-                hw_id = random.randint(100000000000000,999999999999999)
-                if hw_id not in HW_ID_LIST:
-                    break
-            hw_file= request.files['hw_file']
-            if hw_file:
-                path = f'static/homework_file/{hw_id}.pdf'
-                hw_file.save(path)
-            else:
-                path = None
+            # HW_ID_LIST = []
+            # cursor.execute('SELECT HW_ID FROM HW_DATA;')
+            # for row in cursor.fetchall():
+            #     HW_ID_LIST.append(row[0])
+            # while True:
+            #     hw_id = random.randint(100000000000000,999999999999999)
+            #     if hw_id not in HW_ID_LIST:
+            #         break
+            # hw_file = request.files['hw_file']
+            # if hw_file:
+            #     path = f'static/homework_file/{hw_id}.pdf'
+            #     hw_file.save(path)
+            # else:
+            #     path = None
+            path = None
             d,t = funt.Functions().get_date_time()
-            cursor.execute('INSERT INTO HW_DATA(HW_ID,HW_CLASS,HW_TEXT,HW_FILE_PATH,HW_DATE,HW_TIME,T_ID) VALUES(?,?,?,?,?,?,?)',
-            (hw_id,request.form.get('hw_class'),request.form.get('hw_text'),path,d,t,session['user_id'])) 
+            cursor.execute('INSERT INTO HW_DATA(HW_CLASS,HW_TEXT,HW_FILE_PATH,HW_DATE,HW_TIME,T_ID) VALUES(?,?,?,?,?,?)',
+            (request.form.get('hw_class'),request.form.get('hw_text'),path,d,t,session['user_id'])) 
             funt.Data().data_base_function(conn)
             return render_template('confirmation.html')
         return render_template('teacher/functions/hw_sender.html')
@@ -883,9 +891,7 @@ def sleep_mode():
 #################only for download report card and fees slip
 @app.route('/dwn_reportcard',methods=["GET","POST"])
 def dwn_reportcard():
-    if log_check():
-        if session['role'] != 'ADMIN':
-            return redirect(url_for('dashboard'))
+    if log_check() and session['role'] == 'ADMIN':
         report_card_data = cc.Report_card().view_report_card(request.form.get('st_id'),data_only=True)
         file = funt.Functions().crt_pdf_html(report_card_data)
         return send_file(file, as_attachment=True,download_name=f"Report_card_{request.form.get('st_id')}.pdf")
@@ -908,12 +914,12 @@ def download_fees_slip():
 
 @app.route("/DPSADMISSION_FORM")
 def welcometoadmissionform():
-    return render_template('admission_form/adwelcomepage.html')
+    return render_template('other_pages/admission_form/adwelcomepage.html')
 
 @app.route('/ADMISSION_FORM',methods=["POST","GET"])
 def admission_form():
     session['role']="ADMISSION"
-    return render_template('admission_form/admissionform.html')
+    return render_template('other_pages/admission_form/admissionform.html')
 
 @app.route('/ADMISSION_PAYMENT',methods=["POST","GET"])
 def payment():
@@ -933,11 +939,11 @@ def payment():
         cursor.execute('SELECT * FROM STUDENT_DATA WHERE ADHAAR = ?',(request.form.get('ST_ADHAAR'),))
         if cursor.fetchone() is not None:
             funt.Functions().data_base_function(conn)
-            return render_template('admission_form/payment.html',msg=f'<font style="color:red">YOUR ENTERED ADHAAR [{ST_ADHAAR}] IS INVALID!!!</font>',ST_NAME=ST_NAME,ST_FATHER=ST_FATHER,ST_MOTHER=ST_MOTHER,ST_GENDER=ST_GENDER,ST_CLASS=ST_CLASS,ST_DOB=ST_DOB,ST_ADDRESS=ST_ADDRESS,ST_MOBILE=ST_MOBILE,ST_ADHAAR=ST_ADHAAR,ST_PEN=ST_PEN,ST_EMAIL=ST_EMAIL)
+            return render_template('other_pages/admission_form/payment.html',msg=f'<font style="color:red">YOUR ENTERED ADHAAR [{ST_ADHAAR}] IS INVALID!!!</font>',ST_NAME=ST_NAME,ST_FATHER=ST_FATHER,ST_MOTHER=ST_MOTHER,ST_GENDER=ST_GENDER,ST_CLASS=ST_CLASS,ST_DOB=ST_DOB,ST_ADDRESS=ST_ADDRESS,ST_MOBILE=ST_MOBILE,ST_ADHAAR=ST_ADHAAR,ST_PEN=ST_PEN,ST_EMAIL=ST_EMAIL)
         cursor.execute('SELECT * FROM STUDENT_DATA WHERE PEN = ?',(request.form.get('ST_PEN'),))
         if cursor.fetchone() is not None:
             funt.Functions().data_base_function(conn)
-            return render_template('admission_form/payment.html',msg=f'<font style="color:red">YOUR ENTERED PEN NO. [{ST_PEN}] IS INVALID!!!</font>',ST_NAME=ST_NAME,ST_FATHER=ST_FATHER,ST_MOTHER=ST_MOTHER,ST_GENDER=ST_GENDER,ST_CLASS=ST_CLASS,ST_DOB=ST_DOB,ST_ADDRESS=ST_ADDRESS,ST_MOBILE=ST_MOBILE,ST_ADHAAR=ST_ADHAAR,ST_PEN=ST_PEN,ST_EMAIL=ST_EMAIL)
+            return render_template('other_pages/admission_form/payment.html',msg=f'<font style="color:red">YOUR ENTERED PEN NO. [{ST_PEN}] IS INVALID!!!</font>',ST_NAME=ST_NAME,ST_FATHER=ST_FATHER,ST_MOTHER=ST_MOTHER,ST_GENDER=ST_GENDER,ST_CLASS=ST_CLASS,ST_DOB=ST_DOB,ST_ADDRESS=ST_ADDRESS,ST_MOBILE=ST_MOBILE,ST_ADHAAR=ST_ADHAAR,ST_PEN=ST_PEN,ST_EMAIL=ST_EMAIL)
         if request.form.get('stage') == "st1":
             TRANS_ID = request.form.get('TRANSACTION_ID')
             d,t = funt.Functions().get_date_time()
@@ -956,10 +962,10 @@ def payment():
             DPS CS TEAM<br></p>''')):
                 cursor.execute('DELETE FROM ADMISSION_REQUEST WHERE SR = ?',(sr))
                 funt.Functions().data_base_function(conn)
-                return render_template('admission_form/payment.html',msg=f'<font style="color:red">YOUR ENTERED EMAIL [{ST_EMAIL}] IS INVALID!!!</font><button style="background:white;border:none;" onclick="history.back()">⬅️</button>',ST_NAME=ST_NAME,ST_FATHER=ST_FATHER,ST_MOTHER=ST_MOTHER,ST_GENDER=ST_GENDER,ST_CLASS=ST_CLASS,ST_DOB=ST_DOB,ST_ADDRESS=ST_ADDRESS,ST_MOBILE=ST_MOBILE,ST_ADHAAR=ST_ADHAAR,ST_PEN=ST_PEN,ST_EMAIL=ST_EMAIL)
+                return render_template('other_pages/admission_form/payment.html',msg=f'<font style="color:red">YOUR ENTERED EMAIL [{ST_EMAIL}] IS INVALID!!!</font><button style="background:white;border:none;" onclick="history.back()">⬅️</button>',ST_NAME=ST_NAME,ST_FATHER=ST_FATHER,ST_MOTHER=ST_MOTHER,ST_GENDER=ST_GENDER,ST_CLASS=ST_CLASS,ST_DOB=ST_DOB,ST_ADDRESS=ST_ADDRESS,ST_MOBILE=ST_MOBILE,ST_ADHAAR=ST_ADHAAR,ST_PEN=ST_PEN,ST_EMAIL=ST_EMAIL)
             return redirect(url_for('welcometoadmissionform'))
         funt.Functions().data_base_function(conn)
-        return render_template('admission_form/payment.html',ST_NAME=ST_NAME,ST_FATHER=ST_FATHER,ST_MOTHER=ST_MOTHER,ST_GENDER=ST_GENDER,ST_CLASS=ST_CLASS,ST_DOB=ST_DOB,ST_ADDRESS=ST_ADDRESS,ST_MOBILE=ST_MOBILE,ST_ADHAAR=ST_ADHAAR,ST_PEN=ST_PEN,ST_EMAIL=ST_EMAIL)
+        return render_template('other_pages/admission_form/payment.html',ST_NAME=ST_NAME,ST_FATHER=ST_FATHER,ST_MOTHER=ST_MOTHER,ST_GENDER=ST_GENDER,ST_CLASS=ST_CLASS,ST_DOB=ST_DOB,ST_ADDRESS=ST_ADDRESS,ST_MOBILE=ST_MOBILE,ST_ADHAAR=ST_ADHAAR,ST_PEN=ST_PEN,ST_EMAIL=ST_EMAIL)
     else:
         return redirect(url_for('welcometoadmissionform'))
 
@@ -1019,6 +1025,50 @@ def admission_request_manual():
     else:
         return redirect(url_for('welcome_page'))
 
+#OTHER PAGES FUNCTIONS
+@app.route('/verify_report_card',methods=["GET","POST"])
+def verify_report_card():
+    code=''
+    if request.method == "POST":
+        encrypted_text = request.form.get('encrypted_text').split('https://dpsjalesar.onrender.com/verify_report_card?encrypted_text=')[1]
+        st_name = request.form.get('st_name')
+        st_father = request.form.get('st_father')
+        st_mother = request.form.get('st_mother')
+        st_dob = request.form.get('st_dob')
+        st_adm = request.form.get('st_adm')
+        st_class = request.form.get('st_class')
+        st_session = request.form.get('st_session')
+        error = '''
+        <fieldset>
+       <b style="color: rgb(255, 0, 0); font-size:200px;">&times;</b><h1><br>INVALID DATA!!!</h1>
+       <ul style="text-align: left;">
+        <b>FOR ANY ISSUE CONTACT ON</b>
+        <li>MOBILE NO:- <a href="https://wa.me/9897432207" target="_blank">+919897432207</a> , <a href="https://wa.me/8273998585" target="_blank">+918273998585</a></li>
+        <li>EMAIL:- <a target="_blank" href="mailto:dpsjalesar@gmail.com?subject=Any Error or Issue is caused in app.&body=Respected Development Team,\n\n">dpsjalesar@gmail.com</a></li>
+       </ul>
+        </fieldset>'''
+        success = '''
+    <fieldset>
+       <b style="color: green; font-size:200px;"><i class="fa fa-check"></i></b><h1><br>DATA AVAILABLE!!!</h1>
+       <ul style="text-align: left;">
+        <b>FOR ANY ISSUE CONTACT ON</b>
+        <li>MOBILE NO:- <a href="https://wa.me/9897432207" target="_blank">+919897432207</a> , <a href="https://wa.me/8273998585" target="_blank">+918273998585</a></li>
+        <li>EMAIL:- <a target="_blank" href="mailto:dpsjalesar@gmail.com?subject=Any Error or Issue is caused in app.&body=Respected Development Team,\n\n">dpsjalesar@gmail.com</a></li>
+    </ul>
+    </fieldset>
+    '''
+        try:
+            encrypted_data = my_cryptography.report_data_decrypt(encrypted_text)
+            input_data = f'''"{st_name},{st_father},{st_mother},{st_dob},{st_adm},{st_class},{st_session}"'''
+            if input_data == encrypted_data:
+                code = success
+        except:
+            code = error
+        return render_template('other_pages/report_card_check.html',status=code)
+    encrypted_text = request.args.get('encrypted_text')
+    if encrypted_text is not None:
+        code = f'value="{encrypted_text}" disabled'
+    return render_template('other_pages/report_card_check.html',code=code)
 
 
 if __name__== "__main__":

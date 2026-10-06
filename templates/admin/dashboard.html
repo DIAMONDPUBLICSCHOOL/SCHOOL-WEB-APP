@@ -38,6 +38,7 @@
         width: 100%;
         }
     }
+    fieldset{text-align: center;}
 </style>
 </head>
 <body>
@@ -46,7 +47,7 @@
     <img src="static/images/SYMBOLS.png" alt="SYMBOL">
     <li>DIAMOND PUBLIC SCHOOL</li>
   </ul>
-  <div id="user_info"><br><b>USER:- <font>ADMIN</font></b><br><a href="{{url_for('logout')}}"><button id="log">LOGOUT <i class="fa fa-sign-out"></i></button></a></div>
+  <div id="user_info"><br><b>USER:- <font>ADMIN</font></b><br><a href="{{url_for('logout')}}"><button id="log">LOGOUT ADMIN <i class="fa fa-sign-out"></i></button></a></div>
             <fieldset>
                 <legend><b>SERVICES</b></legend>
                 <a href="{{url_for('add_student')}}"><button id="dash_btn"><b id="btn">+<i class="fa fa-user"></i></b><br><br>ADD STUDENT</button></a>

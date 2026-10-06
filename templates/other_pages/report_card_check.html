@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DPS REPORT CARD VERIFIER SIMULATOR</title>
+    <link rel="icon" type="image/png" href="{{url_for('static',filename='images/SYMBOLS.png')}}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
+</head>
+<body>
+    <fieldset>
+        <h1>DIAMOND PUBLIC SCHOOL</h1>
+        <h2>REPORT CARD VERIFIER SIMULATOR</h2>
+        <h3>THIS PAGE VERIFIES REPORT CARDS</h3>
+        <hr><hr>
+        <form action="{{url_for('verify_report_card')}}" method="post">
+        <b>ENTER ENCRYPTED QR CODE TEXT <label>*</label></b>
+        <input type="text" id="nor_input" name="encrypted_text" placeholder="ENTER ENCRYPTED QR CODE TEXT" {{code|safe}} required>
+        <b><i><u>NOTE:-</u></i> SCAN THE QR CODE PRESENT ON REPORT CARD BY SCANNER, <br>THAN PUT THE WHOLE TEXT INTO THIS INPUT FIELD.</b>
+        <hr>
+        <b>ENTER STUDENT NAME <label>*</label></b>
+        <input type="text" name="st_name" id="nor_input" placeholder="ENTER STUDENT NAME" required>
+        <b>ENTER FATHER NAME <label>*</label></b>
+        <input type="text" name="st_father" id="nor_input" placeholder="ENTER FATHER NAME" required>
+        <b>ENTER MOTHER NAME <label>*</label></b>
+        <input type="text" name="st_mother" id="nor_input" placeholder="ENTER MOTHER NAME" required>
+        <b>ENTER DOB <label>*</label></b>
+        <input type="date" name="st_dob" id="nor_input" required>
+        <b>ENTER ADMISSION NUMBER <label>*</label></b>
+        <input type="text" name="st_adm" id="nor_input" placeholder="ENTER STUDENT ADMISSION NUMBER" required>
+        <b>CHOOSE CLASS <label>*</label></b>
+        <select id="nor_opt" name="st_class" required>
+            <option value="">---SELECT---</option>
+            <option value="NURSERY">NURSERY</option>
+            <option value="LKG">LKG</option>
+            <option value="UKG">UKG</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+        </select>
+        <b>CHOOSE SESSION <label>*</label></b>
+        <select id="nor_opt" name="st_session" required>
+            <option value="">---SELECT---</option>
+            <option value="2022-2023">2022-2023</option>
+            <option value="2023-2024">2023-2024</option>
+            <option value="2024-2025">2024-2025</option>
+            <option value="2025-2026">2025-2026</option>
+            <option value="2025-2026">2025-2026</option>
+            <option value="2026-2027">2026-2027</option>
+            <option value="2027-2028">2027-2028</option>
+            <option value="2028-2029">2028-2029</option>
+        </select>
+        <button id="nor_btn">VERIFY REPORT CARD</button>
+        </form>
+        {{status|safe}}
+    </fieldset>
+</body>
+</html>

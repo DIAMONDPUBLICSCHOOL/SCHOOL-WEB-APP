@@ -1,4 +1,6 @@
 import sqlite3,my_cryptography,datetime,json,subprocess,os
+
+import qrcode
 import smtplib,sys
 import my_cryptography as crypt
 from email.message import EmailMessage
@@ -99,52 +101,41 @@ class Functions(Data):
             self.data_base_function(conn)
             return True
 
-    # def email_sender(self,receiver_email,subject,message=None,html_content=None):
-    #     if not message and not html_content:
-    #         return False
-    #     msg = EmailMessage()
-    #     msg["Subject"] = subject
-    #     msg["From"] = "nishantkushwah7536@gmail.com"######################################
-    #     msg["To"] = receiver_email
-    #     if html_content:
-    #         msg.add_alternative(html_content, subtype="html")
-    #     elif message:
-    #         msg.set_content(message)
-    #     else:
-    #         raise ValueError("Either message or html_content must be provided.")
-    #     try:
-    #         email_pass = os.environ.get('EMAIL_PASS')
-    #         with smtplib.SMTP("smtp.gmail.com", 587) as server:
-    #             server.starttls()
-    #             server.login(msg['From'],email_pass is not None)
-    #             print(len(email_pass))
-    #             server.send_message(msg)
-    #         return True
-    #     except Exception as e:
-    #         return False
-    def email_sender(self,receiver_email,subject,message=None,html_content=None):
-        print("EMAIL: function started")
-        email_pass = os.environ.get("EMAIL_PASS")
-        print("EMAIL_PASS exists:", email_pass is not None)
-        if email_pass is None:
-            print("EMAIL ERROR: EMAIL_PASS is None")
-            return False
-        print("EMAIL: before SMTP connection")
+    def email_sender(self,receiver_email,subject,html_content):
+        import resend
         try:
-            server = smtplib.SMTP("smtp.gmail.com", 587, timeout=15)
-            print("EMAIL: SMTP connected")
-            server.starttls()
-            print("EMAIL: STARTTLS completed")
-            server.login("your-email@gmail.com", email_pass)
-            print("EMAIL: login successful")
-            server.send_message(message)
-            print("EMAIL: message sent")
-            server.quit()
+            resend.api_key = os.environ.get('API_KEY')
+            r = resend.Emails.send({
+            "from": "onboarding@resend.dev",
+            "to": receiver_email,
+            "subject": subject,
+            "html":html_content})
             return True
-        except Exception as e:
-            print("EMAIL ERROR:", repr(e))
+        except:
             return False
-        
+
+        #for paid version only comment out.
+        # msg = EmailMessage()
+        # msg["Subject"] = subject
+        # msg["From"] = "nishantkushwah7536@gmail.com"######################################
+        # msg["To"] = receiver_email
+        # if html_content:
+        #     msg.add_alternative(html_content, subtype="html")
+        # elif message:
+        #     msg.set_content(message)
+        # else:
+        #     raise ValueError("Either message or html_content must be provided.")
+        # try:
+        #     email_pass = os.environ.get('EMAIL_PASS')
+        #     with smtplib.SMTP("smtp.gmail.com", 587) as server:
+        #         server.starttls()
+        #         server.login(msg['From'],email_pass is not None)
+        #         print(len(email_pass))
+        #         server.send_message(msg)
+        #     return True
+        # except Exception as e:
+        #     return False
+
     from playwright.sync_api import sync_playwright
     def crt_pdf_html(self,data):
         from io import BytesIO
@@ -158,6 +149,14 @@ class Functions(Data):
             pdf_file.seek(0)
             return pdf_file
         
+    def generate_qrcode(self,data):
+        import qrcode,io,base64
+        qr = qrcode.make(data)
+        buffer = io.BytesIO()
+        qr.save(buffer, format="PNG")
+        encoded_image = base64.b64encode(buffer.getvalue()).decode('utf-8')
+        return f'data:image/png:base64,'+encoded_image 
+    
 class LOGIN(Functions):
     def __init__(self):
         super().__init__()
@@ -177,81 +176,6 @@ class LOGIN(Functions):
         self.data_base_function(conn)
         return False
     
-
-class Export(Functions):
-    def __init__(self):
-        super().__init__()
-
-    def student_data(self):
-        conn,cursor = self.data_base_function()
-        ST_LIST = [["ADM. ID","NAME","FATHER","MOTHER","CLASS","DOB","ADDRESS","MOBILE","ADHAAR","PEN"]]
-        cursor.execute('SELECT * FROM STUDENT_DATA;')
-        for row in cursor.fetchall():
-            draft_list = [d for d in row]
-            ST_LIST.append(draft_list)
-        pdf = "STUDENT_DETAILS.pdf"
-        content = ["STUDENT DETAILS;h2"]
-        super().crt_pdf(ST_LIST,pdf,land=True,content=content)
-        self.data_base_function(conn)
-        return 
-
-    def student_pwd(self):
-        conn,cursor = self.data_base_function()
-        PWD_LIST = [["ADM. NO.","PASSWORD"]]
-        cursor.execute('SELECT USER_ID,PASSWORD FROM PASSWORDS WHERE LOG_TYPE = ?;',("STUDENT",))
-        for row in cursor.fetchall():
-            darft_list = []
-            darft_list.append(row[0])
-            darft_list.append(my_cryptography.log_pin_decypt(row[1]))
-            PWD_LIST.append(darft_list)
-        pdf = "STUDENT_PASSWORDS.pdf"
-        content = ["STUDENT PASSWORDS;h2"]
-        super().crt_pdf(PWD_LIST,pdf,content=content)
-        self.data_base_function(conn)
-        return
-    
-    def teacher_data(self):
-        conn,cursor = self.data_base_function()
-        T_LIST = [["ID","NAME","FATHER","MOTHER","DOB","ADDRESS","MOBILE","ADHAAR"]]
-        cursor.execute('SELECT * FROM TEACHER_DATA;')
-        for row in cursor.fetchall():
-            draft_list = [d for d in row]
-            T_LIST.append(draft_list)
-        pdf = "TEACHER_DETAILS.pdf"
-        content = ["TEACHER DETAILS;h2"]
-        super().crt_pdf(T_LIST,pdf,land=True,content=content)
-        self.data_base_function(conn)
-        return 
-
-    def teacher_pwd(self):
-        conn,cursor = self.data_base_function()
-        PWD_LIST = [["ID.","PASSWORD"]]
-        cursor.execute('SELECT USER_ID,PASSWORD FROM PASSWORDS WHERE LOG_TYPE = ?;',("TEACHER",))
-        for row in cursor.fetchall():
-            darft_list = []
-            darft_list.append(row[0])
-            darft_list.append(my_cryptography.log_pin_decypt(row[1]))
-            PWD_LIST.append(darft_list)
-        pdf = "TEACHER_PASSWORDS.pdf"
-        content = ["TEACHER PASSWORDS;h2"]
-        super().crt_pdf(PWD_LIST,pdf,content=content)
-        self.data_base_function(conn)
-        return
-    
-    # def fees_slip_export(self,st_id,fees_amount,rest):
-    #     conn,cursor = self.data_base_function()
-    #     cursor.execute('SELECT Name,Father,Mother,Class FROM STUDENT_DATA WHERE Adm_ID = ?;',(st_id,))
-    #     st_name,st_father,st_mother,st_class = cursor.fetchone()
-    #     pdf = f"FEES_SLIP.pdf"
-    #     cursor.execute("SELECT FEES_ID FROM FEES_DATA ORDER BY FEES_ID DESC;")
-    #     receipt_id = int(cursor.fetchone()[0]) + 1
-    #     d,t = super().get_date_time()
-    #     content = ["FEES SLIP;h2",f"RECEIPT NO :- {receipt_id};h3",f"DATE/TIME :- {d}{t};h3",f"ADMISSION NO.:- {st_id};h3",f"NAME :- {st_name};h3",f"FATHER NAME:- {st_father};h3",f"MOTHER NAME :- {st_mother};h3",f"CLASS :- {st_class};h3"]
-    #     Fees_list = [["ACCECCIRORIES","AMOUNT"],["TUTION FEES","-"],["ELECTRICITY FEES","-"],["MAINTENANCE FEES","-"],["FURNITURE FEES","-"],["OTHER FEES","-"],["TOTAL FEES",fees_amount],["REST FEES:-",rest]]
-    #     super().crt_pdf(Fees_list,pdf,content=content)
-    #     self.data_base_function(conn)
-    #     return
-
 class Data_sync(Functions):
     def __init__(self):
         super().__init__()
@@ -267,7 +191,14 @@ class Data_sync(Functions):
                 cursor.execute('SELECT CLASS FROM STUDENT_DATA WHERE Adm_ID = ?',(int(item),))
                 st_class = cursor.fetchone()[0]
                 if value == 'P':
-                    if int(st_class) < 8:
+                    iclasses = ['NURSERY','LKG','UKG']
+                    if st_class in iclasses:
+                        if st_class == "UKG":
+                            st_class = '1'
+                        else:
+                            st_class = iclasses[iclasses.index(st_class)+1]
+                        cursor.execute('UPDATE STUDENT_DATA SET CLASS = ? WHERE Adm_ID = ?',(st_class,int(item)))
+                    elif int(st_class) < 8:
                         st_class = str(int(st_class)+1)
                         cursor.execute('UPDATE STUDENT_DATA SET CLASS = ? WHERE Adm_ID = ?',(st_class,int(item)))
                     else:
