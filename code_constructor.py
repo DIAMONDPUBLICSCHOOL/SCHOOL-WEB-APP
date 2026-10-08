@@ -578,7 +578,7 @@ th,td{{text-align: left;}}
                 <th><input type="number" name="t{i+1}_4" min="0" max="80"></th></tr>'''
         else:
             for i in range(len(data)):
-                t_1,t_2,t_3,t_4 = list(row)[stage - 1].split(';')[i].split(',')
+                t_1,t_2,t_3,t_4 = list(row)[stage - 3].split(';')[i].split(',')
                 html_text += f'''<tr><th>{data[i]}</th><th><input type="number" value="{t_1}" name="t{i+1}_1" min="0" max="10"></th>
                 <th><input type="number" value="{t_2}" name="t{i+1}_2" min="0" max="5"></th>
                 <th><input type="number" value="{t_3}" name="t{i+1}_3" min="0" max="5"></th>

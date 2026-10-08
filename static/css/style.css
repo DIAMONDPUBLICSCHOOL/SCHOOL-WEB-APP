@@ -1,5 +1,6 @@
 h1{color: red;text-align: center;}
 h2{color: blue;text-align: center;}
+h3{color:rgb(6, 236, 6);text-align: center;}
 fieldset{margin:10px 10px;padding:12px 20px;border:3px solid green;}
 label{color: red;}
 img{float: center;}

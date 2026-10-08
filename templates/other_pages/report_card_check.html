@@ -9,15 +9,21 @@
     <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
 </head>
 <body>
+    <ul id="nav">
+    <li><button type="button"></button></li>
+    <img src="static/images/SYMBOLS.png" alt="SYMBOL">
+    <li>DIAMOND PUBLIC SCHOOL</li>
+    </ul>
     <fieldset>
+        <div style="text-align: center;"><img src="{{url_for('static',filename='images/SYMBOLS.png')}}" alt="SYMBOL" height="100px" width="100px"></div>
         <h1>DIAMOND PUBLIC SCHOOL</h1>
         <h2>REPORT CARD VERIFIER SIMULATOR</h2>
         <h3>THIS PAGE VERIFIES REPORT CARDS</h3>
         <hr><hr>
         <form action="{{url_for('verify_report_card')}}" method="post">
         <b>ENTER ENCRYPTED QR CODE TEXT <label>*</label></b>
-        <input type="text" id="nor_input" name="encrypted_text" placeholder="ENTER ENCRYPTED QR CODE TEXT" {{code|safe}} required>
-        <b><i><u>NOTE:-</u></i> SCAN THE QR CODE PRESENT ON REPORT CARD BY SCANNER, <br>THAN PUT THE WHOLE TEXT INTO THIS INPUT FIELD.</b>
+        <input style="font-weight: bold;" type="text" id="nor_input" name="encrypted_text" placeholder="ENTER ENCRYPTED QR CODE TEXT" {{code|safe}} required>
+        <b><i><u>NOTE:-</u></i> <font style="color: red;">SCAN THE QR CODE PRESENT ON REPORT CARD BY SCANNER, THAN PUT THE WHOLE TEXT INTO THIS INPUT FIELD.</font></b>
         <hr>
         <b>ENTER STUDENT NAME <label>*</label></b>
         <input type="text" name="st_name" id="nor_input" placeholder="ENTER STUDENT NAME" required>
@@ -60,5 +66,6 @@
         </form>
         {{status|safe}}
     </fieldset>
+<ul id="nav"><li>COPYRIGHT&copy; 2026 <code>ALL RIGHTS RESERVED.</code></li></ul>
 </body>
 </html>

@@ -38,6 +38,7 @@
         width: 100%;
         }
     }
+    code{color:black;}
     fieldset{text-align: center;}
 </style>
 </head>
@@ -93,9 +94,10 @@
     <div class="container">
       <form action="{{url_for('command_box')}}" method="post">
       <h2>COMMAND BOX</h2>
-       <b style="color:#000">ENTER UNIVERSAL ADMIN PASSWORD <label>*</label></b>
-       <input type="password" name="pin" placeholder="ENTER UNIVERSAL ADMIN PASSWORD" required>
-      <button type="submit" id="nor_btn">VERIFY [UNIVERSAL ADMIN] PASSWORD</button>
+       <b style="color:#000">ENTER UNIVERSAL ADMIN PASSWORD</b>
+       <input type="password" name="pin" placeholder="ENTER UNIVERSAL ADMIN PASSWORD">
+      <button type="submit" id="nor_btn">LOGIN</button>
+      <code><b><i><u>NOTE:-</u></i> IF YOU ALREADY HAVE LOGGED IN AS UNIVERSAL ADMIN, SIMPLY CLICK ON "<font style="color:blue;">LOGIN</font>" !!!</b></code>
     </div></form>
     <div class="container" style="background-color:#f1f1f1">
       <button type="button" onclick="hide()" class="cancelbtn">Cancel</button>

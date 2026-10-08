@@ -12,6 +12,8 @@ app.secret_key = os.environ.get('SECRET_KEY')
 #    return render_template('error.html')
 
 def log_check():
+    if session["session_token"] == "ADMIN":
+        return True
     if ("user_id" not in session or "role" not in session or "name" not in session or "ip" not in session or "session_token" not in session):
         return False
     if  session["session_token"] != "ADMIN" or session["session_token"] != "ADMISSION":
@@ -40,6 +42,7 @@ def welcome_page():
                 row = cursor.fetchone()
             else:
                 row = ('ADMIN',)
+            his=''
             ip = request.form.get('ip_address')
             session["user_id"] = U_N
             session["role"] = log_type
@@ -50,7 +53,11 @@ def welcome_page():
             cursor.execute("""INSERT INTO ACTIVE_SESSIONS(USER_ID, USER_TYPE, SESSION_TOKEN) VALUES (?, ?, ?) ON CONFLICT(USER_ID, USER_TYPE) DO UPDATE SET SESSION_TOKEN = excluded.SESSION_TOKEN""", (str(U_N), log_type, session_token))
             if session['role'] != 'ADMIN':
                 cursor.execute('SELECT HISTORY FROM LOG_HISTORY WHERE USER_ID = ? AND USER_TYPE = ?',(U_N,log_type))
-                his = cursor.fetchone()[0]
+                data = cursor.fetchone()
+                if data is None:
+                    cursor.execute('INSERT INTO LOG_HISTORY(USER_ID,USER_TYPE,HISTORY) VALUES(?,?,?)',(U_N,log_type,''))
+                else:
+                    his = data[0]
                 d,t = funt.Functions().get_date_time()
                 his += f';{ip.replace(',','').replace(';','')},{str(d).replace(',','').replace(';','')},{str(t).replace(',','').replace(';','')}'
                 cursor.execute('UPDATE LOG_HISTORY SET HISTORY = ? WHERE USER_ID = ? AND USER_TYPE = ?',(his,U_N,log_type))
@@ -68,14 +75,25 @@ def dashboard():
     if log_check():
         conn,cursor = funt.Data().data_base_function()
         if session["role"] == "STUDENT":
+            birthday_code = ''
             cursor.execute('SELECT Name,Father,Mother,Gender,Class,DOB,Address,MOBILE FROM STUDENT_DATA WHERE Adm_ID = ?',(session['user_id'],))
             Name,Father,Mother,gender,Class,DOB,Address,MOBILE = cursor.fetchone()
             if gender.upper() != "MALE" and gender.upper() != "FEMALE":
                 gender_code = '<i class="fa fa-user"></i>'
             else:
                 gender_code = f'<img src="static/images/{gender.lower()}_user.png" alt="{gender.upper()}">'
+            if funt.Functions().get_date_time()[0] == DOB:
+                birthday_code = f'''
+<center><div style="width:80%;color:red;font-size:20px;border:2px solid blue;margin:10px 10px;padding:12px 20px;text-align:center;">
+<img src="static/images/cakeicon.png" alt="Birthday" width="100" height="100"><br>
+<b style="color:blue;">HAPPY BIRTHDAY!!!</b><br>
+DEAR {Name}, <br>
+YOU ARE OUR ONE OF THE SPECIAL CHILDREN. <br>
+MAY YOUR FUTURE WILL BE BRIGHT!!!
+</div></center><hr>
+'''
             funt.Data().data_base_function(conn)
-            return render_template("student/dashboard.html",info=f'''<div id="user_info">{gender_code}<br><br>NAME:- <font>{Name.upper()}</font><br>FATHER NAME:- <font>{Father.upper()}</font><br>MOTHER NAME:- <font>{Mother.upper()}</font><br>CLASS :- <font>{Class}</font><br>ADDRESS :- <font>{Address.upper()}</font><br>D.O.B. :- <font>{DOB.upper()}</font><br>MOBILE NO.:- <font>{MOBILE}</font>''')
+            return render_template("student/dashboard.html",info=f'''<div id="user_info">{gender_code}<br><br>NAME:- <font>{Name.upper()}</font><br>FATHER NAME:- <font>{Father.upper()}</font><br>MOTHER NAME:- <font>{Mother.upper()}</font><br>CLASS :- <font>{Class}</font><br>ADDRESS :- <font>{Address.upper()}</font><br>D.O.B. :- <font>{DOB.upper()}</font><br>MOBILE NO.:- <font>{MOBILE}</font>''',birthday=birthday_code)
         elif session["role"] == "TEACHER":
             cursor.execute('SELECT Name,Father,Mother,Mobile,Gender FROM TEACHER_DATA WHERE ID = ?',(session['user_id'],))
             Name,Father,Mother,Mobile,gender = cursor.fetchone()
@@ -154,10 +172,12 @@ def report_card():
                 if re_type == "st3":
                     cursor.execute(f'UPDATE EXAM_DATA SET TERM_1 = ? WHERE Adm_ID = ?',(data,st_id))
                     funt.Data().data_base_function(conn)
-                    return render_template("teacher/functions/report_card.html",code=cc.Report_card().select_st(c_class),code2=cc.Report_card().teach_st(int(re_type[-1]) -1,st_id,c_class)) 
-                cursor.execute(f'UPDATE EXAM_DATA SET TERM_2 = ? WHERE Adm_ID = ?',(data,st_id))
+                    return render_template("teacher/functions/report_card.html",code=cc.Report_card().select_st(c_class),code2=cc.Report_card().teach_st(int(re_type[2]) +1,st_id,c_class)) 
+                if re_type == "st4":
+                    cursor.execute(f'UPDATE EXAM_DATA SET TERM_2 = ? WHERE Adm_ID = ?',(data,st_id))
+                    funt.Data().data_base_function(conn)
+                    return render_template("teacher/functions/report_card.html")
                 funt.Data().data_base_function(conn)
-                return render_template("teacher/functions/report_card.html")
             return render_template("teacher/functions/report_card.html")
         
         elif session["role"] == "ADMIN":
@@ -440,7 +460,7 @@ def command_box():
     if log_check():
         if 'universal_admin' not in session:
             if request.method == "POST":
-                if str(request.form.get('pin')).strip() == my_cryptography.log_pin_decypt('gAAAAABqVkB7NZlVRW0g-LsW2GP7XACyePFv4GAqN-tN4rZccW-ZNb9bVPjET06Gb8f7o2UjP_VxrretZpszQEbzJjO0IczrR-PKLxlA3r-tMf-uArCdKbg='):
+                if str(request.form.get('pin')).strip() == my_cryptography.log_pin_decypt(my_cryptography.universal_admin_log_pass()):
                     session['universal_admin'] = True
                     return render_template('admin/functions/command_box.html')
                 else:
