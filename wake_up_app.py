@@ -5,7 +5,7 @@ import requests,time,datetime
 print('========== REQUEST SENDING MODULE ==========')
 request_urls={
 "LOGIN PAGE":"https://dpsjalesar.onrender.com",
-"DASHBOARD":"https://dpsjalesar.onrender.com/dashboard",
+"VERIFY REPORT CARD":"https://dpsjalesar.onrender.com/verify_report_card",
 "ADMISSION PAGE":"https://dpsjalesar.onrender.com/DPSADMISSION_FORM",}
 set_time = 10 #every 10 seconds
 fail = 0

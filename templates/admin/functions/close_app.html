@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIAMOND PUBLIC SCHOOL</title>
+    <link rel="icon" type="image/png" href="{{url_for('static',filename='images/SYMBOLS.png')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+    <ul id="nav"><li><a href="{{url_for('dashboard')}}"><button type="button">⬅️</button></a></li></li><img src="static/images/SYMBOLS.png" alt="SYMBOL"><li>DIAMOND PUBLIC SCHOOL</li></ul>
+    <fieldset>
+        <h1>APPLICATION PANEL</h1>
+        <h2>THIS PAGE IS USED TO CLOSE/OPEN THE APPLICATION.</h2>
+        <hr>
+        <form action="{{url_for('close_app')}}" method="post">
+        <b>ENTER SECRET KEY <label>*</label></b>
+        <input type="password" name="secret_key" id="nor_input" placeholder="ENTER SECRET KEY" required>
+        {{code|safe}}
+        <label>{{error|safe}}</label>
+        </form>
+    </fieldset>
+    <ul id="nav"><li>COPYRIGHT&copy; 2026 <code>ALL RIGHTS RESERVED.</code></li></ul>
+</body>
+</html>

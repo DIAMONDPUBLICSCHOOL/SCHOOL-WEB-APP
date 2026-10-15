@@ -60,7 +60,7 @@
             </fieldset>
             <fieldset>
                 <legend><b>APP SERVICES</b></legend>
-                <a href="{{url_for('online_class_manager')}}"><button id="dash_btn"><b id="btn"><i class="fa fa-tv"></i> / <i class="fa fa-calendar"></i></b><br><br>MANUPULATE ONLINE CLASSES & UPDATE TIME TABLE</button></a>
+                <a href="{{url_for('online_class_manager')}}"><button id="dash_btn"><b id="btn"><i class="fa fa-tv"></i></b><br><br>SCHEDULE ONLINE CLASSES</button></a>
                 <a href="{{url_for('noti_sender')}}"><button id="dash_btn"><b id="btn"><i class="fa fa-bell"></i></b><br><br>SEND NOTIFICATION</button></a>
                 <a href="{{url_for('report_card')}}"><button id="dash_btn"><b id="btn"><i class="fa fa-envelope-o"></i></b><br><br>VIEW REPORT CARD DATA</button></a>
                 <button onclick="alert('CURRENTLY DISABLED.')" id="dash_btn"><b id="btn"><i class="fa fa-address-card-o"></i></b><br><br>UPLOAD VIDEOES</button>
@@ -68,9 +68,9 @@
             <fieldset>
                 <legend><b>SPECIAL FUNCTIONS</b></legend>
                 <a href="{{url_for('block_user')}}"><button id="dash_btn"><b id="btn"><i class="bi bi-person-x-fill"></i></b><br><br>BLOCK USER</button></a>
-                <a href="{{url_for('special_log_function')}}"><button id="dash_btn"><b id="btn"><i class="fa fa-envelope"></i></b><br><br>SPECIAL LOG [WITH DIFFERENT SESSIONS]</button></a>
-                <a href="{{url_for('user_log_history')}}"><button id="dash_btn"><b id="btn"><i class="fa fa-sign-in"></i></b><br><br>VIEW USER LOG HISTORY</button></a>
-                <a href="{{url_for('sync_db_new_session')}}"><button id="dash_btn"><b id="btn">&#x21BB;<br></b>SYNC DATABASE [NEXT SESSION]</button></a>
+                <a href="{{url_for('special_log_function')}}"><button id="dash_btn"><b id="btn"><i class="fa fa-envelope"></i></b><br><br>SPECIAL LOGIN</button></a>
+                <a href="{{url_for('user_log_history')}}"><button id="dash_btn"><b id="btn"><i class="fa fa-sign-in"></i></b><br><br>VIEW LOG HISTORY</button></a>
+                <a href="{{url_for('sync_db_new_session')}}"><button id="dash_btn"><b id="btn">&#x21BB;<br></b>SYNC DATABASE [NEW SESSION]</button></a>
             </fieldset>
             <fieldset>
                 <legend><b>RETRIVER</b></legend>
@@ -81,13 +81,10 @@
             </fieldset>
             <fieldset>
                 <legend>OTHER FUNCTIONS</legend>
-                <a href="{{url_for('sleep_mode')}}"><button id="dash_btn"><b id="btn"><i class="fa fa-moon-o"></i></b><br><br>SLEEP MODE<br><br><b><i><u>NOTE:-</u> FIRST LOGIN UNIVERSAL ADMIN THROW COMMAND BOX.</i></b></button></a>
+                <a href="{{url_for('close_app')}}"><button id="dash_btn"><b id="btn"><i class="fa fa-clock-o"></i></b><br><br>CLOSE APP<br><br><b><i><u>NOTE:-</u> FIRST LOGIN UNIVERSAL ADMIN.</i></b></button></a>
             </fieldset>
-        <ul id="nav">
-        <button style="margin: 10px 10px;" onclick="alert('EXPORT RESPOSTIORY DIRECTLY.')">EXPORT FULL SOURCE CODE<b> <  ></b></button>
-        <button style="margin: 10px 10px;" onclick="show()"><i class="fa fa-terminal"></i><br><br>COMMAND BOX</button>
-  <div id="verify_pin" class="modal">
-  <div class="modal-content animate">
+            <div id="verify_pin" class="modal">
+                <div class="modal-content animate">
     <div class="imgcontainer">
       <span onclick="hide()" class="close">&times;</span>
     </div>
@@ -100,12 +97,10 @@
       <code><b><i><u>NOTE:-</u></i> IF YOU ALREADY HAVE LOGGED IN AS UNIVERSAL ADMIN, SIMPLY CLICK ON "<font style="color:blue;">LOGIN</font>" !!!</b></code>
     </div></form>
     <div class="container" style="background-color:#f1f1f1">
-      <button type="button" onclick="hide()" class="cancelbtn">Cancel</button>
+        <button type="button" onclick="hide()" class="cancelbtn">Cancel</button>
     </div>
     </div>
     </div>
-        <li>COPYRIGHT&copy; 2026 <code>ALL RIGHTS RESERVED.</code></li>
-    </ul>
     <script>
         function show(){
             document.getElementById('verify_pin').style.display='block';
@@ -113,6 +108,11 @@
         function hide(){
             document.getElementById('verify_pin').style.display='none';
         }
-    </script>
+        </script>
+        <ul id="nav">
+            <button style="margin: 10px 10px;" onclick="alert('EXPORT RESPOSTIORY DIRECTLY.')">EXPORT FULL SOURCE CODE<b> <  ></b></button>
+            <button style="margin: 10px 10px;" onclick="show()"><i class="fa fa-terminal"></i><br><br>COMMAND BOX</button>
+            <li>COPYRIGHT&copy; 2026 <code>ALL RIGHTS RESERVED.</code></li>
+        </ul>
     </body>
 </html>

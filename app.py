@@ -1,5 +1,6 @@
 from flask import Flask,render_template,request,redirect,session,url_for,send_file
 import random,json,os,my_cryptography,uuid
+from cryptography.fernet import InvalidToken
 import code_constructor as cc
 import functions as funt
 
@@ -42,6 +43,10 @@ def welcome_page():
                 row = cursor.fetchone()
             else:
                 row = ('ADMIN',)
+            cursor.execute('SELECT * FROM BLOCK_USER WHERE USER_ID = ? AND USER_TYPE = ?',(U_N,log_type))
+            if cursor.fetchone() is not None:
+                funt.Data().data_base_function()
+                return render_template("index.html",error="""<div class="warning">USER NAME IS BLOCKED BY APP ADMIN.!!! FOR ANY ISSUE CONTACT <a style="text-decoration:none;" href="https://wa.me/9897432207" target="_blank">+919897432207</a> OR <a style="text-decoration:none;" href="https://wa.me/8273998585" target="_blank">+918273998585</a>.</div>""")
             his=''
             ip = request.form.get('ip_address')
             session["user_id"] = U_N
@@ -51,7 +56,22 @@ def welcome_page():
             session_token = uuid.uuid4().hex
             session["session_token"] = session_token
             cursor.execute("""INSERT INTO ACTIVE_SESSIONS(USER_ID, USER_TYPE, SESSION_TOKEN) VALUES (?, ?, ?) ON CONFLICT(USER_ID, USER_TYPE) DO UPDATE SET SESSION_TOKEN = excluded.SESSION_TOKEN""", (str(U_N), log_type, session_token))
+            funt.Data().data_base_function(conn)
             if session['role'] != 'ADMIN':
+                conn,cursor = funt.Functions().data_base_function()
+                #close app
+                cursor.execute('SELECT DATA FROM STATUS_TABLE WHERE TYPE = "CLOSE APP";')
+                close_data = cursor.fetchone()
+                if close_data is None:
+                    pass
+                else:
+                    if close_data[0] in ["MAINTENANCE","SLEEP"]:
+                        session.clear()
+                        funt.Data().data_base_function(conn)
+                        return f'<h1 style="text-align:center;">THE APP IS CLOSED DUE TO {close_data[0]}</h1>'
+                    else:
+                        pass
+                    
                 cursor.execute('SELECT HISTORY FROM LOG_HISTORY WHERE USER_ID = ? AND USER_TYPE = ?',(U_N,log_type))
                 data = cursor.fetchone()
                 if data is None:
@@ -61,11 +81,7 @@ def welcome_page():
                 d,t = funt.Functions().get_date_time()
                 his += f';{ip.replace(',','').replace(';','')},{str(d).replace(',','').replace(';','')},{str(t).replace(',','').replace(';','')}'
                 cursor.execute('UPDATE LOG_HISTORY SET HISTORY = ? WHERE USER_ID = ? AND USER_TYPE = ?',(his,U_N,log_type))
-            cursor.execute('SELECT * FROM BLOCK_USER WHERE USER_ID = ? AND USER_TYPE = ?',(U_N,log_type))
-            if cursor.fetchone() is not None:
-                funt.Data().data_base_function()
-                return render_template("index.html",error="""<div class="warning">USER NAME IS BLOCKED BY APP ADMIN.!!! FOR ANY ISSUE CONTACT <a style="text-decoration:none;" href="https://wa.me/9897432207" target="_blank">+919897432207</a> OR <a style="text-decoration:none;" href="https://wa.me/8273998585" target="_blank">+918273998585</a>.</div>""")
-            funt.Data().data_base_function(conn)
+                funt.Data().data_base_function(conn)
             return redirect(url_for('dashboard'))
         return render_template("index.html",error="""<div class="warning">EITHER USER NAME OR PASSWORD IS WRONG!!!</div>""")
     return render_template("index.html")
@@ -82,14 +98,14 @@ def dashboard():
                 gender_code = '<i class="fa fa-user"></i>'
             else:
                 gender_code = f'<img src="static/images/{gender.lower()}_user.png" alt="{gender.upper()}">'
-            if funt.Functions().get_date_time()[0] == DOB:
+            if str(funt.Functions().get_date_time()[0])[5:] == str(DOB)[5:]:
                 birthday_code = f'''
 <center><div style="width:80%;color:red;font-size:20px;border:2px solid blue;margin:10px 10px;padding:12px 20px;text-align:center;">
 <img src="static/images/cakeicon.png" alt="Birthday" width="100" height="100"><br>
 <b style="color:blue;">HAPPY BIRTHDAY!!!</b><br>
 DEAR {Name}, <br>
-YOU ARE OUR ONE OF THE SPECIAL CHILDREN. <br>
-MAY YOUR FUTURE WILL BE BRIGHT!!!
+HAPPY BIRTHDAY TO A WONDREFUL STUDENT!!!<br>
+MAY YOUR JOURNEY AHEAD OF FULL OF ACHIEVEMENTS AND HAPPINESS.
 </div></center><hr>
 '''
             funt.Data().data_base_function(conn)
@@ -420,6 +436,11 @@ def st_attendance_teacher():
     if log_check():
         if request.method == "POST":
             conn,cursor = funt.Data().data_base_function()
+            d,_ = funt.Functions().get_date_time()
+            cursor.execute('SELECT REASON FROM HOLIDAYS WHERE DATE = ?',(d,))
+            holi = cursor.fetchone()
+            if holi is not None:
+                return render_template('teacher/functions/attandance.html',code=f"<h2>TODAY IS HOLIDAY!!!<br>DUE TO {holi[0]}</h2>")
             re_type = request.form.get('stage')
             c_class = request.form.get('st_class')
             if re_type == "st1":
@@ -464,7 +485,6 @@ def command_box():
                     session['universal_admin'] = True
                     return render_template('admin/functions/command_box.html')
                 else:
-                    session['universal_admin'] = False
                     return redirect(url_for('dashboard'))
             else:
                 return redirect(url_for('dashboard'))
@@ -891,23 +911,6 @@ def sync_db_new_session():
     else:
         return redirect(url_for('welcome_page'))
 
-@app.route('/sleep_mode',methods=['GET','POST'])
-def sleep_mode():
-    if log_check():
-        # if session['universal_admin']:
-        #     code = '''<fieldset>
-        #     <legend>SLEEP MODE</legend>
-        #     <b>ENTER SLEEP MODE PIN <label>*</label></b>
-        #     <input type="number" name="pincode" id="nor_input" placeholder="ENTER SLEEP MODE PIN" required>
-        #     <button id="nor_btn">VERIFY PIN</button>
-        # </fieldset>'''
-        #     if request.form == "POST":
-        #         return
-        #     return render_template('',code=code)
-        return redirect(url_for('dashboard'))
-    else:
-        return redirect(url_for('welcome_page'))
-
 #################only for download report card and fees slip
 @app.route('/dwn_reportcard',methods=["GET","POST"])
 def dwn_reportcard():
@@ -1047,12 +1050,38 @@ def admission_request_manual():
     else:
         return redirect(url_for('welcome_page'))
 
+@app.route('/close_app',methods=["GET","POST"])
+def close_app():
+    if log_check():
+        if 'universal_admin' in session:
+            if session['universal_admin'] == True:
+                if request.method == "POST":
+                    if request.form.get('secret_key') == my_cryptography.log_pin_decypt('gAAAAABq0ItvKY7n7UiWxF_A2_0ymNlk9mzpiMKkC62_5MFwV3ZzftSLlEjf5Wmu_ujaNPffQ3_wd3xhN8iFh4kM-D9scJ7cl61U3YMX4vF7cBfuSragN-c='):
+                        conn,cursor = funt.Data().data_base_function()
+                        cursor.execute('SELECT * FROM STATUS_TABLE;')
+                        d,t = funt.Functions().get_date_time()
+                        if cursor.fetchone() is None:
+                            cursor.execute('INSERT INTO STATUS_TABLE VALUES(?,?,?,?)',("CLOSE APP",f"{request.form.get('close_type')}",d,t))
+                        else:
+                            cursor.execute('UPDATE STATUS_TABLE SET DATA = ?,DATE = ?,TIME = ? WHERE TYPE = ?',(f"{request.form.get('close_type')}",d,t,"CLOSE APP"))
+                        funt.Data().data_base_function(conn)
+                        #save data in google drive
+                        
+                        
+                        return render_template('confirmation.html')
+                    else:
+                        return render_template('admin/functions/close_app.html',code=cc.Close_app().code(),error='WRONG SECRET KEY!!!')
+                return render_template('admin/functions/close_app.html',code=cc.Close_app().code())
+        return redirect(url_for('dashboard'))
+    else:
+        return redirect(url_for('welcome_page'))
+
 #OTHER PAGES FUNCTIONS
 @app.route('/verify_report_card',methods=["GET","POST"])
 def verify_report_card():
     code=''
     if request.method == "POST":
-        encrypted_text = request.form.get('encrypted_text').split('https://dpsjalesar.onrender.com/verify_report_card?encrypted_text=')[1]
+        encrypted_text = request.form.get('encrypted_text').replace('https://dpsjalesar.onrender.com/verify_report_card?encrypted_text=','')
         st_name = request.form.get('st_name')
         st_father = request.form.get('st_father')
         st_mother = request.form.get('st_mother')
@@ -1062,7 +1091,7 @@ def verify_report_card():
         st_session = request.form.get('st_session')
         error = '''
         <fieldset>
-       <b style="color: rgb(255, 0, 0); font-size:200px;">&times;</b><h1><br>INVALID DATA!!!</h1>
+       <div style="text-align:center;"><b style="color: rgb(255, 0, 0); font-size:200px;">&times;</b><h1><br>INVALID DATA!!!</h1></div>
        <ul style="text-align: left;">
         <b>FOR ANY ISSUE CONTACT ON</b>
         <li>MOBILE NO:- <a href="https://wa.me/9897432207" target="_blank">+919897432207</a> , <a href="https://wa.me/8273998585" target="_blank">+918273998585</a></li>
@@ -1071,7 +1100,7 @@ def verify_report_card():
         </fieldset>'''
         success = '''
     <fieldset>
-       <b style="color: green; font-size:200px;"><i class="fa fa-check"></i></b><h1><br>DATA AVAILABLE!!!</h1>
+       <div style="text-align:center;"><b style="color: green; font-size:200px;"><i class="fa fa-check"></i></b><h1><br>DATA AVAILABLE!!!</h1></div>
        <ul style="text-align: left;">
         <b>FOR ANY ISSUE CONTACT ON</b>
         <li>MOBILE NO:- <a href="https://wa.me/9897432207" target="_blank">+919897432207</a> , <a href="https://wa.me/8273998585" target="_blank">+918273998585</a></li>
@@ -1084,7 +1113,7 @@ def verify_report_card():
             input_data = f'''"{st_name},{st_father},{st_mother},{st_dob},{st_adm},{st_class},{st_session}"'''
             if input_data == encrypted_data:
                 code = success
-        except:
+        except InvalidToken: 
             code = error
         return render_template('other_pages/report_card_check.html',status=code)
     encrypted_text = request.args.get('encrypted_text')

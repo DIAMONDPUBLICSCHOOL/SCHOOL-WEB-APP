@@ -23,7 +23,7 @@
         <form action="{{url_for('verify_report_card')}}" method="post">
         <b>ENTER ENCRYPTED QR CODE TEXT <label>*</label></b>
         <input style="font-weight: bold;" type="text" id="nor_input" name="encrypted_text" placeholder="ENTER ENCRYPTED QR CODE TEXT" {{code|safe}} required>
-        <b><i><u>NOTE:-</u></i> <font style="color: red;">SCAN THE QR CODE PRESENT ON REPORT CARD BY SCANNER, THAN PUT THE WHOLE TEXT INTO THIS INPUT FIELD.</font></b>
+        <b><i><u>NOTE:-</u></i> <font style="color: red;">AUTO ENTERED BY SCANNED QR CODE.</font></b>
         <hr>
         <b>ENTER STUDENT NAME <label>*</label></b>
         <input type="text" name="st_name" id="nor_input" placeholder="ENTER STUDENT NAME" required>
@@ -34,7 +34,7 @@
         <b>ENTER DOB <label>*</label></b>
         <input type="date" name="st_dob" id="nor_input" required>
         <b>ENTER ADMISSION NUMBER <label>*</label></b>
-        <input type="text" name="st_adm" id="nor_input" placeholder="ENTER STUDENT ADMISSION NUMBER" required>
+        <input type="number" min="0" name="st_adm" id="nor_input" placeholder="ENTER STUDENT ADMISSION NUMBER" required>
         <b>CHOOSE CLASS <label>*</label></b>
         <select id="nor_opt" name="st_class" required>
             <option value="">---SELECT---</option>

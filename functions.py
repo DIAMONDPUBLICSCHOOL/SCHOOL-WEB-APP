@@ -105,7 +105,7 @@ class Functions(Data):
         import resend
         try:
             resend.api_key = os.environ.get('API_KEY')
-            r = resend.Emails.send({
+            resend.Emails.send({
             "from": "onboarding@resend.dev",
             "to": receiver_email,
             "subject": subject,
@@ -137,7 +137,6 @@ class Functions(Data):
         #     return False
 
     def crt_pdf_html(self,data):
-        from playwright.sync_api import sync_playwright
         from io import BytesIO
         with sync_playwright() as p:
             browser = p.chromium.launch()
