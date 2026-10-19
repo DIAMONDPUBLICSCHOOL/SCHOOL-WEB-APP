@@ -834,7 +834,7 @@ SLIP NO.:- <b>{slip_id}</b><br>
 
 class Close_app:
     def code(self):
-        yes = '''<b>CHOOSE CLOSE TYPE <label>*</label></b>
+        yes = '''
         <input name="close_type" value="open" hidden>
         <button id="nor_btn" style="background:green;color:white;">OPEN APPLICATION <i class="fa fa-check"></i></button>'''
         no = '''<b>CHOOSE CLOSE TYPE <label>*</label></b>

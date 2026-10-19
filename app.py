@@ -15,7 +15,7 @@ app.secret_key = os.environ.get('SECRET_KEY')
 def log_check():
     if session["session_token"] == "ADMIN":
         return True
-    if ("user_id" not in session or "role" not in session or "name" not in session or "ip" not in session or "session_token" not in session):
+    if ("user_id" not in session or "role" not in session or "real_role" not in session or "name" not in session or "ip" not in session or "session_token" not in session):
         return False
     if  session["session_token"] != "ADMIN" or session["session_token"] != "ADMISSION":
         conn,cursor = funt.Functions().data_base_function()
@@ -51,6 +51,7 @@ def welcome_page():
             ip = request.form.get('ip_address')
             session["user_id"] = U_N
             session["role"] = log_type
+            session["real_role"] = log_type
             session["name"] = row
             session['ip'] = ip
             session_token = uuid.uuid4().hex
@@ -90,6 +91,9 @@ def welcome_page():
 def dashboard():
     if log_check():
         conn,cursor = funt.Data().data_base_function()
+        admin = ""
+        if session['real_role'] == "ADMIN":
+            admin = """<label style="color:red;font-size:30px;font-weight:bold;">ADMIN USER LOGGED..</label>"""
         if session["role"] == "STUDENT":
             birthday_code = ''
             cursor.execute('SELECT Name,Father,Mother,Gender,Class,DOB,Address,MOBILE FROM STUDENT_DATA WHERE Adm_ID = ?',(session['user_id'],))
@@ -104,12 +108,12 @@ def dashboard():
 <img src="static/images/cakeicon.png" alt="Birthday" width="100" height="100"><br>
 <b style="color:blue;">HAPPY BIRTHDAY!!!</b><br>
 DEAR {Name}, <br>
-HAPPY BIRTHDAY TO A WONDREFUL STUDENT!!!<br>
+HAPPY BIRTHDAY TO A WONDERFUL STUDENT!!!<br>
 MAY YOUR JOURNEY AHEAD OF FULL OF ACHIEVEMENTS AND HAPPINESS.
 </div></center><hr>
 '''
             funt.Data().data_base_function(conn)
-            return render_template("student/dashboard.html",info=f'''<div id="user_info">{gender_code}<br><br>NAME:- <font>{Name.upper()}</font><br>FATHER NAME:- <font>{Father.upper()}</font><br>MOTHER NAME:- <font>{Mother.upper()}</font><br>CLASS :- <font>{Class}</font><br>ADDRESS :- <font>{Address.upper()}</font><br>D.O.B. :- <font>{DOB.upper()}</font><br>MOBILE NO.:- <font>{MOBILE}</font>''',birthday=birthday_code)
+            return render_template("student/dashboard.html",admin=admin,info=f'''<div id="user_info">{gender_code}<br><br>NAME:- <font>{Name.upper()}</font><br>FATHER NAME:- <font>{Father.upper()}</font><br>MOTHER NAME:- <font>{Mother.upper()}</font><br>CLASS :- <font>{Class}</font><br>ADDRESS :- <font>{Address.upper()}</font><br>D.O.B. :- <font>{DOB.upper()}</font><br>MOBILE NO.:- <font>{MOBILE}</font>''',birthday=birthday_code)
         elif session["role"] == "TEACHER":
             cursor.execute('SELECT Name,Father,Mother,Mobile,Gender FROM TEACHER_DATA WHERE ID = ?',(session['user_id'],))
             Name,Father,Mother,Mobile,gender = cursor.fetchone()
@@ -118,7 +122,7 @@ MAY YOUR JOURNEY AHEAD OF FULL OF ACHIEVEMENTS AND HAPPINESS.
             else:
                 gender_code = f'<img src="static/images/{gender.lower()}_user.png" alt="{gender.upper()}">'
             funt.Data().data_base_function(conn)
-            return render_template("teacher/dashboard.html",info=f'''<div id="user_info">{gender_code}<br><br>NAME:- <font>{Name.upper()}</font><br>FATHER NAME:-<font>{Father.upper()}</font><br>MOTHER NAME:-<font>{Mother.upper()}</font><br>MOBILE NO.:-<font>{Mobile}</font>''')
+            return render_template("teacher/dashboard.html",admin=admin,info=f'''<div id="user_info">{gender_code}<br><br>NAME:- <font>{Name.upper()}</font><br>FATHER NAME:-<font>{Father.upper()}</font><br>MOTHER NAME:-<font>{Mother.upper()}</font><br>MOBILE NO.:-<font>{Mobile}</font>''')
         elif session["role"] == "ADMIN":
             funt.Data().data_base_function(conn)
             return render_template("admin/dashboard.html")
@@ -127,8 +131,14 @@ MAY YOUR JOURNEY AHEAD OF FULL OF ACHIEVEMENTS AND HAPPINESS.
 
 @app.route('/logout')
 def logout():
-    session.clear()
-    return redirect(url_for('welcome_page'))
+    if (session['real_role'] != session['role']) and session['real_role'] == "ADMIN":
+        session['role'] = session['real_role']
+        session['name'] = 'ADMIN'
+        session["user_id"] = 1
+        return redirect(url_for('dashboard'))
+    else:
+        session.clear()
+        return redirect(url_for('welcome_page'))
 
 @app.route('/confirmation',methods=['GET'])
 def confirmation():
@@ -476,24 +486,26 @@ def online_classes_teacher():
         return redirect(url_for('welcome_page'))
 
 #ADMIN
+@app.route('/universal_admin_login',methods=["GET","POST"])
+def universal_admin_login():
+    if log_check():
+        if request.method == "POST":
+            if str(request.form.get('pin')).strip() == my_cryptography.log_pin_decypt(my_cryptography.universal_admin_log_pass()):
+                session['universal_admin'] = True
+                return redirect(url_for('dashboard'))
+            else:
+                return redirect(url_for('dashboard'))
+    else:
+        return redirect(url_for('welcome_page'))
+
 @app.route('/command_box',methods=["GET","POST"])
 def command_box():
     if log_check():
-        if 'universal_admin' not in session:
-            if request.method == "POST":
-                if str(request.form.get('pin')).strip() == my_cryptography.log_pin_decypt(my_cryptography.universal_admin_log_pass()):
-                    session['universal_admin'] = True
-                    return render_template('admin/functions/command_box.html')
-                else:
-                    return redirect(url_for('dashboard'))
-            else:
-                return redirect(url_for('dashboard'))
-        elif session['universal_admin']:
+        if 'universal_admin' in session:
             if request.method == "POST":
                 output,error = funt.Functions().command_box(str(request.form.get('command')).strip())
                 return render_template('admin/functions/command_box.html',output=output,error=error)
-            else:
-                return render_template('admin/functions/command_box.html')
+            return render_template('admin/functions/command_box.html')
         else:
             return redirect(url_for('dashboard'))
     else:

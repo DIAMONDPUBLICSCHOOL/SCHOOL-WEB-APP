@@ -81,26 +81,32 @@
             </fieldset>
             <fieldset>
                 <legend>OTHER FUNCTIONS</legend>
-                <a href="{{url_for('close_app')}}"><button id="dash_btn"><b id="btn"><i class="fa fa-clock-o"></i></b><br><br>CLOSE APP<br><br><b><i><u>NOTE:-</u> FIRST LOGIN UNIVERSAL ADMIN.</i></b></button></a>
+                <b><i><u>NOTE:-</u> <font style="color: red;">FIRST LOGIN UNIVERSAL ADMIN.</font></i></b><br>
+                <a href="{{url_for('command_box')}}"><button id="dash_btn"><b id="btn"><i class="fa fa-terminal"></i></b><br><br>COMMAND BOX</button></a>
+                <a href="{{url_for('close_app')}}"><button id="dash_btn"><b id="btn"><i class="fa fa-clock-o"></i></b><br><br>CLOSE APP</button></a>
             </fieldset>
+            <ul id="nav">
+                <button style="margin: 10px 10px;" onclick="alert('EXPORT RESPOSTIORY DIRECTLY.')">EXPORT FULL SOURCE CODE<b> <  ></b></button>
+                <button style="margin: 10px 10px;" onclick="show()">UNIVERSAL ADMIN LOGIN <i class="fa fa-sign-in"></i></button>
+                <li>COPYRIGHT&copy; 2026 <code>ALL RIGHTS RESERVED.</code></li>
+            </ul>
             <div id="verify_pin" class="modal">
                 <div class="modal-content animate">
-    <div class="imgcontainer">
-      <span onclick="hide()" class="close">&times;</span>
-    </div>
-    <div class="container">
-      <form action="{{url_for('command_box')}}" method="post">
-      <h2>COMMAND BOX</h2>
-       <b style="color:#000">ENTER UNIVERSAL ADMIN PASSWORD</b>
-       <input type="password" name="pin" placeholder="ENTER UNIVERSAL ADMIN PASSWORD">
-      <button type="submit" id="nor_btn">LOGIN</button>
-      <code><b><i><u>NOTE:-</u></i> IF YOU ALREADY HAVE LOGGED IN AS UNIVERSAL ADMIN, SIMPLY CLICK ON "<font style="color:blue;">LOGIN</font>" !!!</b></code>
-    </div></form>
-    <div class="container" style="background-color:#f1f1f1">
-        <button type="button" onclick="hide()" class="cancelbtn">Cancel</button>
-    </div>
-    </div>
-    </div>
+                    <div class="imgcontainer">
+                        <span onclick="hide()" class="close">&times;</span>
+                    </div>
+                    <div class="container">
+                        <form action="{{url_for('universal_admin_login')}}" method="post">
+                        <h2>UNIVERSAL ADMIN</h2>
+                        <b style="color:#000">ENTER UNIVERSAL ADMIN PASSWORD</b>
+                        <input type="password" name="pin" placeholder="ENTER UNIVERSAL ADMIN PASSWORD">
+                        <button type="submit" id="nor_btn">LOGIN</button>
+                        <div class="container" style="background-color:#f1f1f1">
+                            <button type="button" onclick="hide()" class="cancelbtn">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
     <script>
         function show(){
             document.getElementById('verify_pin').style.display='block';
@@ -109,10 +115,5 @@
             document.getElementById('verify_pin').style.display='none';
         }
         </script>
-        <ul id="nav">
-            <button style="margin: 10px 10px;" onclick="alert('EXPORT RESPOSTIORY DIRECTLY.')">EXPORT FULL SOURCE CODE<b> <  ></b></button>
-            <button style="margin: 10px 10px;" onclick="show()"><i class="fa fa-terminal"></i><br><br>COMMAND BOX</button>
-            <li>COPYRIGHT&copy; 2026 <code>ALL RIGHTS RESERVED.</code></li>
-        </ul>
     </body>
 </html>
