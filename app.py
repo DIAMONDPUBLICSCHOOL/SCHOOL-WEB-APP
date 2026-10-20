@@ -13,10 +13,10 @@ app.secret_key = os.environ.get('SECRET_KEY')
 #    return render_template('error.html')
 
 def log_check():
-    if session["session_token"] == "ADMIN":
-        return True
     if ("user_id" not in session or "role" not in session or "real_role" not in session or "name" not in session or "ip" not in session or "session_token" not in session):
         return False
+    if session["session_token"] == "ADMIN":
+        return True
     if  session["session_token"] != "ADMIN" or session["session_token"] != "ADMISSION":
         conn,cursor = funt.Functions().data_base_function()
         cursor.execute("""SELECT SESSION_TOKEN FROM ACTIVE_SESSIONS WHERE USER_ID = ? AND USER_TYPE = ?""", (str(session["user_id"]), session["role"]))
