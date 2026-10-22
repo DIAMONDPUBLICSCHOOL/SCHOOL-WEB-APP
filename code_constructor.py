@@ -571,12 +571,12 @@ th,td{{text-align: left;}}
         return html_text
 
     def teach_st(self,stage,st_id,c_class):
-        html_text = f'''<input name="c_class" value="{c_class}" hidden><input name="stage" value="st{stage+2}" hidden><input type="number" name="st_del" value="{st_id}" hidden><h1>REPORT CARD</h1><table border="3"><tr><th colspan="5"><code><u><i>NOTE:- </i></u> FOR ABSENT LEAVE BLANK INPUT FIELD.</code></th></tr><tr><th rowspan="2">REPORT CARD</th><th colspan="4">TERM:- {stage}</th></tr>
+        html_text = f'''<input name="c_class" value="{c_class}" hidden><input name="stage" value="st{stage+1}" hidden><input type="number" name="st_del" value="{st_id}" hidden><h1>REPORT CARD</h1><table border="3"><tr><th colspan="5"><code><u><i>NOTE:- </i></u> FOR ABSENT LEAVE BLANK INPUT FIELD.</code></th></tr><tr><th rowspan="2">REPORT CARD</th><th colspan="4">TERM:- {stage-1}</th></tr>
         <tr><th>P.T. [10]</th><th>ACT. [5]</th><th>N.B. [5]</th><th>MAIN [80]</th></tr>'''
         conn,cursor = funt.Data().data_base_function()
         cursor.execute('SELECT Class FROM STUDENT_DATA WHERE Adm_ID = ?',(st_id,))
         c_class = cursor.fetchone()[0]
-        cursor.execute('SELECT TERM_1,TERM_2 FROM EXAM_DATA WHERE Adm_ID = ?',(st_id,))
+        cursor.execute(f'SELECT TERM_{stage-1} FROM EXAM_DATA WHERE Adm_ID = ?',(st_id,))
         row = cursor.fetchone()
         data = super().subject_list(c_class)
         if row is None:
@@ -587,12 +587,12 @@ th,td{{text-align: left;}}
                 <th><input type="number" name="t{i+1}_4" min="0" max="80"></th></tr>'''
         else:
             for i in range(len(data)):
-                t_1,t_2,t_3,t_4 = list(row)[stage - 3].split(';')[i].split(',')
+                t_1,t_2,t_3,t_4 = row[0].split(';')[i].split(',')
                 html_text += f'''<tr><th>{data[i]}</th><th><input type="number" value="{t_1}" name="t{i+1}_1" min="0" max="10"></th>
                 <th><input type="number" value="{t_2}" name="t{i+1}_2" min="0" max="5"></th>
                 <th><input type="number" value="{t_3}" name="t{i+1}_3" min="0" max="5"></th>
                 <th><input type="number" value="{t_4}" name="t{i+1}_4" min="0" max="80"></th></tr>'''
-        if stage < 2:
+        if stage <= 2:
             html_text += '</table><button id="nor_btn">NEXT >>></button>'
         else:
             html_text += '</table><button id="nor_btn">SAVE DATA</button>'

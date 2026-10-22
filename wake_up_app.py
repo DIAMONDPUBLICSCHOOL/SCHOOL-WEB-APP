@@ -29,4 +29,4 @@ if fail >= 3:
 	while True:
 		i+=1
 		print(f'{i}. SYSTEM GOT AN ERROR !!!\n[{d},{t}]')
-		time.sleep(0.1)
+		time.sleep(1)

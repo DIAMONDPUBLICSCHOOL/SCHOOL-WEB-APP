@@ -1,3 +1,7 @@
+############# NO USE IN RENDER
+from dotenv import load_dotenv
+load_dotenv()
+#############################
 from flask import Flask,render_template,request,redirect,session,url_for,send_file
 import random,json,os,my_cryptography,uuid
 from cryptography.fernet import InvalidToken
@@ -12,9 +16,12 @@ app.secret_key = os.environ.get('SECRET_KEY')
 # def handle_all_errors(e):
 #    return render_template('error.html')
 
-def log_check():
+def log_check(permit=None):
     if ("user_id" not in session or "role" not in session or "real_role" not in session or "name" not in session or "ip" not in session or "session_token" not in session):
         return False
+    if permit is not None:
+        if permit != session['role']:
+            return False
     if session["session_token"] == "ADMIN":
         return True
     if  session["session_token"] != "ADMIN" or session["session_token"] != "ADMISSION":
@@ -106,7 +113,7 @@ def dashboard():
                 birthday_code = f'''
 <center><div style="width:80%;color:red;font-size:20px;border:2px solid blue;margin:10px 10px;padding:12px 20px;text-align:center;">
 <img src="static/images/cakeicon.png" alt="Birthday" width="100" height="100"><br>
-<b style="color:blue;">HAPPY BIRTHDAY!!!</b><br>
+<b style="color:blue;">HAPPY BIRTHDAY !!!</b><br>
 DEAR {Name}, <br>
 HAPPY BIRTHDAY TO A WONDERFUL STUDENT!!!<br>
 MAY YOUR JOURNEY AHEAD OF FULL OF ACHIEVEMENTS AND HAPPINESS.
@@ -145,21 +152,21 @@ def confirmation():
     if log_check():
         return redirect(url_for('dashboard'))
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
     
 @app.route('/notifications')
 def noti_view():
     if log_check():
         return render_template('notifications.html',code=cc.Notifications().notifications_creater())
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
 # @app.route('/videos')
 # def videos():
 #     if log_check():
 #         return render_template('videos.html',code=cc.Videos_Sender().videos_creater())
 #     else:
-#         return redirect(url_for('welcome_page'))
+#         return redirect(url_for('logout'))
 
 @app.route("/report_card",methods=["GET","POST"])
 def report_card():
@@ -180,13 +187,14 @@ def report_card():
 
                 if re_type == "st2":
                     funt.Data().data_base_function(conn)
-                    return render_template("teacher/functions/report_card.html",code=cc.Report_card().teach_st(int(re_type[-1]) -1,st_id,c_class))
+                    return render_template("teacher/functions/report_card.html",code=cc.Report_card().teach_st(int(re_type[2]),st_id,c_class))
                 
                 data = ''
                 for i in range(len(cc.content_creator().subject_list(c_class))):
                     var = (f't{i+1}_1',f't{i+1}_2',f't{i+1}_3',f't{i+1}_4')
                     data += f'{request.form.get(var[0])},{request.form.get(var[1])},{request.form.get(var[2])},{request.form.get(var[3])};'
                 data = data[:-1]
+                #to create row
                 cursor.execute('SELECT * FROM EXAM_DATA WHERE Adm_ID = ?',(st_id,))
                 if cursor.fetchone() is None:
                     sub = ''
@@ -195,14 +203,15 @@ def report_card():
                         sub += ',,,;'
                     cursor.execute('INSERT INTO EXAM_DATA VALUES (?,?,?)',(st_id,sub,sub))
                     conn.commit()
+
                 if re_type == "st3":
                     cursor.execute(f'UPDATE EXAM_DATA SET TERM_1 = ? WHERE Adm_ID = ?',(data,st_id))
                     funt.Data().data_base_function(conn)
-                    return render_template("teacher/functions/report_card.html",code=cc.Report_card().select_st(c_class),code2=cc.Report_card().teach_st(int(re_type[2]) +1,st_id,c_class)) 
+                    return render_template("teacher/functions/report_card.html",code=cc.Report_card().teach_st(int(re_type[2]),st_id,c_class)) 
                 if re_type == "st4":
                     cursor.execute(f'UPDATE EXAM_DATA SET TERM_2 = ? WHERE Adm_ID = ?',(data,st_id))
                     funt.Data().data_base_function(conn)
-                    return render_template("teacher/functions/report_card.html")
+                    return render_template("teacher/functions/report_card.html",code=cc.Report_card().select_st(c_class))
                 funt.Data().data_base_function(conn)
             return render_template("teacher/functions/report_card.html")
         
@@ -217,9 +226,9 @@ def report_card():
                     return render_template("admin/functions/report_card.html",code=cc.Report_card().view_report_card(st_id,user_type='ADMIN'))
             return render_template("admin/functions/report_card.html")
         else:
-            return redirect(url_for('welcome_page'))
+            return redirect(url_for('logout'))
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
 @app.route('/change_pwd',methods=["GET","POST"])
 def change_pwd():
@@ -239,7 +248,7 @@ def change_pwd():
                     return render_template('admin/functions/change_pwd.html',error='PASSWORD NOT CHANGED.')
             return render_template('admin/functions/change_pwd.html')
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
 @app.route('/time_table',methods=["GET","POST"])
 def time_table():
@@ -255,7 +264,7 @@ def time_table():
                 return render_template('teacher/functions/time_table.html',code=cc.Online_classes().table_code(request.form.get('st_class')))
             return render_template('teacher/functions/time_table.html')
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
 @app.route('/complains',methods=["GET","POST"])
 def complains():
@@ -274,35 +283,37 @@ def complains():
         <button id="nor_btn">SUBMIT</button></form>''')
         elif session['role'] == 'ADMIN':
             return render_template('complain.html',code=cc.Complains().admin_complain_code())
+        else:
+            return redirect(url_for('logout'))
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
 #STUDENT
 @app.route('/homework')
 def homework_view():
-    if log_check():
+    if log_check('STUDENT'):
         conn,cursor = funt.Data().data_base_function()
         cursor.execute('SELECT CLASS FROM STUDENT_DATA WHERE Adm_ID = ?',(session['user_id'],))
         st_class = cursor.fetchone()[0]
         funt.Data().data_base_function(conn)
         return render_template("student/functions/hw.html",code=cc.Homework().hw_code(st_class))
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
 @app.route('/student_online_classes',methods=['GET',"POST"])
 def student_online_classes():
-    if log_check():
+    if log_check('STUDENT'):
         conn,cursor = funt.Data().data_base_function()
         cursor.execute('SELECT Class FROM STUDENT_DATA WHERE Adm_ID = ?;',(session['user_id'],))
         st_class = cursor.fetchone()[0]
         funt.Data().data_base_function(conn)
         return render_template('student/functions/online_classes.html',code=cc.Online_classes().student_code_online(st_class,funt.Functions().get_day()))
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
 @app.route('/attandance',methods=["GET","POST"])
 def st_attandance():
-    if log_check():
+    if log_check('STUDENT'):
         conn,cursor = funt.Data().data_base_function()
         cursor.execute('SELECT Class FROM STUDENT_DATA WHERE Adm_ID = ?;',(session['user_id'],))
         st_class = cursor.fetchone()[0]
@@ -311,27 +322,27 @@ def st_attandance():
             return render_template('student/functions/attandance.html',subj_opt=cc.Attandance().subject_opt(st_class),attandance_list=cc.Attandance().load_student_attandance(session['user_id'],request.form.get('month'),request.form.get('subject')))
         return render_template('student/functions/attandance.html',subj_opt=cc.Attandance().subject_opt(st_class))
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
 @app.route('/class_tests',methods=["GET","POST"])
 def student_class_test():
-    if log_check():
+    if log_check('STUDENT'):
         st_id = session['user_id']
         return render_template('student/functions/tests.html',code=cc.Tests().test_manual_student(st_id))
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
 @app.route('/testpaper',methods=["GET","POST"])
 def testpaper():
-    if log_check():
+    if log_check('STUDENT'):
         test_id = request.form.get('test_id')
         return render_template('student/functions/testpaper.html',code=cc.Tests().generate_test_code(test_id))
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
 @app.route('/test_submittion',methods=["POST","GET"])
 def test_submittion():
-    if log_check():
+    if log_check('STUDENT'):
         conn,cursor = funt.Data().data_base_function()
         test_id = request.form.get('test_id')
         li = request.form.to_dict(flat=True)
@@ -344,19 +355,19 @@ def test_submittion():
         funt.Data().data_base_function(conn)
         return render_template('confirmation.html')
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
 #TEACHER
 @app.route('/test_generator',methods=["GET"])
 def test_generator():
-    if log_check():
+    if log_check('TEACHER'):
         return render_template('teacher/functions/test_generator.html')
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
 @app.route('/test_generator/test_del',methods=["GET","POST"])
 def test_del():
-    if log_check():
+    if log_check('TEACHER'):
         testdata = request.form.get("TEST_DATA_INPUT")
         conn,cursor = funt.Data().data_base_function()
         cursor.execute('SELECT TEST_ID FROM TEST_DATA;')
@@ -370,11 +381,11 @@ def test_del():
                 break
         return render_template('teacher/functions/test_del.html',code=testdata,test_id=test_id)
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
     
 @app.route("/test_generator/test_del/test_sending_confirmation",methods=["POST","GET"])
 def test_data_storage():
-    if log_check():
+    if log_check('TEACHER'):
         conn,cursor = funt.Data().data_base_function()
         time = f'{str(request.form.get("test_time")).strip()}:00'
         cursor.execute("INSERT INTO TEST_DATA(TEST_ID,DATA,DATE,TIME,SUBJECT,CLASS,TOTAL_MARKS,T_ID) VALUES(?,?,?,?,?,?,?,?)",
@@ -382,11 +393,11 @@ def test_data_storage():
         funt.Data().data_base_function(conn)
         return render_template('confirmation.html')
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
 @app.route('/student_test_data',methods=["GET","POST"])
 def student_test_data():
-    if log_check():
+    if log_check('TEACHER'):
         if request.form.get('stage') == "st1":
             return render_template('teacher/functions/test_data.html',opt_code=cc.Tests().test_ids_teacher(int(session['user_id']),request.form.get('c_class')))
         if request.form.get('stage') == "st2":
@@ -409,12 +420,12 @@ def student_test_data():
             return render_template('confirmation.html')
         return render_template('teacher/functions/test_data.html')
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
 
 @app.route('/homework_sender',methods=["GET","POST"])
 def teacher_hw_sender():
-    if log_check():
+    if log_check('TEACHER'):
         if request.method == 'POST':
             conn,cursor = funt.Data().data_base_function()
             # HW_ID_LIST = []
@@ -439,11 +450,11 @@ def teacher_hw_sender():
             return render_template('confirmation.html')
         return render_template('teacher/functions/hw_sender.html')
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
 @app.route('/student_attandance',methods=["POST","GET"]) 
 def st_attendance_teacher():
-    if log_check():
+    if log_check('TEACHER'):
         if request.method == "POST":
             conn,cursor = funt.Data().data_base_function()
             d,_ = funt.Functions().get_date_time()
@@ -476,19 +487,19 @@ def st_attendance_teacher():
                 return render_template('teacher/functions/attandance.html')
         return render_template('teacher/functions/attandance.html')
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
 @app.route('/online_classes_teacher',methods=["GET","POST"])
 def online_classes_teacher():
-    if log_check():
+    if log_check('TEACHER'):
         return render_template('teacher/functions/online_classes.html',code=cc.Online_classes().table_code(teacher_entity=True))
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
 #ADMIN
 @app.route('/universal_admin_login',methods=["GET","POST"])
 def universal_admin_login():
-    if log_check():
+    if log_check('ADMIN'):
         if request.method == "POST":
             if str(request.form.get('pin')).strip() == my_cryptography.log_pin_decypt(my_cryptography.universal_admin_log_pass()):
                 session['universal_admin'] = True
@@ -496,11 +507,11 @@ def universal_admin_login():
             else:
                 return redirect(url_for('dashboard'))
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
 @app.route('/command_box',methods=["GET","POST"])
 def command_box():
-    if log_check():
+    if log_check('ADMIN'):
         if 'universal_admin' in session:
             if request.method == "POST":
                 output,error = funt.Functions().command_box(str(request.form.get('command')).strip())
@@ -509,11 +520,11 @@ def command_box():
         else:
             return redirect(url_for('dashboard'))
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
 @app.route('/noti_sender',methods=['GET','POST'])
 def noti_sender():
-    if log_check():
+    if log_check('ADMIN'):
         if request.method == "POST":
             d,t = funt.Functions().get_date_time()
             conn,cursor = funt.Functions().data_base_function()
@@ -523,11 +534,11 @@ def noti_sender():
             return render_template('confirmation.html')
         return render_template('admin/functions/notification_sender.html')
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
 # @app.route('/admin_video_sender',methods=["GET","POST"])
 # def admin_video_sender():
-#     if log_check():
+#     if log_check('ADMIN'):
 #         if request.method == "POST":
 #             conn,cursor = funt.Functions().data_base_function()
 #             capt = request.form.get('caption')
@@ -545,11 +556,11 @@ def noti_sender():
 #             return render_template('confirmation.html')
 #         return render_template('admin/functions/videos_sender.html')
 #     else:
-#         return redirect(url_for('welcome_page'))
+#         return redirect(url_for('logout'))
 
 @app.route('/add_student',methods=["GET","POST"])
 def add_student():
-    if log_check():
+    if log_check('ADMIN'):
         if request.method == "POST":
             conn,cursor = funt.Data().data_base_function()
             ST_ID = int(request.form.get('st_adm'))
@@ -596,11 +607,11 @@ def add_student():
             return render_template('confirmation.html')
         return render_template('admin/functions/add_st.html')
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
     
 @app.route('/add_teacher',methods=["GET","POST"])
 def add_teacher():
-    if log_check():
+    if log_check('ADMIN'):
         if request.method == "POST":
             conn,cursor = funt.Data().data_base_function()
             T_ID_ = int(request.form.get('T_ID'))
@@ -635,11 +646,11 @@ def add_teacher():
             return render_template('confirmation.html')
         return render_template('admin/functions/add_t.html')
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
 @app.route("/student_manual",methods=["GET","POST"])
 def student_manual():
-    if log_check():
+    if log_check('ADMIN'):
         if request.method == "POST":
             conn,cursor = funt.Data().data_base_function()
             if request.form.get('action_type') == "EDIT":
@@ -665,11 +676,11 @@ def student_manual():
             funt.Data().data_base_function(conn)
         return render_template('admin/functions/st_del.html',code=cc.Details_Page().students())
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
 @app.route("/teacher_manual",methods=["GET","POST"])
 def teacher_manual():
-    if log_check():
+    if log_check('ADMIN'):
         if request.method == "POST":
             conn,cursor = funt.Data().data_base_function()
             if request.form.get('action_type') == "EDIT":
@@ -693,11 +704,11 @@ def teacher_manual():
             funt.Data().data_base_function(conn)
         return render_template('admin/functions/t_del.html',code=cc.Details_Page().teachers())
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
 @app.route('/online_class_manager',methods=["GET","POST"])
 def online_class_manager():
-    if log_check():
+    if log_check('ADMIN'):
         if request.method == "POST":
             re_type = request.form.get('stage')
             c_class = request.form.get('class')
@@ -723,11 +734,11 @@ def online_class_manager():
                     return render_template('confirmation.html')
         return render_template('admin/functions/online_class_manager.html')
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
 @app.route('/online_class_holidays',methods=["GET","POST"])
 def online_class_holidays():
-    if log_check():
+    if log_check('ADMIN'):
         if request.method == "POST":
             conn,cursor = funt.Data().data_base_function()
             cursor.execute('SELECT REASON FROM HOLIDAYS WHERE DATE = ?',(request.form.get('date'),))
@@ -740,11 +751,11 @@ def online_class_holidays():
             return render_template('confirmation.html')
         return render_template('admin/functions/online_class_holidays.html')
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
 @app.route('/export_data',methods=["GET","POST"])
 def export_data():
-    if log_check():
+    if log_check('ADMIN'):
         if request.method == "POST":
             exp_type = request.form.get('btn_type')
             file_data,filename  = cc.Export().Export_data_bridge(exp_type)
@@ -752,12 +763,12 @@ def export_data():
             return send_file(file,mimetype="application/pdf",as_attachment=True,download_name=filename)
         return render_template('admin/functions/export_data.html')
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
     
 
 @app.route('/fees_slip',methods=["GET","POST"])
 def fees_slip():
-    if log_check():
+    if log_check('ADMIN'):
         if request.method == "POST":
             conn,cursor = funt.Data().data_base_function()
             re_type = request.form.get('stage')
@@ -820,11 +831,11 @@ def fees_slip():
                 code="<script>alert('DATA SAVED SUCCESFULLY!!!');</script>",code2=code2,st_id=st_id,st_name=st_name,st_father=st_father,st_mother=st_mother,st_class=st_class)
         return render_template('admin/functions/fees_slip.html')
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
 @app.route('/block_user',methods=["GET","POST"])
 def block_user():
-    if log_check():
+    if log_check('ADMIN'):
         if request.method == "POST":
             conn,cursor = funt.Data().data_base_function()
             user_type = request.form.get('user_type')
@@ -855,20 +866,20 @@ def block_user():
             return render_template('admin/functions/block_user.html',code="DATA SAVED SUCCESSFULLLY")
         return render_template('admin/functions/block_user.html')
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
 @app.route('/user_log_history',methods=["GET","POST"])
 def user_log_history():
-    if log_check():
+    if log_check('ADMIN'):
         if request.method == "POST":
             return render_template('admin/functions/user_log_history.html',code=cc.Log_History().user_log_history(request.form.get('USER_ID'),request.form.get('USER_TYPE')))
         return render_template('admin/functions/user_log_history.html')
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
 @app.route('/special_log',methods=["GET","POST"])
 def special_log_function():
-    if log_check():
+    if log_check('ADMIN'):
         if request.method == "POST":
             conn,cursor = funt.Data().data_base_function()
             log_type = request.form.get('type').upper()
@@ -903,11 +914,11 @@ def special_log_function():
                     return render_template('admin/functions/special_log.html',code='TEACHER ID IS WRONG.')
         return render_template('admin/functions/special_log.html')
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
 @app.route('/sync_db_new_session',methods=["GET","POST"])
 def sync_db_new_session():
-    if log_check():    
+    if log_check('ADMIN'):    
         if request.method == "POST":
             return render_template('admin/functions/sync_db_new_session.html',code=funt.Data_sync().data_sync(request.form.to_dict(flat=True)))
         d,_ = funt.Functions().get_date_time()
@@ -921,28 +932,54 @@ def sync_db_new_session():
                 return render_template('admin/functions/sync_db_new_session.html',code='<h2>DATABASE SYNC PERIOD IS EXPIRED.</h2>')
         return render_template('admin/functions/sync_db_new_session.html',code=funt.Data_sync().data_sync_status_funt())
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
+
+@app.route('/close_app',methods=["GET","POST"])
+def close_app():
+    if log_check('ADMIN'):
+        if 'universal_admin' in session:
+            if session['universal_admin'] == True:
+                if request.method == "POST":
+                    if request.form.get('secret_key') == my_cryptography.log_pin_decypt('gAAAAABq0ItvKY7n7UiWxF_A2_0ymNlk9mzpiMKkC62_5MFwV3ZzftSLlEjf5Wmu_ujaNPffQ3_wd3xhN8iFh4kM-D9scJ7cl61U3YMX4vF7cBfuSragN-c='):
+                        conn,cursor = funt.Data().data_base_function()
+                        cursor.execute('SELECT * FROM STATUS_TABLE;')
+                        d,t = funt.Functions().get_date_time()
+                        if cursor.fetchone() is None:
+                            cursor.execute('INSERT INTO STATUS_TABLE VALUES(?,?,?,?)',("CLOSE APP",f"{request.form.get('close_type')}",d,t))
+                        else:
+                            cursor.execute('UPDATE STATUS_TABLE SET DATA = ?,DATE = ?,TIME = ? WHERE TYPE = ?',(f"{request.form.get('close_type')}",d,t,"CLOSE APP"))
+                        funt.Data().data_base_function(conn)
+                        #save data in google drive
+                        
+                        
+                        return render_template('confirmation.html')
+                    else:
+                        return render_template('admin/functions/close_app.html',code=cc.Close_app().code(),error='WRONG SECRET KEY!!!')
+                return render_template('admin/functions/close_app.html',code=cc.Close_app().code())
+        return redirect(url_for('dashboard'))
+    else:
+        return redirect(url_for('logout'))
 
 #################only for download report card and fees slip
 @app.route('/dwn_reportcard',methods=["GET","POST"])
 def dwn_reportcard():
-    if log_check() and session['role'] == 'ADMIN':
+    if log_check('ADMIN'):
         report_card_data = cc.Report_card().view_report_card(request.form.get('st_id'),data_only=True)
         file = funt.Functions().crt_pdf_html(report_card_data)
         return send_file(file, as_attachment=True,download_name=f"Report_card_{request.form.get('st_id')}.pdf")
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
 @app.route('/download_fees_slip',methods=["GET","POST"])
 def download_fees_slip():
-    if log_check():
+    if log_check('ADMIN'):
         if request.method == "POST":
             fees_slip_data = cc.Fees_slip().view_fees_slip(request.form.get('st_id'),request.form.get('fees_amount'),request.form.get('slip_no'))###############
             file = funt.Functions().crt_pdf_html(fees_slip_data)
             return send_file(file, as_attachment=True,download_name=f"Fees_slip_{request.form.get('slip_no')}_{request.form.get('st_id')}.pdf")
         return redirect(url_for('dashboard'))
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 #########################################
 
 ############ ADMISSION FORM CODE
@@ -995,9 +1032,9 @@ def payment():
             <code><b><i>NOTE :-</i> PLEASE KEEP THIS SR NUMBER SAVE.</b></code><br>
             REGARDS:-<br>
             DPS CS TEAM<br></p>''')):
-                cursor.execute('DELETE FROM ADMISSION_REQUEST WHERE SR = ?',(sr))
                 funt.Functions().data_base_function(conn)
-                return render_template('other_pages/admission_form/payment.html',msg=f'<font style="color:red">YOUR ENTERED EMAIL [{ST_EMAIL}] IS INVALID!!!</font><button style="background:white;border:none;" onclick="history.back()">⬅️</button>',ST_NAME=ST_NAME,ST_FATHER=ST_FATHER,ST_MOTHER=ST_MOTHER,ST_GENDER=ST_GENDER,ST_CLASS=ST_CLASS,ST_DOB=ST_DOB,ST_ADDRESS=ST_ADDRESS,ST_MOBILE=ST_MOBILE,ST_ADHAAR=ST_ADHAAR,ST_PEN=ST_PEN,ST_EMAIL=ST_EMAIL)
+                return render_template('other_pages/admission_form/payment.html',msg=f'<font style="color:red">YOUR ENTERED EMAIL [{ST_EMAIL}] IS INVALID!!!<button onclick="history.back()">⬅️ </button></font><button style="background:white;border:none;" onclick="history.back()">⬅️</button>',ST_NAME=ST_NAME,ST_FATHER=ST_FATHER,ST_MOTHER=ST_MOTHER,ST_GENDER=ST_GENDER,ST_CLASS=ST_CLASS,ST_DOB=ST_DOB,ST_ADDRESS=ST_ADDRESS,ST_MOBILE=ST_MOBILE,ST_ADHAAR=ST_ADHAAR,ST_PEN=ST_PEN,ST_EMAIL=ST_EMAIL)
+            funt.Functions().data_base_function(conn)
             return redirect(url_for('welcometoadmissionform'))
         else:
             pass
@@ -1006,11 +1043,12 @@ def payment():
     else:
         return redirect(url_for('welcometoadmissionform'))
 
+##ADMIN
 @app.route("/admission_request_manual",methods=["POST","GET"])
 def admission_request_manual():
-    if log_check():
-        conn,cursor = funt.Functions().data_base_function()
+    if log_check('ADMIN'):
         if request.method == "POST":
+            conn,cursor = funt.Functions().data_base_function()
             if request.form.get('action_type') == "ACCEPT":
                 cursor.execute('SELECT * FROM STUDENT_DATA WHERE Adm_ID = ?',(request.form.get('st_adm'),))
                 if cursor.fetchone() is not None:
@@ -1055,38 +1093,12 @@ def admission_request_manual():
                 funt.Functions().data_base_function(conn)
                 return render_template('confirmation.html')
             else:
+                funt.Functions().data_base_function(conn)
                 return render_template('admin/functions/admission_request.html',code="SOMETHING WENT WRONG!!!")
-        cursor.execute('SELECT * FROM ADMISSION_REQUEST WHERE STATUS = "PENDING";')
-        funt.Functions().data_base_function(conn)
         return render_template('admin/functions/admission_request.html',code=cc.Admission_request().admission_request())
     else:
-        return redirect(url_for('welcome_page'))
+        return redirect(url_for('logout'))
 
-@app.route('/close_app',methods=["GET","POST"])
-def close_app():
-    if log_check():
-        if 'universal_admin' in session:
-            if session['universal_admin'] == True:
-                if request.method == "POST":
-                    if request.form.get('secret_key') == my_cryptography.log_pin_decypt('gAAAAABq0ItvKY7n7UiWxF_A2_0ymNlk9mzpiMKkC62_5MFwV3ZzftSLlEjf5Wmu_ujaNPffQ3_wd3xhN8iFh4kM-D9scJ7cl61U3YMX4vF7cBfuSragN-c='):
-                        conn,cursor = funt.Data().data_base_function()
-                        cursor.execute('SELECT * FROM STATUS_TABLE;')
-                        d,t = funt.Functions().get_date_time()
-                        if cursor.fetchone() is None:
-                            cursor.execute('INSERT INTO STATUS_TABLE VALUES(?,?,?,?)',("CLOSE APP",f"{request.form.get('close_type')}",d,t))
-                        else:
-                            cursor.execute('UPDATE STATUS_TABLE SET DATA = ?,DATE = ?,TIME = ? WHERE TYPE = ?',(f"{request.form.get('close_type')}",d,t,"CLOSE APP"))
-                        funt.Data().data_base_function(conn)
-                        #save data in google drive
-                        
-                        
-                        return render_template('confirmation.html')
-                    else:
-                        return render_template('admin/functions/close_app.html',code=cc.Close_app().code(),error='WRONG SECRET KEY!!!')
-                return render_template('admin/functions/close_app.html',code=cc.Close_app().code())
-        return redirect(url_for('dashboard'))
-    else:
-        return redirect(url_for('welcome_page'))
 
 #OTHER PAGES FUNCTIONS
 @app.route('/verify_report_card',methods=["GET","POST"])
