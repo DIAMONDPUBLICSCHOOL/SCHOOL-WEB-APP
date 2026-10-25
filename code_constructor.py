@@ -24,9 +24,9 @@ class Complains(content_creator):
         if len(li) > 1:
             li.reverse()
         for item in li:
-            user,user_type,complain,d,t = item
-            html_text += f'<div id="notifi"><div id="noti_heading">USER ID :- {user}, USER TYPE :- {user_type}, DATE/TIME :- {d},{t}</div><b>COMPLAIN :- </b>{complain}</div>'
-        return html_text + '\n<label><code><b>NOTE - </b>THESE COMPLAINS CONNOT WE DELETED.</code></label>'
+            sr,user,user_type,complain,d,t = item
+            html_text += f'''<div id="notifi"><div id="noti_heading"><b>USER ID :- {user}, USER TYPE :- {user_type},<br>DATE/TIME :- {d},{t}</b><form action="/complains" method="post"><input name="comp_sr" value="{sr}" hidden><button style="float:right;height:26px;width:26px" onclick="alert('COMPLAIN DELETED SUCCESSFULLY!!!')"><i class="fa fa-trash"></i></button></form></div><b>COMPLAIN :- </b>{complain}</div>'''
+        return html_text
     
 class Tests(content_creator):
     #test content
@@ -269,8 +269,8 @@ class Details_Page(content_creator):
     D.O.B.:- {dob}<br>
     MOBILE:- {mobile}<br>
     ADDRESS:- {add}<br></b>
-    <button onclick="run1('{st_id}','{name}','{father}','{mother}','{dob}','{mobile}','{add}')" style="width:auto;">EDIT STUDENT DETAILS</button>
-    <button onclick="run2('{st_id}','{name}','{father}','{mother}','{dob}','{mobile}','{add}')" style="width:auto;">DELETE STUDENT</button>
+    <button name="submit" onclick="run1('{st_id}','{name}','{father}','{mother}','{dob}','{mobile}','{add}')" style="width:auto;">EDIT STUDENT DETAILS</button>
+    <button name="submit" onclick="run2('{st_id}','{name}','{father}','{mother}','{dob}','{mobile}','{add}')" style="width:auto;">DELETE STUDENT</button>
     </div>
 </div>"""
         funt.Data().data_base_function(conn)
@@ -292,8 +292,8 @@ class Details_Page(content_creator):
     D.O.B.:- {dob}<br>
     MOBILE:- {mobile}<br>
     ADDRESS:- {add}<br></b>
-    <button onclick="run1('{id}','{name}','{father}','{mother}','{dob}','{mobile}','{add}')" style="width:auto;">EDIT TEACHER DETAILS</button>
-    <button onclick="run2('{id}','{name}','{father}','{mother}','{dob}','{mobile}','{add}')" style="width:auto;">DELETE TEACHER</button>
+    <button name="submit" onclick="run1('{id}','{name}','{father}','{mother}','{dob}','{mobile}','{add}')" style="width:auto;">EDIT TEACHER DETAILS</button>
+    <button name="submit" onclick="run2('{id}','{name}','{father}','{mother}','{dob}','{mobile}','{add}')" style="width:auto;">DELETE TEACHER</button>
     </div>
 </div>"""
         funt.Data().data_base_function(conn)
@@ -723,8 +723,8 @@ class Admission_request:
         <tr><th>ADHAAR</th><td>{adhaar}</td><tr><th>PEN</th><td>{pen}</td></tr>
         </table>
         <code style="color:red;font-size:20;">TRANSACTION ID:- {trans_id}</code></b><br><br>
-        <button onclick="run(re,{sr})" id="nor_btn" style="background:red;width:40%;">REJECT REQUEST &times;</button>
-        <button onclick="run(acc,{sr})" id="nor_btn" style="background:green;width:40%;">ACCEPT REQUEST <i class="fa fa-check"></i></button>
+        <button onclick="run(re,{sr})" id="nor_btn" style="background:red;width:40%;">REJECT REQUEST&times;</button>
+        <button onclick="run(acc,{sr})" id="nor_btn" style="background:green;width:40%;">ACCEPT REQUEST<i class="fa fa-check"></i></button>
         </div>\n'''
         funt.Data().data_base_function(conn)
         return html_text

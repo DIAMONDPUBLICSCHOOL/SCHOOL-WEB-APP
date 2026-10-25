@@ -15,7 +15,7 @@ class Data:
             conn.close()
             return
         else:
-            conn = sqlite3.connect('data.db')
+            conn = sqlite3.connect('data.db',timeout=30)
             cursor = conn.cursor()
             return conn,cursor
     def class_fees(self,st_class):

@@ -131,8 +131,11 @@ MAY YOUR JOURNEY AHEAD OF FULL OF ACHIEVEMENTS AND HAPPINESS.
             funt.Data().data_base_function(conn)
             return render_template("teacher/dashboard.html",admin=admin,info=f'''<div id="user_info">{gender_code}<br><br>NAME:- <font>{Name.upper()}</font><br>FATHER NAME:-<font>{Father.upper()}</font><br>MOTHER NAME:-<font>{Mother.upper()}</font><br>MOBILE NO.:-<font>{Mobile}</font>''')
         elif session["role"] == "ADMIN":
+            universal_code = ''
             funt.Data().data_base_function(conn)
-            return render_template("admin/dashboard.html")
+            if 'universal_admin' not in session:
+                universal_code = '''<b><i><u>NOTE:-</u> <font style="color: red;">FIRST LOGIN UNIVERSAL ADMIN.</font></i></b><br>'''
+            return render_template("admin/dashboard.html",universal_code=universal_code)
     else:
         return redirect(url_for("welcome_page"))
 
@@ -269,21 +272,27 @@ def time_table():
 @app.route('/complains',methods=["GET","POST"])
 def complains():
     if log_check():
+        conn,cursor = funt.Data().data_base_function()
         if session['role'] == "STUDENT" or session['role'] == "TEACHER":
             if request.method == "POST":
                 d,t = funt.Functions().get_date_time()
-                conn,cursor = funt.Data().data_base_function()
-                cursor.execute('INSERT INTO COMPLAINS VALUES(?,?,?,?,?)',(session['user_id'],session['role'],request.form.get('complain'),d,t))
+                cursor.execute('INSERT INTO COMPLAINS(USER_ID,USER_TYPE,COMPLAIN,DATE,TIME) VALUES(?,?,?,?,?)',(session['user_id'],session['role'],request.form.get('complain'),d,t))
                 funt.Data().data_base_function(conn)
                 return render_template('complain.html',comment='<b><label>COMPLAIN SENDED SUCCESSFULLY.</b></label>',code='''<form action="/complains" method="post">
         <textarea id="nor_input" rows="5" placeholder="ENTER YOUR COMPLAIN........." name="complain" required></textarea>
         <button id="nor_btn">SUBMIT</button></form>''')
+            funt.Data().data_base_function(conn)
             return render_template('complain.html',code='''<form action="/complains" method="post">
         <textarea id="nor_input" rows="5" placeholder="ENTER YOUR COMPLAIN........." name="complain" required></textarea>
         <button id="nor_btn">SUBMIT</button></form>''')
         elif session['role'] == 'ADMIN':
+            if request.method == "POST":
+                sr = request.form.get('comp_sr')
+                cursor.execute('DELETE FROM COMPLAINS WHERE SR = ?',(sr,))
+            funt.Data().data_base_function(conn)
             return render_template('complain.html',code=cc.Complains().admin_complain_code())
         else:
+            funt.Data().data_base_function(conn)
             return redirect(url_for('logout'))
     else:
         return redirect(url_for('logout'))
@@ -671,7 +680,6 @@ def student_manual():
                 cursor.execute('DELETE FROM BLOCK_USER WHERE USER_ID = ? AND USER_TYPE = "STUDENT";',(dest_id,))
                 cursor.execute('DELETE FROM EXAM_DATA WHERE Adm_ID = ?',(dest_id,))
                 cursor.execute('DELETE FROM LOG_HISTORY WHERE USER_TYPE = "STUDENT" AND USER_ID = ?',(dest_id,))
-                cursor.execute('DELETE FROM SINGLE_LOG WHERE USER_TYPE = "STUDENT" AND USER_ID = ?',(dest_id,))
 
             funt.Data().data_base_function(conn)
         return render_template('admin/functions/st_del.html',code=cc.Details_Page().students())
@@ -699,7 +707,6 @@ def teacher_manual():
                 cursor.execute('DELETE FROM TEACHER_DATA WHERE ID = ?',(det_id,))
                 cursor.execute('DELETE FROM PASSWORDS WHERE LOG_TYPE = "TEACHER" AND USER_ID = ?',(det_id,))
                 cursor.execute('DELETE FROM BLOCK_USER WHERE USER_ID = ? AND USER_TYPE = "TEACHER";',(det_id,))
-                cursor.execute('DELETE FROM SINGLE_LOG WHERE USER_TYPE = ? AND USER_ID = ?',('TEACHER',det_id))
 
             funt.Data().data_base_function(conn)
         return render_template('admin/functions/t_del.html',code=cc.Details_Page().teachers())
@@ -863,7 +870,7 @@ def block_user():
                     funt.Data().data_base_function(conn)
                     return render_template('admin/functions/block_user.html',code="USER NOT BLOCK[]")
             funt.Data().data_base_function(conn)
-            return render_template('admin/functions/block_user.html',code="DATA SAVED SUCCESSFULLLY")
+            return render_template('admin/functions/block_user.html',code="DATA SAVED SUCCESSFULLY")
         return render_template('admin/functions/block_user.html')
     else:
         return redirect(url_for('logout'))

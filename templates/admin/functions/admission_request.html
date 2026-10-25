@@ -8,7 +8,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <style>
     input{width: 100%;padding: 12px 20px;margin: 8px 0;display: inline-block;border: 1px solid #ccc;box-sizing: border-box;}
-    button {background-color: #04AA6D;color: white;padding: 14px 20px;margin: 8px 0;border: none;cursor: pointer;width: 100%;}
+    button[name=submit]{background-color: #04AA6D;color: white;padding: 14px 20px;margin: 8px 0;border: none;cursor: pointer;width: 100%;}
     button:hover {opacity: 0.8;}
     .cancelbtn {width: auto;padding: 10px 18px;background-color: #f44336;}
     .imgcontainer {text-align: center;margin: 24px 0 12px 0;position: relative;}
@@ -53,6 +53,7 @@
                 {{code|safe}}
             </fieldset>
         </fieldset>
+        
 <div id="acc" class="modal">
   <div class="modal-content animate">
     <div class="imgcontainer">
@@ -67,7 +68,7 @@
         <input type="number" name="st_adm" id="st_adm" placeholder="ENTER ADM. NO." required>
         <b>CREATE PASSWORD <label>*</label></b>
         <input type="password" name="st_pwd" id="st_pwd" placeholder="CREATE PASSWORD" required>
-        <button>ACCEPT REQUEST</button>
+        <button id="nor_input" name="submit">ACCEPT REQUEST</button>
         </form>
     </div>
     <div class="container" style="background-color:#f1f1f1"></div>
@@ -85,7 +86,7 @@
         <input type="text" name="action_type" value="REJECT" style="display: none;">
         <input type="number" name="sr" id="sr" style="display: none;">
         <b>DO YOU WANT TO REJECT THE REQUEST <font id="sr_show" style="color: red;"></font> ???</b>
-        <button id="nor_btn">REJECT REQUEST</button>
+        <button id="nor_btn" name="submit">REJECT REQUEST</button>
         </form>
     </div>
     <div class="container" style="background-color:#f1f1f1">
