@@ -299,6 +299,35 @@ class Details_Page(content_creator):
         funt.Data().data_base_function(conn)
         return html_text
 
+    def restore_data(self):
+        html_text_st = ''
+        html_text_t = ''
+        html_text_add = ''
+        conn,cursor = funt.Data().data_base_function()
+        cursor.execute('SELECT * FROM RESTORE_DATA WHERE user_type = "STUDENT";')
+        for row in cursor.fetchall():
+            user_id,_,name,father,mother,gender,cls,dob,add,mob,adhaar,pen,d,t = row
+            html_text_st += f'''<div id="notifi"><div id="noti_heading">DATE:- {d}, TIME :- {t}</div>
+ADM ID:- {user_id}<br>STUDENT NAME:-{name}<br>FATHER :- {father}<br>MOTHER :- {mother}<br>GENDER :- {gender}<br>CLASS :- {cls}<br>DATE OF BIRTH:- {dob}<br>ADDRESS :- {add}<br>MOBILE N0.:- {mob}<br>ADHAAR :- {adhaar}<br>PEN NO. :-{pen}<br>
+<form action="/DATA_RESTORER" method="post"><input type="number" name="user_id" value="{user_id}" hidden><input name="user_type" value="STUDENT" hidden><button id="nor_btn">RESTORE STUDENT &#x21BB;</button></form>
+</div>'''
+        cursor.execute('SELECT * FROM RESTORE_DATA WHERE user_type = "TEACHER";')
+        for row in cursor.fetchall():
+            user_id,_,name,father,mother,gender,_,dob,add,mob,adhaar,_,d,t = row
+            html_text_t += f'''<div id="notifi"><div id="noti_heading">DATE:- {d}, TIME :- {t}</div>
+ADM ID:- {user_id}<br>STUDENT NAME:-{name}<br>FATHER :- {father}<br>MOTHER :- {mother}<br>GENDER :- {gender}<br>DATE OF BIRTH:- {dob}<br>ADDRESS :- {add}<br>MOBILE N0.:- {mob}<br>ADHAAR :- {adhaar}<br>
+<form action="/DATA_RESTORER" method="post"><input type="number" name="user_id" value="{user_id}" hidden><input name="user_type" value="TEACHER" hidden><button id="nor_btn">RESTORE TEACHER &#x21BB;</button></form>
+</div>'''
+        cursor.execute('SELECT * FROM ADMISSION_REQUEST WHERE STATUS = "REJECTED";')
+        for row in cursor.fetchall():
+            sr,name,father,mother,gender,cls,dob,add,mob,adhaar,email,pen,trans,d,t,_ = row
+            html_text_add += f'''<div class="notifi"><div class="noti_heading">DATE:- {d}, TIME :- {t},ADMISSION SR.:- {sr}</div>
+NAME:- {name}<br>FATHER:- {father}<br>MOTHER:- {mother}<br>GENDER:- {gender}<br>CLASS:- {cls}<br>DATE OF BIRTH :- {dob}<br>ADDRESS:- {add}<br>MOBILE:- {mob}<br>ADHHAR:- {adhaar}<br>PEN NO.:- {pen}<br><font style="color:red;">EMAIL:- {email}<br>TRANSACTION ID:-{trans}</font><br>
+<form action="/DATA_RESTORER" method="post"><input type="number" name="user_id" value="{sr}" hidden><input name="user_type" value="ADMISSION_REQUEST" hidden><button id="nor_btn">RESTORE TEACHER &#x21BB;</button></form>
+</div>'''
+        funt.Data().data_base_function(conn)
+        return (html_text_st,html_text_t,html_text_add)
+
 class Online_classes(content_creator):
     def __init__(self):
         super().__init__()

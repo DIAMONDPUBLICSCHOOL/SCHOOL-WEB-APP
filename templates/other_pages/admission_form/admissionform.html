@@ -24,11 +24,11 @@
             <legend><b>STUDENT DETAILS</b></legend>
             <form action="{{url_for('payment')}}" method="post">
                 <b>STUDENT NAME <label>*</label></b>
-                <input type="text" id="nor_input" name="ST_NAME" placeholder="ENTER STUDENT NAME" required>
+                <input type="text" value="{{ST_NAME}}" id="nor_input" name="ST_NAME" placeholder="ENTER STUDENT NAME" required>
                 <b>FATHER NAME <label>*</label></b>
-                <input type="text" id="nor_input" name="ST_FATHER" placeholder="ENTER FATHER NAME" required>
+                <input type="text" value="{{ST_FATHER}}" id="nor_input" name="ST_FATHER" placeholder="ENTER FATHER NAME" required>
                 <b>MOTHER NAME <label>*</label></b>
-                <input type="text" id="nor_input" name="ST_MOTHER" placeholder="ENTER MOTHER NAME" required>
+                <input type="text" value="{{ST_MOTHER}}" id="nor_input" name="ST_MOTHER" placeholder="ENTER MOTHER NAME" required>
                 <b>CLASS:- <label>*</label></b>
                 <select id="nor_opt" name="ST_CLASS" required>
                     <option value="">---SELECT---</option>
@@ -45,24 +45,24 @@
                     <option value="8">8</option>
                 </select>
                 <b>D.O.B. <label>*</label></b>
-                <input type="date" id="nor_input" name="ST_DOB" required>
+                <input type="date" id="nor_input" value="{{ST_DOB}}" name="ST_DOB" required>
                 <b>GENDER <label>*</label></b>
-                <select id="nor_input" name="ST_GENDER" required>
+                <select id="nor_input" value="{{ST_GENDER}}" name="ST_GENDER" required>
                     <option value="">---SELECT---</option>
                     <option value="MALE">MALE</option>
                     <option value="FEMALE">FEMALE</option>
                 </select>
                 <b>ADDRESS <label>*</label></b>
-                <input type="text" id="nor_input" name="ST_ADDRESS" placeholder="ENTER ADDRESS" required>
+                <input type="text" value="{{ST_ADDRESS}}" id="nor_input" name="ST_ADDRESS" placeholder="ENTER ADDRESS" required>
                 <b>MOBILE <label>*</label></b>
-                <input type="number" id="nor_input" name="ST_MOBILE" placeholder="ENTER MOBILE" max="9999999999" min="6000000000" required>
+                <input type="number" value="{{ST_MOBILE}}" id="nor_input" name="ST_MOBILE" placeholder="ENTER MOBILE" max="9999999999" min="6000000000" required>
                 <b>ADHAAR NO. <label>*</label></b>
-                <input type="number" id="nor_input" name="ST_ADHAAR" placeholder="ENTER ADHAAR NUMBER" min="100000000000" max="999999999999" required>
+                <input type="number" value="{{ST_ADHAAR}}" id="nor_input" name="ST_ADHAAR" placeholder="ENTER ADHAAR NUMBER" min="100000000000" max="999999999999" required>
                 <b>PEN NO. </b>
-                <input type="number" id="nor_input" name="ST_PEN" placeholder="ENTER PEN NO." min="10000000000" max="99999999999">
+                <input type="number" value="{{ST_PEN}}" id="nor_input" name="ST_PEN" placeholder="ENTER PEN NO." min="10000000000" max="99999999999">
                 <hr>
                 <b>EMAIL [FOR ALL THE ADMISSION RELATED UPDATES] <label>*</label></b>
-                <input type="email" id="nor_input" name="ST_EMAIL" placeholder="ENTER EMAIL" required>
+                <input type="email" value="{{ST_EMAIL}}" id="nor_input" name="ST_EMAIL" placeholder="ENTER EMAIL" required>
                 <input type="checkbox" required> <b>ABOVE DETAILS FILLED BY ME IS CORRECT!!!</b>
                 <button id="nor_btn">SUBMIT</button>
             </form>

@@ -33,19 +33,8 @@
             <hr>
             <form action="{{url_for('payment')}}" method="post">
                 <input type="text" name="stage" value="st1" hidden>
-                <input type="text" name="ST_NAME" value="{{ST_NAME}}" hidden>
-                <input type="text" name="ST_FATHER" value="{{ST_FATHER}}" hidden>
-                <input type="text" name="ST_MOTHER" value="{{ST_MOTHER}}" hidden>
-                <input type="text" name="ST_CLASS" value="{{ST_CLASS}}" hidden>
-                <input type="text" name="ST_GENDER" value="{{ST_GENDER}}" hidden>
-                <input type="date" name="ST_DOB" value="{{ST_DOB}}" hidden>
-                <input type="text" name="ST_ADDRESS" value="{{ST_ADDRESS}}" hidden>
-                <input type="number" name="ST_MOBILE" value="{{ST_MOBILE}}" hidden>
-                <input type="number" name="ST_ADHAAR" value="{{ST_ADHAAR}}" hidden>
-                <input type="number" name="ST_PEN" value="{{ST_PEN}}" hidden>
-                <input type="email" name="ST_EMAIL" value="{{ST_EMAIL}}" hidden><br><br>
                 <b>ENTER PAYMENT TRANSACTION ID <label>*</label></b>
-                <input type="password" name="TRANSACTION_ID" id="nor_input" placeholder="ENTER ADMISSION FEES TRANSACTION ID" required>
+                <input type="password" value="{{TRANS_ID}}" name="TRANSACTION_ID" id="nor_input" placeholder="ENTER ADMISSION FEES TRANSACTION ID" required>
                 <button id="nor_btn"><b>SEND REQUEST </b><i class="fa fa-paper-plane"></i></button>
             </form>
         </fieldset>

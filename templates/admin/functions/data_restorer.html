@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" href="{{url_for('static',filename='images/SYMBOLS.png')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIAMOND PUBLIC SCHOOL</title>
+</head>
+<body><ul id="nav">
+    <li><a href="{{url_for('dashboard')}}"><button type="button">⬅️</button></a></li>
+    <img src="static/images/SYMBOLS.png" alt="SYMBOL">
+    <li>DIAMOND PUBLIC SCHOOL</li>
+  </ul>
+   <fieldset>
+        <h1>RESTORE DATA</h1>
+        <code><i><b><u>NOTE:-</u></b> THIS PAGE IS USED TO RESTORE DELETED DATA [IN RUNNING SESSION].</i></code>
+        <font style="color: red;">{{error|safe}}</font>
+        <fieldset>
+            <legend>STUDENTS</legend>
+            {{code1|safe}}
+        </fieldset>
+        <fieldset>
+            <legend>TEACHERS</legend>
+            {{code2|safe}}
+        </fieldset>
+        <fieldset>
+            <legend>ADMISSION REQUESTS</legend>
+            {{code3|safe}}
+        </fieldset>
+   </fieldset> 
+<ul id="nav"><li>COPYRIGHT&copy; 2026 <code>ALL RIGHTS RESERVED.</code></li></ul>
+</body>
+</html>

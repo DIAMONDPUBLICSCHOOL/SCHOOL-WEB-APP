@@ -10,6 +10,7 @@ import functions as funt
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY')
+temporary_data = {}
 
 # NEVER DISCOMMENT THE BELOW CODE WHEN YOU ARE REPAIRING THIS APP.!!!!!!!!!!!!!!
 # @app.errorhandler(Exception)
@@ -602,6 +603,10 @@ def add_student():
             if ST_PEN in ST_DATA_LI3:
                 return render_template('admin/functions/add_st.html',error="STUDENT PEN IS ALREADY REGISTERED!!!",
                 e1=ST_NAME,e2=ST_FATHER,e3=ST_MOTHER,e4=ST_CLASS,e5=ST_DOB,e6=ST_ADDRESS,e7=ST_MOBILE,e8=ST_ADHAAR,e10=ST_ID,e11=r_pwd,e12=ST_GENDER)
+            cursor.execute('SELECT * FROM RESTORE_DATA WHERE user_type = "STUDENT" AND ID = ?',(ST_ID,))
+            if cursor.fetchone() is not None:
+                return render_template('admin/functions/add_st.html',error="STUDENT ID IS IN RESTORE DATA [THIS IS NOT PERMITTED IN CURRENT SESSION]. (ENTER ANOTHER ADMISSION NO.)!!!",
+                e1=ST_NAME,e2=ST_FATHER,e3=ST_MOTHER,e4=ST_CLASS,e5=ST_DOB,e6=ST_ADDRESS,e7=ST_MOBILE,e8=ST_ADHAAR,e9=ST_PEN,e11=r_pwd,e12=ST_GENDER)
             cursor.execute('INSERT INTO STUDENT_DATA(Adm_ID,Name,Father,Mother,Gender,CLASS,DOB,Address,MOBILE,Adhaar,PEN) VALUES(?,?,?,?,?,?,?,?,?,?,?);',
             (ST_ID,ST_NAME,ST_FATHER,ST_MOTHER,ST_GENDER,ST_CLASS,ST_DOB,ST_ADDRESS,ST_MOBILE,ST_ADHAAR,ST_PEN))
             cursor.execute('INSERT INTO PASSWORDS(LOG_TYPE,USER_ID,PASSWORD) VALUES(?,?,?)',('STUDENT',ST_ID,ST_PWD))
@@ -646,6 +651,10 @@ def add_teacher():
             if T_ADHAAR in T_DATA_LI2:
                 return render_template('admin/functions/add_t.html',error="TEACHER ADHAAR IS ALREADY REGISTERED!!!"
                 ,e1=T_NAME,e2=T_FATHER,e3=T_MOTHER,e4=T_ADDRESS,e5=T_DOB,e7=T_ID_,e8=r_pwd,e9=T_MOBILE,e10=T_GENDER)
+            cursor.execute('SELECT * FROM RESTORE_DATA WHERE User_type = "TEACHER" AND ID = ?',(T_ID_,))
+            if cursor.fetchone() is not None:
+                return render_template('admin/functions/add_t.html',error="TEACHER ID IS IN RESTORE DATA [THIS IS NOT PERMITTED IN CURRENT SESSION]. (ENTER ANOTHER ID)!!!",
+                e1=T_NAME,e2=T_FATHER,e3=T_MOTHER,e4=T_ADDRESS,e5=T_DOB,e6=T_ADHAAR,e8=r_pwd,e9=T_MOBILE,e10=T_GENDER)
             cursor.execute('INSERT INTO TEACHER_DATA(ID,Name,Father,Mother,Gender,DOB,Address,MOBILE,Adhaar) VALUES(?,?,?,?,?,?,?,?,?);',
             (T_ID_,T_NAME,T_FATHER,T_MOTHER,T_GENDER,T_DOB,T_ADDRESS,T_MOBILE,T_ADHAAR))
             cursor.execute('INSERT INTO PASSWORDS(LOG_TYPE,USER_ID,PASSWORD) VALUES(?,?,?);',("TEACHER",T_ID_,T_PWD))
@@ -674,7 +683,10 @@ def student_manual():
                 (st_name,st_father,st_mother,st_dob,st_mob,st_add,st_id))
                 
             elif request.form.get('action_type') == "DELETE":
+                d,t = funt.Functions().get_date_time()
                 dest_id = int(request.form.get('dest_id'))
+                _,Name,Father,Mother,Gender,CLASS,DOB,Address,MOBILE,Adhaar,PEN = cursor.execute('SELECT * FROM STUDENT_DATA WHERE Adm_ID = ?',(dest_id,)).fetchone()
+                cursor.execute('INSERT INTO RESTORE_DATA VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)',(dest_id,"STUDENT",Name,Father,Mother,Gender,CLASS,DOB,Address,MOBILE,Adhaar,PEN,d,t))
                 cursor.execute('DELETE FROM STUDENT_DATA WHERE Adm_ID = ?',(dest_id,))
                 cursor.execute('DELETE FROM PASSWORDS WHERE LOG_TYPE = "STUDENT" AND USER_ID = ?',(dest_id,))
                 cursor.execute('DELETE FROM BLOCK_USER WHERE USER_ID = ? AND USER_TYPE = "STUDENT";',(dest_id,))
@@ -703,13 +715,45 @@ def teacher_manual():
                 (t_name,t_father,t_mother,t_dob,t_mob,t_add,t_id))
 
             elif request.form.get('action_type') == "DELETE":
+                d,t = funt.Functions().get_date_time()
                 det_id = int(request.form.get('det_id'))
+                _,Name,Father,Mother,Gender,DOB,Address,MOBILE,Adhaar = cursor.execute('SELECT * FROM TEACHER_DATA WHERE ID = ?',(det_id,)).fetchone()
+                cursor.execute('INSERT INTO RESTORE_DATA(ID,User_type,Name,Father,Mother,Gender,DOB,Address,MOBILE,Adhaar,DATE,TIME) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)',(det_id,"TEACHER",Name,Father,Mother,Gender,DOB,Address,MOBILE,Adhaar,d,t))
                 cursor.execute('DELETE FROM TEACHER_DATA WHERE ID = ?',(det_id,))
                 cursor.execute('DELETE FROM PASSWORDS WHERE LOG_TYPE = "TEACHER" AND USER_ID = ?',(det_id,))
                 cursor.execute('DELETE FROM BLOCK_USER WHERE USER_ID = ? AND USER_TYPE = "TEACHER";',(det_id,))
 
             funt.Data().data_base_function(conn)
         return render_template('admin/functions/t_del.html',code=cc.Details_Page().teachers())
+    else:
+        return redirect(url_for('logout'))
+
+@app.route('/DATA_RESTORER',methods=["GET","POST"])
+def data_restorer():
+    if log_check('ADMIN'):
+        if request.method == "POST":
+            conn,cursor = funt.Data().data_base_function()
+            user_id = request.form.get('user_id')
+            user_type = request.form.get('user_type')
+            cursor.execute('SELECT * FROM RESTORE_DATA WHERE ID = ? AND User_type = ?',(user_id,user_type))
+            row = cursor.fetchone()
+            if row is None:
+                c1,c2,c3 = cc.Details_Page().restore_data()
+                return render_template('admin/functions/data_restorer.html',error="DATA NOT FOUND!!!",code1=c1,code2=c2,code3=c3)
+            if user_type == "STUDENT":
+                cursor.execute('INSERT INTO STUDENT_DATA(Adm_ID,Name,Father,Mother,Gender,CLASS,DOB,Address,MOBILE,Adhaar,PEN) VALUES(?,?,?,?,?,?,?,?,?,?,?);',
+                (row[0],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11]))
+                cursor.execute('INSERT INTO PASSWORDS(LOG_TYPE,USER_ID,PASSWORD) VALUES(?,?,?)',('STUDENT',row[0],funt.Functions().crt_pwd("123456")))
+            elif user_type == "TEACHER":
+                cursor.execute('INSERT INTO TEACHER_DATA(ID,Name,Father,Mother,Gender,DOB,Address,MOBILE,Adhaar) VALUES(?,?,?,?,?,?,?,?,?);',
+                (row[0],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9]))
+                cursor.execute('INSERT INTO PASSWORDS(LOG_TYPE,USER_ID,PASSWORD) VALUES(?,?,?)',('TEACHER',row[0],funt.Functions().crt_pwd("123456")))
+            elif user_type == "ADMISSION_REQUEST":
+                cursor.execute('UPDATE ADMISSION_REQUEST SET STATUS = "PENDING" WHERE SR = ?',(user_id,))
+            cursor.execute('DELETE FROM RESTORE_DATA WHERE ID = ? AND user_type = ?',(user_id,user_type))
+            funt.Data().data_base_function(conn)
+        c1,c2,c3 = cc.Details_Page().restore_data()
+        return render_template('admin/functions/data_restorer.html',code1=c1,code2=c2,code3=c3)
     else:
         return redirect(url_for('logout'))
 
@@ -1003,50 +1047,56 @@ def admission_form():
 @app.route('/ADMISSION_PAYMENT',methods=["POST","GET"])
 def payment():
     if session['role'] == 'ADMISSION':
-        ST_NAME = request.form.get('ST_NAME')
-        ST_FATHER = request.form.get('ST_FATHER')
-        ST_MOTHER = request.form.get('ST_MOTHER')
-        ST_GENDER = request.form.get('ST_GENDER')
-        ST_CLASS = request.form.get('ST_CLASS')
-        ST_DOB = request.form.get('ST_DOB')
-        ST_ADDRESS = request.form.get('ST_ADDRESS')
-        ST_MOBILE = int(request.form.get('ST_MOBILE'))
-        ST_ADHAAR = int(request.form.get('ST_ADHAAR'))
-        ST_PEN = request.form.get('ST_PEN')
-        ST_EMAIL = request.form.get('ST_EMAIL')
         conn,cursor = funt.Functions().data_base_function()
-        cursor.execute('SELECT * FROM STUDENT_DATA WHERE ADHAAR = ?',(request.form.get('ST_ADHAAR'),))
-        if cursor.fetchone() is not None:
-            funt.Functions().data_base_function(conn)
-            return render_template('other_pages/admission_form/payment.html',msg=f'<font style="color:red">YOUR ENTERED ADHAAR [{ST_ADHAAR}] IS INVALID!!!</font>',ST_NAME=ST_NAME,ST_FATHER=ST_FATHER,ST_MOTHER=ST_MOTHER,ST_GENDER=ST_GENDER,ST_CLASS=ST_CLASS,ST_DOB=ST_DOB,ST_ADDRESS=ST_ADDRESS,ST_MOBILE=ST_MOBILE,ST_ADHAAR=ST_ADHAAR,ST_PEN=ST_PEN,ST_EMAIL=ST_EMAIL)
-        cursor.execute('SELECT * FROM STUDENT_DATA WHERE PEN = ?',(request.form.get('ST_PEN'),))
-        if cursor.fetchone() is not None:
-            funt.Functions().data_base_function(conn)
-            return render_template('other_pages/admission_form/payment.html',msg=f'<font style="color:red">YOUR ENTERED PEN NO. [{ST_PEN}] IS INVALID!!!</font>',ST_NAME=ST_NAME,ST_FATHER=ST_FATHER,ST_MOTHER=ST_MOTHER,ST_GENDER=ST_GENDER,ST_CLASS=ST_CLASS,ST_DOB=ST_DOB,ST_ADDRESS=ST_ADDRESS,ST_MOBILE=ST_MOBILE,ST_ADHAAR=ST_ADHAAR,ST_PEN=ST_PEN,ST_EMAIL=ST_EMAIL)
-        if request.form.get('stage') == "st1":
-            TRANS_ID = request.form.get('TRANSACTION_ID')
-            d,t = funt.Functions().get_date_time()
-            cursor.execute('INSERT INTO ADMISSION_REQUEST(NAME,FATHER,MOTHER,GENDER,CLASS,DOB,ADDRESS,MOBILE,ADHAAR,EMAIL,PEN,TRANSACTION_ID,DATE,TIME,STATUS) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',(ST_NAME,ST_FATHER,ST_MOTHER,ST_GENDER,ST_CLASS,ST_DOB,ST_ADDRESS,ST_MOBILE,ST_ADHAAR,ST_EMAIL,ST_PEN,TRANS_ID,d,t,"PENDING"))
-            #send email to student
-            cursor.execute('SELECT SR FROM ADMISSION_REQUEST WHERE ADHAAR = ? AND TRANSACTION_ID = ?',(ST_ADHAAR,TRANS_ID))
-            sr = cursor.fetchone()[0]
-            if not (funt.Functions().email_sender(ST_EMAIL,'THANK FOR SENDING ADMISSION REQUEST',html_content=f'''
-            <h1 style="color:red;text-align:center;">DIAMOND PUBLIC SCHOOL (D.P.S.)</h1>
-            <h2 style="color:blue;text-align:center;">BADE MIYAN DARGAH ROAD, NEAR EX:- KAILASPATI TALKIES , JALESAR (ETAH)</h2>
-            <h3style="color:green;text-align:center;">YOUR ADMISSION REQUEST HAS BEEN SENDED.<h3> 
-            <h4>YOUR ADMISSION REQUEST SR NUMBER IS <font style="color:red;">{sr}</font>.</h4>
-            <p style="font-size:12;">
-            <code><b><i>NOTE :-</i> PLEASE KEEP THIS SR NUMBER SAVE.</b></code><br>
-            REGARDS:-<br>
-            DPS CS TEAM<br></p>''')):
+        if 'ADMISSION' in temporary_data:
+            cursor.execute('SELECT * FROM STUDENT_DATA WHERE ADHAAR = ?',(temporary_data['ADMISSION']['ST_ADHAAR'],))
+            if cursor.fetchone() is not None:
                 funt.Functions().data_base_function(conn)
-                return render_template('other_pages/admission_form/payment.html',msg=f'<font style="color:red">YOUR ENTERED EMAIL [{ST_EMAIL}] IS INVALID!!!<button onclick="history.back()">⬅️ </button></font><button style="background:white;border:none;" onclick="history.back()">⬅️</button>',ST_NAME=ST_NAME,ST_FATHER=ST_FATHER,ST_MOTHER=ST_MOTHER,ST_GENDER=ST_GENDER,ST_CLASS=ST_CLASS,ST_DOB=ST_DOB,ST_ADDRESS=ST_ADDRESS,ST_MOBILE=ST_MOBILE,ST_ADHAAR=ST_ADHAAR,ST_PEN=ST_PEN,ST_EMAIL=ST_EMAIL)
-            funt.Functions().data_base_function(conn)
-            return redirect(url_for('welcometoadmissionform'))
-        else:
-            pass
+                return render_template('other_pages/admission_form/admissionform.html',msg=f'<font style="color:red">YOUR ENTERED ADHAAR [{temporary_data['ADMISSION']['ST_ADHAAR']}] IS INVALID!!!</font>',ST_NAME=temporary_data['ADMISSION']['ST_NAME'],ST_FATHER=temporary_data['ADMISSION']['ST_FATHER'],ST_MOTHER=temporary_data['ADMISSION']['ST_MOTHER'],ST_GENDER=temporary_data['ADMISSION']['ST_GENDER'],ST_CLASS=temporary_data['ADMISSION']['ST_CLASS'],ST_DOB=temporary_data['ADMISSION']['ST_DOB'],ST_ADDRESS=temporary_data['ADMISSION']['ST_ADDRESS'],ST_MOBILE=temporary_data['ADMISSION']['ST_MOBILE'],ST_PEN=temporary_data['ADMISSION']['ST_PEN'],ST_EMAIL=temporary_data['ADMISSION']['ST_EMAIL'])
+            cursor.execute('SELECT * FROM STUDENT_DATA WHERE PEN = ?',(request.form.get('ST_PEN'),))
+            if cursor.fetchone() is not None:
+                funt.Functions().data_base_function(conn)
+                return render_template('other_pages/admission_form/admissionform.html',msg=f'<font style="color:red">YOUR ENTERED PEN NO. [{temporary_data['ADMISSION']['ST_PEN']}] IS INVALID!!!</font>',ST_NAME=temporary_data['ADMISSION']['ST_NAME'],ST_FATHER=temporary_data['ADMISSION']['ST_FATHER'],ST_MOTHER=temporary_data['ADMISSION']['ST_MOTHER'],ST_GENDER=temporary_data['ADMISSION']['ST_GENDER'],ST_CLASS=temporary_data['ADMISSION']['ST_CLASS'],ST_DOB=temporary_data['ADMISSION']['ST_DOB'],ST_ADDRESS=temporary_data['ADMISSION']['ST_ADDRESS'],ST_MOBILE=temporary_data['ADMISSION']['ST_MOBILE'],ST_ADHAAR=temporary_data['ADMISSION']['ST_ADHAAR'],ST_EMAIL=temporary_data['ADMISSION']['ST_EMAIL'])
+            if request.form.get('stage') == "st1":
+                temporary_data['ADMISSION']['TRANS_ID'] = request.form.get('TRANSACTION_ID')
+                d,t = funt.Functions().get_date_time()
+                cursor.execute('INSERT INTO ADMISSION_REQUEST(NAME,FATHER,MOTHER,GENDER,CLASS,DOB,ADDRESS,MOBILE,ADHAAR,EMAIL,PEN,TRANSACTION_ID,DATE,TIME,STATUS) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',(temporary_data['ADMISSION']['ST_NAME'],temporary_data['ADMISSION']['ST_FATHER'],temporary_data['ADMISSION']['ST_MOTHER'],temporary_data['ADMISSION']['ST_GENDER'],temporary_data['ADMISSION']['ST_CLASS'],temporary_data['ADMISSION']['ST_DOB'],temporary_data['ADMISSION']['ST_ADDRESS'],temporary_data['ADMISSION']['ST_MOBILE'],temporary_data['ADMISSION']['ST_ADHAAR'],temporary_data['ADMISSION']['ST_EMAIL'],temporary_data['ADMISSION']['ST_PEN'],temporary_data['ADMISSION']['TRANS_ID'],d,t,"PENDING"))
+                #send email to student
+                cursor.execute('SELECT SR FROM ADMISSION_REQUEST WHERE ADHAAR = ? AND TRANSACTION_ID = ?',(temporary_data['ADMISSION']['ST_ADHAAR'],temporary_data['ADMISSION']['TRANS_ID']))
+                sr = cursor.fetchone()[0]
+                if not (funt.Functions().email_sender(temporary_data['ADMISSION']['ST_EMAIL'],'THANK FOR SENDING ADMISSION REQUEST',html_content=f'''
+                <h1 style="color:red;text-align:center;">DIAMOND PUBLIC SCHOOL (D.P.S.)</h1>
+                <h2 style="color:blue;text-align:center;">BADE MIYAN DARGAH ROAD, NEAR EX:- KAILASPATI TALKIES , JALESAR (ETAH)</h2>
+                <h3style="color:green;text-align:center;">YOUR ADMISSION REQUEST HAS BEEN SENDED.<h3> 
+                <h4>YOUR ADMISSION REQUEST SR NUMBER IS <font style="color:red;">{sr}</font>.</h4>
+                <p style="font-size:12;">
+                <code><b><i>NOTE :-</i> PLEASE KEEP THIS SR NUMBER SAVE.</b></code><br>
+                REGARDS:-<br>
+                DPS CS TEAM<br></p>''')):
+                    funt.Functions().data_base_function(conn)
+                    return render_template('other_pages/admission_form/admissionform.html',msg=f'<font style="color:red">YOUR ENTERED EMAIL [{temporary_data['ADMISSION']['ST_EMAIL']}] IS INVALID!!!</font>',ST_NAME=temporary_data['ADMISSION']['ST_NAME'],ST_FATHER=temporary_data['ADMISSION']['ST_FATHER'],ST_MOTHER=temporary_data['ADMISSION']['ST_MOTHER'],ST_GENDER=temporary_data['ADMISSION']['ST_GENDER'],ST_CLASS=temporary_data['ADMISSION']['ST_CLASS'],ST_DOB=temporary_data['ADMISSION']['ST_DOB'],ST_ADDRESS=temporary_data['ADMISSION']['ST_ADDRESS'],ST_MOBILE=temporary_data['ADMISSION']['ST_MOBILE'],ST_ADHAAR=temporary_data['ADMISSION']['ST_ADHAAR'],ST_PEN=temporary_data['ADMISSION']['ST_PEN'])
+                temporary_data={}
+                funt.Functions().data_base_function(conn)
+                return redirect(url_for('welcometoadmissionform'))
+            else:
+                pass
+        elif 'ADMISSION' not in temporary_data:
+            temporary_data['ADMISSION'] = {
+            "ST_NAME":request.form.get('ST_NAME').upper(),
+            "ST_FATHER":request.form.get('ST_FATHER').upper(),
+            "ST_MOTHER":request.form.get('ST_MOTHER').upper(),
+            "ST_GENDER":request.form.get('ST_GENDER').upper(),
+            "ST_CLASS":request.form.get('ST_CLASS'),
+            "ST_DOB":request.form.get('ST_DOB'),
+            "ST_ADDRESS":request.form.get('ST_ADDRESS').upper(),
+            "ST_MOBILE":int(request.form.get('ST_MOBILE')),
+            "ST_ADHAAR":int(request.form.get('ST_ADHAAR')),
+            "ST_PEN":request.form.get('ST_PEN'),
+            "ST_EMAIL":request.form.get('ST_EMAIL').lower()}
         funt.Functions().data_base_function(conn)
-        return render_template('other_pages/admission_form/payment.html',ST_NAME=ST_NAME,ST_FATHER=ST_FATHER,ST_MOTHER=ST_MOTHER,ST_GENDER=ST_GENDER,ST_CLASS=ST_CLASS,ST_DOB=ST_DOB,ST_ADDRESS=ST_ADDRESS,ST_MOBILE=ST_MOBILE,ST_ADHAAR=ST_ADHAAR,ST_PEN=ST_PEN,ST_EMAIL=ST_EMAIL)
+        if 'ADMISSION' in temporary_data:
+            return render_template('other_pages/admission_form/payment.html',TRANS_ID=temporary_data['ADMISSION']['TRANS_ID'])
+        return render_template('other_pages/admission_form/payment.html')
     else:
         return redirect(url_for('welcometoadmissionform'))
 
