@@ -228,6 +228,7 @@ class Data_sync(Functions):
             cursor.execute('DELETE FROM TEST_DATA;')
             cursor.execute('DELETE FROM HW_DATA;')
             cursor.execute('DELETE FROM HOLIDAYS;')
+            cursor.execute('DELETE FROM RESTORE_DATA;')
             self.data_base_function(conn)
             data_sync_dic[str(d)[:4]]["STATUS"]["DATA_RESET"]="PASS"
         except:
