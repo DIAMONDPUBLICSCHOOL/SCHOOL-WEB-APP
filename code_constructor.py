@@ -258,7 +258,7 @@ class Details_Page(content_creator):
         html_text = ''
         for row in cursor.fetchall():
             st_id,name,father,mother,dob,mobile,add,cls = row
-            html_text += f"""<div id="notifi">
+            html_text += f"""<div id="notifi" class="student-card" data-search="{st_id} {name}">
     <div id="del_div"><b>
     CLASS:- {cls}<br>
     ADM. NO:- {st_id}<br>
@@ -282,7 +282,7 @@ class Details_Page(content_creator):
         html_text = ''
         for row in cursor.fetchall():
             id,name,father,mother,dob,mobile,add = row
-            html_text += f"""<div id="notifi">
+            html_text += f"""<div id="notifi" class="teacher-card" data-search="{id} {name}">
     <div id="del_div"><b>
     TEACHER'S ID:- {id}<br>
     <hr>

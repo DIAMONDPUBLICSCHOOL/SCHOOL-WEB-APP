@@ -203,8 +203,9 @@ def report_card():
                 if cursor.fetchone() is None:
                     sub = ''
                     cursor.execute('SELECT CLASS FROM STUDENT_DATA WHERE Adm_ID = ?',(st_id,))
-                    for _ in range(len(cc.content_creator().subject_list(cursor.fetchone()[0]))-1):
+                    for _ in range(len(cc.content_creator().subject_list(cursor.fetchone()[0]))):
                         sub += ',,,;'
+                    sub = sub[:-1]
                     cursor.execute('INSERT INTO EXAM_DATA VALUES (?,?,?)',(st_id,sub,sub))
                     conn.commit()
 
@@ -474,10 +475,11 @@ def st_attendance_teacher():
                 return render_template('teacher/functions/attandance.html',code=f"<h2>TODAY IS HOLIDAY!!!<br>DUE TO {holi[0]}</h2>")
             re_type = request.form.get('stage')
             c_class = request.form.get('st_class')
-            if re_type == "st1":
-                funt.Data().data_base_function()
-                return render_template('teacher/functions/attandance.html',code=cc.Attandance().load_sub(c_class))
-            sub =  request.form.get('subject')
+            # if re_type == "st1":
+            #     funt.Data().data_base_function()
+            #     return render_template('teacher/functions/attandance.html',code=cc.Attandance().load_sub(c_class))
+            # sub =  request.form.get('subject')
+            sub = 'ALL'###########
             if re_type == "st2":
                 funt.Data().data_base_function()
                 return render_template('teacher/functions/attandance.html',code2=cc.Attandance().load_attandance_teacher(c_class,sub))

@@ -50,6 +50,10 @@
                 <div><code style="float: left;width: 49.8%;"><b><i><u>NOTE:-</u></i></b> ANY ACTION MADE HERE IS INREVESIVLE. WE CAREFULL!!!</code>
                 <a href="{{url_for('add_student')}}" style="float: right;width: 49.8%;"><button id="nor_btn"><b>+</b> ADD STUDENT</button></a></div>
             </fieldset>
+            <fieldset>
+              <legend>SEARCH STUDENT ID</legend>
+              <input type="text" id="studentSearch" placeholder="ENTER STUDENT's ADM.NO. / NAME" oninput="searchStudent()">
+            </fieldset>
                 {{code|safe}}
         </fieldset>
 <div id="edit_container" class="modal">
@@ -109,6 +113,17 @@
 </div>
 
 <script>
+  function searchStudent(){
+    let filter = document.getElementById('studentSearch').value.toLowerCase().trim();
+    let students = document.querySelectorAll('.student-card');
+    students.forEach(function(student){
+      let searchData = student.dataset.search.toLowerCase();
+      if(searchData.includes(filter)){
+        student.style.display = '';
+    }
+    else{
+        student.style.display = 'none';
+    }})}
     function run1(st_id_,st_name_,st_father_,st_mother_,st_dob_,st_mob_,st_add_){
         document.getElementById('edit_container').style.display='block';
         document.getElementById('st_id').value = st_id_

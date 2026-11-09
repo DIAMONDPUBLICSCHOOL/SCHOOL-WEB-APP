@@ -33,8 +33,11 @@
                 <option value="03">MARCH</option>
             </select>
             <b>CHOOSE SUBJECT <label>*</label></b>
-            {{subj_opt|safe}}
-            <button id="nor_btn">SUBMIT</button>
+            <select id="nor_input" name="subject" required>
+                <option value="ALL" selected>ALL</option>
+            </select>
+            <!-- {{subj_opt|safe}} -->
+            <button id="nor_btn">SEARCH</button>
             </form>
         </fieldset>
         {{attandance_list|safe}}
