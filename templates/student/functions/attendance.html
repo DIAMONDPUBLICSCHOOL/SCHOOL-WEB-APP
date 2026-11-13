@@ -15,8 +15,8 @@
   </ul>
     <fieldset>
         <fieldset>
-            <form action="#" method="post">
-            <h1>ATTANDANCE</h1>
+            <form action="{{url_for('st_attendance')}}" method="post">
+            <h1>ATTENDANCE</h1>
             <b>CHOOSE MONTH <label>*</label></b>
             <select name="month" id="nor_opt" required>
                 <option value="">--- SELECT ---</option>
@@ -40,7 +40,7 @@
             <button id="nor_btn">SEARCH</button>
             </form>
         </fieldset>
-        {{attandance_list|safe}}
+        {{attendance_list|safe}}
     </fieldset>
 <ul id="nav"><li>COPYRIGHT&copy; 2026 <code>ALL RIGHTS RESERVED.</code></li></ul>
 </body>

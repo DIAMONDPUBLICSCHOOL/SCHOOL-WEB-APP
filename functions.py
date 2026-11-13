@@ -222,7 +222,7 @@ class Data_sync(Functions):
         ###data reset
         conn,cursor = self.data_base_function()
         try:
-            cursor.execute('DELETE FROM ATTANDANCE;')
+            cursor.execute('DELETE FROM ATTENDANCE;')
             cursor.execute('DELETE FROM EXAM_DATA;')
             cursor.execute('DELETE FROM STUDENT_TEST_DATA;')
             cursor.execute('DELETE FROM TEST_DATA;')

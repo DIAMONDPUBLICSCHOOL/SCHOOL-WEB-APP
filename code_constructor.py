@@ -584,7 +584,7 @@ th,td{{text-align: left;}}
 <tr><th>WORK EDUCATION</th><td>A</td><th>SINCERITY</th><td>A</td></tr>
 <tr><th>ART EDUCATION</th><td>A</td><th>BEHAVIOUR</th><td>A</td></tr>
 <tr><th>HEALTH AND PHYSICAL EDUCATION</th><td>A</td><th>VALUES</th><td>A</td></tr>
-<tr><th>MORAL SCIENCE</th><td>A</td><th>ATTANDANCE</th><td>A</td></tr>
+<tr><th>MORAL SCIENCE</th><td>A</td><th>ATTENDANCE</th><td>A</td></tr>
 </table>
 <br>
 <b>CONGRATULATIONS!!!</b> YOU ARE PROMOTED TO CLASS :- <b>{ncls}</b>
@@ -650,18 +650,18 @@ class Attandance(content_creator):
         html_text += '</select><button id="nor_btn">LOAD LIST</button>'
         return html_text
     
-    def load_attandance_teacher(self,c_class,subject):
+    def load_attendance_teacher(self,c_class,subject):
         date,_ = funt.Functions().get_date_time()
         conn,cursor = funt.Data().data_base_function()
         cursor.execute('SELECT REASON FROM HOLIDAYS WHERE DATE = ?',(date,))
         rea = cursor.fetchone()
         if rea is not None:
             return f'''<h2>TODAY IS HOLIDAY</h2><h2>REAON:- {rea[0]}</h2>'''
-        html_text = f'<input name="st_class" value="{c_class}" hidden><input name="subject" value="{subject}" hidden><table border="2"><tr><th colspan="3">CLASS :- {c_class}</th><th colspan="3">ATTANDANCE</th></tr><tr><th>ADM. ID.</th><th>NAME</th><th>FATHER NAME</th><th>PRESENT</th><th>ABSENT</th></tr>'
+        html_text = f'<input name="st_class" value="{c_class}" hidden><input name="subject" value="{subject}" hidden><table border="2"><tr><th colspan="3">CLASS :- {c_class}</th><th colspan="3">ATTENDANCE</th></tr><tr><th>ADM. ID.</th><th>NAME</th><th>FATHER NAME</th><th>PRESENT</th><th>ABSENT</th></tr>'
         cursor.execute('SELECT Adm_ID,Name,Father FROM STUDENT_DATA WHERE Class = ?',(c_class,))
         at_data = cursor.fetchall()
         for item in at_data:
-            cursor.execute('SELECT Status FROM ATTANDANCE WHERE Adm_ID = ? AND DATE = ? AND SUBJECT = ?',(item[0],date,subject))
+            cursor.execute('SELECT Status FROM ATTENDANCE WHERE Adm_ID = ? AND DATE = ? AND SUBJECT = ?',(item[0],date,subject))
             stat = cursor.fetchone()
             if stat is not None:
                 if stat[0] == 'P':
@@ -674,7 +674,7 @@ class Attandance(content_creator):
         funt.Data().data_base_function(conn)
         return html_text
     
-    def load_student_attandance(self,st_id,month,sub):
+    def load_student_attendance(self,st_id,month,sub):
         html_text = f'<input name="stage" value="st2" hidden><table border="3"><tr><th>DATE</th><th>PRESENT [P]<br>ABSENT [A]</th></tr>'
         def my_font(status):
             if status == 'P':
@@ -687,7 +687,7 @@ class Attandance(content_creator):
             #     properties = 'background:black;'
             return f'<mark style="{properties}color:white;padding:2px 2px;">{status}</mark>'
         conn,cursor = funt.Data().data_base_function()
-        cursor.execute('SELECT Date,Status FROM ATTANDANCE WHERE Adm_ID = ? AND Subject = ?',(st_id,sub))
+        cursor.execute('SELECT Date,Status FROM ATTENDANCE WHERE Adm_ID = ? AND Subject = ?',(st_id,sub))
         at_data = cursor.fetchall()
         for item in at_data:
             if item[0][5:7] == month:

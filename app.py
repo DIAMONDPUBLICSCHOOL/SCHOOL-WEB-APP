@@ -322,16 +322,16 @@ def student_online_classes():
     else:
         return redirect(url_for('logout'))
 
-@app.route('/attandance',methods=["GET","POST"])
-def st_attandance():
+@app.route('/attendance',methods=["GET","POST"])
+def st_attendance():
     if log_check('STUDENT'):
         conn,cursor = funt.Data().data_base_function()
         cursor.execute('SELECT Class FROM STUDENT_DATA WHERE Adm_ID = ?;',(session['user_id'],))
         st_class = cursor.fetchone()[0]
         funt.Data().data_base_function(conn)
         if request.method == "POST":
-            return render_template('student/functions/attandance.html',subj_opt=cc.Attandance().subject_opt(st_class),attandance_list=cc.Attandance().load_student_attandance(session['user_id'],request.form.get('month'),request.form.get('subject')))
-        return render_template('student/functions/attandance.html',subj_opt=cc.Attandance().subject_opt(st_class))
+            return render_template('student/functions/attendance.html',subj_opt=cc.Attandance().subject_opt(st_class),attendance_list=cc.Attandance().load_student_attendance(session['user_id'],request.form.get('month'),request.form.get('subject')))
+        return render_template('student/functions/attendance.html',subj_opt=cc.Attandance().subject_opt(st_class))
     else:
         return redirect(url_for('logout'))
 
@@ -463,7 +463,7 @@ def teacher_hw_sender():
     else:
         return redirect(url_for('logout'))
 
-@app.route('/student_attandance',methods=["POST","GET"]) 
+@app.route('/student_attendance',methods=["POST","GET"]) 
 def st_attendance_teacher():
     if log_check('TEACHER'):
         if request.method == "POST":
@@ -472,32 +472,32 @@ def st_attendance_teacher():
             cursor.execute('SELECT REASON FROM HOLIDAYS WHERE DATE = ?',(d,))
             holi = cursor.fetchone()
             if holi is not None:
-                return render_template('teacher/functions/attandance.html',code=f"<h2>TODAY IS HOLIDAY!!!<br>DUE TO {holi[0]}</h2>")
+                return render_template('teacher/functions/attendance.html',code=f"<h2>TODAY IS HOLIDAY!!!<br>DUE TO {holi[0]}</h2>")
             re_type = request.form.get('stage')
             c_class = request.form.get('st_class')
             # if re_type == "st1":
             #     funt.Data().data_base_function()
-            #     return render_template('teacher/functions/attandance.html',code=cc.Attandance().load_sub(c_class))
+            #     return render_template('teacher/functions/attendance.html',code=cc.Attandance().load_sub(c_class))
             # sub =  request.form.get('subject')
             sub = 'ALL'###########
             if re_type == "st2":
                 funt.Data().data_base_function()
-                return render_template('teacher/functions/attandance.html',code2=cc.Attandance().load_attandance_teacher(c_class,sub))
+                return render_template('teacher/functions/attendance.html',code2=cc.Attandance().load_attendance_teacher(c_class,sub))
             date,_ = funt.Functions().get_date_time()
             if re_type == "st3":
                 cursor.execute('SELECT Adm_ID FROM STUDENT_DATA WHERE Class = ?',(c_class,))
                 at_data  = cursor.fetchall()
                 date,_ = funt.Functions().get_date_time()
                 for item in at_data:
-                    cursor.execute('SELECT Status FROM ATTANDANCE WHERE Adm_ID = ? AND Date = ? AND Subject = ?',(item[0],date,sub))
+                    cursor.execute('SELECT Status FROM ATTENDANCE WHERE Adm_ID = ? AND Date = ? AND Subject = ?',(item[0],date,sub))
                     stat = cursor.fetchone()
                     if stat is None:
-                        cursor.execute('INSERT INTO ATTANDANCE VALUES(?,?,?,?)',(item[0],date,sub,request.form.get(str(item[0]))))
+                        cursor.execute('INSERT INTO ATTENDANCE VALUES(?,?,?,?)',(item[0],date,sub,request.form.get(str(item[0]))))
                     else:
-                        cursor.execute('UPDATE ATTANDANCE SET Status = ? WHERE Adm_ID = ? AND Date = ? AND Subject = ?',(request.form.get(str(item[0])),item[0],date,sub))
+                        cursor.execute('UPDATE ATTENDANCE SET Status = ? WHERE Adm_ID = ? AND Date = ? AND Subject = ?',(request.form.get(str(item[0])),item[0],date,sub))
                 funt.Data().data_base_function(conn)
-                return render_template('teacher/functions/attandance.html')
-        return render_template('teacher/functions/attandance.html')
+                return render_template('teacher/functions/attendance.html')
+        return render_template('teacher/functions/attendance.html')
     else:
         return redirect(url_for('logout'))
 

@@ -17,8 +17,8 @@
         <fieldset>
             <form action="{{url_for('st_attendance_teacher')}}" method="post">
                 <input name="stage" value="st2" hidden><!--st1-->
-                <h1>STUDENT ATTANDANCE</h1>
-                <b>ATTANDANCE DATE:- <label id="dt"></label></b><br><br>
+                <h1>STUDENT ATTENDANCE</h1>
+                <b>ATTENDANCE DATE:- <label id="dt"></label></b><br><br>
                 <b>CHOOSE CLASS <label>*</label></b>
                 <select id="nor_opt" name="st_class" required>
                     <option value="">---SELECT---</option>
@@ -34,7 +34,8 @@
                     <option value="7">7</option>
                     <option value="8">8</option>
                 </select>
-            <button id="nor_btn">LOAD SUBJECTS</button></form>
+                <button id="nor_btn">SEARCH</button></form>
+            <!-- <button id="nor_btn">LOAD SUBJECTS</button></form> -->
         </fieldset>
         <!-- <fieldset>
             <form action="{{url_for('st_attendance_teacher')}}" method="post">
